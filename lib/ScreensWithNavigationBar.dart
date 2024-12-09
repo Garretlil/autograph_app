@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'DynamicContentProvider.dart';
-import 'package:flutter/material.dart';
-
+import 'CartScreens/Cart1.dart';
+import 'CartScreens/Cart2.dart';
+import 'HomeScreens/DetailsScreenForSection.dart';
+import 'HomeScreens/EventsOnline.dart';
 import 'HomeScreens/EventsOnlineOfflineScreen.dart';
 import 'HomeScreens/HomePage.dart';
+import 'HomeScreens/ListOfVebinars.dart';
+import 'ProfilePage.dart';
 
 
 class ScreensWithNavigationBar extends StatefulWidget {
@@ -16,72 +19,147 @@ class ScreensWithNavigationBar extends StatefulWidget {
 
 class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
   int _selectedIndex = 0;
-  Widget _currentScreen = const HomePage(); // Начальный экран - HomePage
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      switch (index) {
-        case 0:
-          _currentScreen = const HomePage();
-          break;
-        case 1:
-          _currentScreen = const EventsOnlineOffline();
-          break;
-      }
-    });
+  // Ключи для каждого Navigator
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+  ];
+
+  // Обработка нажатия назад
+  Future<bool> _onWillPop() async {
+    final isFirstRouteInCurrentTab =
+    !await _navigatorKeys[_selectedIndex].currentState!.maybePop();
+    if (isFirstRouteInCurrentTab) {
+      return true;
+    }
+    return false;
   }
-  void _navigateToEvents() {
-    setState(() {
-      _currentScreen = const EventsOnlineOffline();
-    });
-  }
-  void _onselectedindex(int index){
-    setState(() {
-      index=_selectedIndex;
-    });
+
+  Widget _buildNavigator(int index) {
+    return Navigator(
+      key: _navigatorKeys[index],
+      initialRoute: '/',
+      onGenerateRoute: (RouteSettings settings) {
+        WidgetBuilder builder;
+        switch (index) {
+          case 0:
+               switch (settings.name) {
+                  case '/':
+                    return MaterialPageRoute(builder: (context) => const HomePage());
+                  case '/EventsOnlineOffline':
+                    return MaterialPageRoute(builder: (context) => const EventsOnlineOffline());
+                  case '/EventsOnline':
+                      return MaterialPageRoute(builder: (context) => const EventsOnline());
+                  case '/DetailsScreenForSection':
+                    final args = settings.arguments as Map<String, dynamic>; // Cast arguments to Map
+                    return MaterialPageRoute(
+                      builder: (context) => DetailsScreenForSection(
+                        section: args['section'], // Access 'section' key
+                       ),
+                    );
+                 case '/ListOfVebinars':
+                   final args = settings.arguments as Map<String, dynamic>; // Cast arguments to Map
+                   return MaterialPageRoute(
+                     builder: (context) => ListOfVebinars(
+                       section: args['section'], // Access 'section' key
+                     ),
+                   );
+                   default:
+                     throw Exception('Unknown route: ${settings.name}');
+                 }
+               break;
+          case 1:
+            builder = (context) {
+              switch (settings.name) {
+                case '/':
+                  return const Cart1();
+                case '/Cart1':
+                  return const Cart1();
+                case '/Cart2':
+                  return const Cart2();
+                default:
+                  throw Exception('Unknown route: ${settings.name}');
+              }
+            };
+            break;
+          case 2:
+            builder = (context) {
+              switch (settings.name) {
+                case '/':
+                  return const ProfilePage();
+                case '/editProfile':
+                  return const ProfilePage();
+                default:
+                  throw Exception('Unknown route: ${settings.name}');
+              }
+            };
+            break;
+          default:
+            throw Exception('Unknown tab index: $index');
+        }
+        return MaterialPageRoute(builder: builder, settings: settings);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _currentScreen,
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        body: IndexedStack(
+          index: _selectedIndex,
+          children: List.generate(
+            _navigatorKeys.length,
+                (index) => _buildNavigator(index),
           ),
         ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(20)),
-          child: BottomNavigationBar(
-            elevation: 0,
-            backgroundColor: Colors.black.withOpacity(0),
-            currentIndex: _selectedIndex,
-            selectedItemColor: Colors.deepOrange,
-            unselectedItemColor: Colors.white70,
-            iconSize: 33,
-            onTap: (index) {
-              _onItemTapped(index);
-            },
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(Icons.account_balance_rounded),
-                label: 'Home',
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            image: const DecorationImage(
+              image: AssetImage('assets/imageBottom.png'),
+              fit: BoxFit.cover,
+            ),
+            borderRadius: BorderRadius.circular(0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(25)),
+              child: BottomNavigationBar(
+                elevation: 0,
+                backgroundColor: Colors.black.withOpacity(0.5),
+                currentIndex: _selectedIndex,
+                selectedItemColor: Colors.deepOrange,
+                unselectedItemColor: Colors.white70,
+                iconSize: 33,
+                onTap: (index) {
+                  setState(() {
+                    _selectedIndex = index;
+                  });
+                },
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.account_balance_rounded),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.shopping_cart),
+                    label: 'Cart',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person),
+                    label: 'Profile',
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart),
-                label: 'Cart',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
-              ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+
 }

@@ -1,17 +1,16 @@
-import 'package:autograph_app/BottomAppBarProvider.dart';
 import 'package:flutter/material.dart';
 
-import 'EventsOnlineOfflineScreen.dart';
-import '../ScreensWithNavigationBar.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+
+
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePage();
+  State<ProfilePage> createState() => _ProfilePage();
 }
 
-class _HomePage extends State<HomePage> {
+class _ProfilePage extends State<ProfilePage> {
 
   @override
   void initState() {
@@ -96,7 +95,6 @@ class _HomePage extends State<HomePage> {
                   SizedBox(height: 12.0 * MediaQuery.of(context).devicePixelRatio),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/EventsOnlineOffline');
                     },
                     child: Text(
                       'EVENTS',

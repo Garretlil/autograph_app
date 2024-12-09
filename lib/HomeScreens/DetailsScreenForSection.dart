@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../BottomAppBarProvider.dart';
-import '../Theme/Colors.dart';
 
-class EventsOnlineOffline extends StatefulWidget {
-  const EventsOnlineOffline({super.key});
+
+class DetailsScreenForSection extends StatefulWidget {
+  final String section;
+
+  const DetailsScreenForSection({super.key,required this.section});
 
   @override
-  State<EventsOnlineOffline> createState() => _EventsOnlineOfflineState();
+  State<DetailsScreenForSection> createState() => _DetailsScreenForSection();
 }
 
-class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
+class _DetailsScreenForSection extends State<DetailsScreenForSection> {
   @override
   void initState() {
     super.initState();
@@ -39,17 +40,14 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 15.0 * MediaQuery.of(context).devicePixelRatio), // Отступ сверху только для кнопки
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context); // Возврат на предыдущий экран
-                      },
-                      child: Icon(
-                        Icons.arrow_back_ios_new,
-                        size: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                        color: Colors.white,
-                      ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context); // Возврат на предыдущий экран
+                    },
+                    child: Icon(
+                      Icons.arrow_back_ios_new,
+                      size: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                      color: Colors.white,
                     ),
                   ),
                   Column(
@@ -72,43 +70,56 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                           color: Colors.white,
                         ),
                       ),
+                      Text(
+                        widget.section,
+                        style: TextStyle(
+                          fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontWeight: FontWeight.normal,
+                          fontFamily: 'Inria Serif',
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(width: 24), // Пустое место справа для баланса
                 ],
               ),
               SizedBox(height: 60.0 * MediaQuery.of(context).devicePixelRatio),
-              Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/EventsOnline');
-                      },
-                      child: Text(
-                        'ONLINE',
-                        style: TextStyle(
-                          fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontFamily: 'Inria Serif',
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                        height: 70.0 * MediaQuery.of(context).devicePixelRatio),
-                    Text(
-                      'OFFLINE',
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/ListOfVebinars',
+                        arguments: {
+                          'section': widget.section,
+                        },
+                      );
+                    },
+                    child: Text(
+                      'TOPICS',
                       style: TextStyle(
-                        fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                        fontWeight: FontWeight.normal,
+                        fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontWeight: FontWeight.w100,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  SizedBox(
+                      height: 30.0 * MediaQuery.of(context).devicePixelRatio),
+                  Text(
+                    'TRAILER',
+                    style: TextStyle(
+                      fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontWeight: FontWeight.w200,
+                      color: Colors.white,
+                      fontFamily: 'Inria Serif',
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -116,5 +127,4 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
       ),
     );
   }
-
 }
