@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-import '../BottomAppBarProvider.dart';
-import '../HomeScreens/HomePage.dart';
 import '../ScreensWithNavigationBar.dart';
 
 class Registration extends StatelessWidget {

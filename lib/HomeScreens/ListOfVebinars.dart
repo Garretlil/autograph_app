@@ -19,7 +19,6 @@ class _ListOfVebinars extends State<ListOfVebinars> {
   void initState() {
     super.initState();
   }
-  LocalCart cart=LocalCart();
 
   final List<Map<String, dynamic>> vebinarChooseList = [
     {'word': 'Hacked programms for FREE', 'isOn': false,'cost':2},
@@ -129,10 +128,10 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                             setState(() {
                               item['isOn'] = value;
                               if (value==true){
-                                cart.addToCart(item);
+                                LocalCart.instance.addWebinarToCourse(widget.section,item);
                               }
                               else{
-                                cart.deleteFromCart(item);
+                                LocalCart.instance.removeWebinarFromCourse(widget.section,item);
                               }
                             });
                           },
@@ -147,34 +146,34 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: Text(
-                    'TOTAL:    ${cart.summaOfCart}\$ ',
+                    'TOTAL:    ${LocalCart.instance.getGoalCoursePrice(widget.section)}\$ ',
                     style: const TextStyle(fontSize: 22, color: Colors.white,fontFamily: 'Inria Serif',),
                   ),
                 ),
                 SizedBox(width: 42.0 * MediaQuery.of(context).devicePixelRatio),
-                ElevatedButton(
-                  onPressed: () {
-
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey.withOpacity(0.6),
-                    //backgroundColor: Colors.grey,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                    minimumSize: Size.zero,
-                    maximumSize: const Size(double.infinity, 30),
-                  ),
-                  child: const Text(
-                    'ADD TO CART',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                // ElevatedButton(
+                //   onPressed: () {
+                //        //LocalCart.instance.registVebinarsInCart(widget.section);
+                //   },
+                //   style: ElevatedButton.styleFrom(
+                //     backgroundColor: Colors.grey.withOpacity(0.6),
+                //     //backgroundColor: Colors.grey,
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(20),
+                //     ),
+                //     padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                //     minimumSize: Size.zero,
+                //     maximumSize: const Size(double.infinity, 30),
+                //   ),
+                //   child: const Text(
+                //     'ADD TO CART',
+                //     style: TextStyle(
+                //       fontSize: 20,
+                //       color: Colors.white,
+                //     ),
+                //     textAlign: TextAlign.center,
+                //   ),
+                // ),
               ],
             )
           ],

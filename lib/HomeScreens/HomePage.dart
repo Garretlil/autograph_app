@@ -1,8 +1,4 @@
-import 'package:autograph_app/BottomAppBarProvider.dart';
 import 'package:flutter/material.dart';
-
-import 'EventsOnlineOfflineScreen.dart';
-import '../ScreensWithNavigationBar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'CartScreens/Cart1.dart';
-import 'CartScreens/Cart2.dart';
+import 'CartScreens/CartChooseScreen.dart';
+import 'CartScreens/CartEventsScreen.dart';
 import 'HomeScreens/DetailsScreenForSection.dart';
 import 'HomeScreens/EventsOnline.dart';
 import 'HomeScreens/EventsOnlineOfflineScreen.dart';
 import 'HomeScreens/HomePage.dart';
 import 'HomeScreens/ListOfVebinars.dart';
-import 'ProfilePage.dart';
-
+import 'ProfileScreens/ProfilePage.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});
@@ -20,7 +19,6 @@ class ScreensWithNavigationBar extends StatefulWidget {
 class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
   int _selectedIndex = 0;
 
-  // Ключи для каждого Navigator
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -74,11 +72,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
             builder = (context) {
               switch (settings.name) {
                 case '/':
-                  return const Cart1();
-                case '/Cart1':
-                  return const Cart1();
+                  return const CartChooseScreen();
+                case '/CartEvents':
+                  return const CartEvents();
                 case '/Cart2':
-                  return const Cart2();
+                  return const CartEvents();
                 default:
                   throw Exception('Unknown route: ${settings.name}');
               }
