@@ -36,13 +36,13 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Верхняя панель с кнопкой назад
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context); // Возврат на предыдущий экран
+                      Navigator.pop(context);
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new,
@@ -81,7 +81,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24), // Пустое место справа для баланса
+                  const SizedBox(width: 24),
                 ],
               ),
               SizedBox(height: 60.0 * MediaQuery.of(context).devicePixelRatio),

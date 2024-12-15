@@ -1,79 +1,75 @@
-/// Обеспечивает добавление, удаление из корзины и подсчет конечной суммы
-class LocalCart {
+import '../Courses.dart';
 
+class LocalCart {
    LocalCart._privateConstructor();
 
    static final LocalCart instance = LocalCart._privateConstructor();
 
-   final List<Map<String, dynamic>> _cart = [];
+   final Map<String, List<Map<String, dynamic>>> _selectedWebinarsByCourse = {};
 
-   List<Map<String, dynamic>> getCart() => _cart;
-
-   int getGoalCoursePrice(String courseName){
-      if (_cart.isEmpty){
-         return 0;
-      }
-      else{
-         final course = _cart.firstWhere((item) => item['courseName'] == courseName);
-         return course['totalPrice'];
-      }
-
+   Map<String, List<Map<String, dynamic>>> getCart() {
+      return Map.unmodifiable(_selectedWebinarsByCourse);
    }
 
+   /// Получение выбранных вебинаров для указанного курса
+   List<Map<String, dynamic>> getSelectedWebinars(String courseName) {
+      return List.unmodifiable(_selectedWebinarsByCourse[courseName] ?? []);
+   }
+
+   /// Получение итоговой цены для указанного курса
+   int getCourseTotalPrice(String courseName) {
+      final webinars = _selectedWebinarsByCourse[courseName] ?? [];
+      return webinars.fold(0, (sum, webinar) => sum + (webinar['cost'] as int));
+   }
+
+   /// Получение общей суммы всех курсов
    int getTotalPrice() {
-      return _cart.fold(0, (sum, course) => sum + course['totalPrice'] as int);
+      return _selectedWebinarsByCourse.keys.fold(0, (total, courseName) {
+         return total + getCourseTotalPrice(courseName);
+      });
    }
 
+   /// Добавление вебинара к курсу
    void addWebinarToCourse(String courseName, Map<String, dynamic> webinar) {
-      final course = _cart.firstWhere(
-             (item) => item['courseName'] == courseName,
-         orElse: () => {},
-      );
+      _selectedWebinarsByCourse.putIfAbsent(courseName, () => []);
 
-      if (course.isEmpty) {
-         _cart.add({
-            'courseName': courseName,
-            'webinars': [webinar],
-            'totalPrice': webinar['cost'] as int,
-         });
-      } else {
-         final webinars = course['webinars'] as List<Map<String, dynamic>>;
+      final webinars = _selectedWebinarsByCourse[courseName]!;
+
+      if (!webinars.any((item) => item['word'] == webinar['word'])) {
          webinars.add(webinar);
-
-         course['totalPrice'] += webinar['cost'] as int;
       }
    }
 
+   /// Удаление вебинара из курса
    void removeWebinarFromCourse(String courseName, Map<String, dynamic> webinar) {
-      final courseIndex = _cart.indexWhere((item) => item['courseName'] == courseName);
-
-      if (courseIndex != -1) {
-         final course = _cart[courseIndex];
-         final webinars = course['webinars'] as List<Map<String, dynamic>>;
-
-         if (webinars.contains(webinar)) {
-            webinars.remove(webinar);
+      final webinars = _selectedWebinarsByCourse[courseName];
+      if (webinars != null) {
+         webinars.removeWhere((item) => item['word'] == webinar['word']);
+         var webinarToUpdate = CourseWebinars.instance.webinarsByCourse[courseName]?.firstWhere(
+                (item) => item['word'] == webinar['word'],
+         );
+         if (webinarToUpdate != null) {
+            webinarToUpdate['isOn'] = false; // Устанавливаем 'isOn' в false
          }
-
-         course['totalPrice'] = webinars.fold(0, (sum, item) => sum + (item['cost'] as int));
 
          if (webinars.isEmpty) {
-            _cart.removeAt(courseIndex);
+            _selectedWebinarsByCourse.remove(courseName);
          }
       }
    }
-
+   /// Очистка корзины
    void clearCart() {
-      _cart.clear();
+      _selectedWebinarsByCourse.clear();
    }
 
-   // Получение списка вебинаров для курса
-   List<Map<String, dynamic>> getWebinarsForCourse(String courseName) {
-      final course = _cart.firstWhere(
-             (item) => item['courseName'] == courseName,
-         orElse: () => {},
-      );
+   /// Проверка наличия вебинаров для курса
+   bool courseHasWebinars(String courseName) {
+      return _selectedWebinarsByCourse.containsKey(courseName) &&
+          _selectedWebinarsByCourse[courseName]!.isNotEmpty;
+   }
 
-      return course.isNotEmpty ? course['webinars'] as List<Map<String, dynamic>> : [];
+   /// Получение всех выбранных курсов
+   List<String> getSelectedCourses() {
+      return _selectedWebinarsByCourse.keys.toList();
    }
 }

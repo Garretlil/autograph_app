@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import '../Courses.dart';
 import '../HomeScreens/LocalCart.dart';
-
 
 class CartEvents extends StatefulWidget {
   const CartEvents({super.key});
@@ -17,12 +17,12 @@ class _CartEvents extends State<CartEvents> {
 
   @override
   Widget build(BuildContext context) {
-    final cartItems = LocalCart.instance.getCart();
+    //final cartItems = LocalCart.instance.getCart();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/image.png'), // Задаем фон
+            image: AssetImage('assets/image.png'),
             fit: BoxFit.cover,
           ),
         ),
@@ -36,13 +36,12 @@ class _CartEvents extends State<CartEvents> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Верхняя панель
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context); // Возврат на предыдущий экран
+                      Navigator.pop(context);
                     },
                     child: const Icon(
                       Icons.arrow_back_ios_new,
@@ -72,33 +71,31 @@ class _CartEvents extends State<CartEvents> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24), // Для баланса
+                  const SizedBox(width: 24),
                 ],
               ),
               const SizedBox(height: 30.0),
-              // Секция EVENTS
               Expanded(
-                child: cartItems.isEmpty ?
-                     Center(
-                      child: Text(
-                        'Your cart is empty :(',
-                        style: TextStyle(color: Colors.white,
-                            fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
-                             fontFamily: 'Inria Serif'
-                        ),
-                      ),
-                    )
-                :ListView.builder(
-                  itemCount: cartItems.length,
+                child: LocalCart.instance.getCart().isEmpty
+                    ? Center(
+                  child: Text(
+                    'Your cart is empty :(',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontFamily: 'Inria Serif',
+                    ),
+                  ),
+                )
+                    : ListView.builder(
+                  itemCount: LocalCart.instance.getSelectedCourses().length,
                   itemBuilder: (context, index) {
-                    final course = cartItems[index]; // Элемент курса
-                    final courseName = course['courseName']; // Название курса
-                    final webinars = course['webinars'] ?? [];
+                    final courseName = LocalCart.instance.getSelectedCourses()[index];
+                    final webinars = LocalCart.instance.getSelectedWebinars(courseName);
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Название курса
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 10.0),
                           child: Text(
@@ -121,8 +118,7 @@ class _CartEvents extends State<CartEvents> {
                             return Padding(
                               padding: const EdgeInsets.symmetric(vertical: 5.0),
                               child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     children: [
@@ -130,7 +126,6 @@ class _CartEvents extends State<CartEvents> {
                                         onTap: () {
                                           setState(() {
                                             LocalCart.instance.removeWebinarFromCourse(courseName, webinar);
-                                            LocalCart.instance.getTotalPrice();
                                           });
                                         },
                                         child: const Icon(
@@ -140,7 +135,7 @@ class _CartEvents extends State<CartEvents> {
                                       ),
                                       const SizedBox(width: 10.0),
                                       Text(
-                                        webinar['word'], // Название вебинара
+                                        webinar['word'],
                                         style: const TextStyle(
                                           fontSize: 15.0,
                                           fontWeight: FontWeight.normal,
@@ -151,7 +146,7 @@ class _CartEvents extends State<CartEvents> {
                                     ],
                                   ),
                                   Text(
-                                    '${webinar['cost']} \$', // Цена вебинара
+                                    webinar['cost'].toString(),
                                     style: const TextStyle(
                                       fontSize: 18.0,
                                       color: Colors.white,
@@ -168,8 +163,8 @@ class _CartEvents extends State<CartEvents> {
                   },
                 ),
               ),
+
               const SizedBox(height: 20.0),
-              // Общая сумма
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -182,7 +177,7 @@ class _CartEvents extends State<CartEvents> {
                     ),
                   ),
                   Text(
-                    '${LocalCart.instance.getTotalPrice()} \$', // Общая сумма
+                    '${LocalCart.instance.getTotalPrice()} \$',
                     style: const TextStyle(
                       fontSize: 25.0,
                       color: Colors.white,
@@ -192,7 +187,6 @@ class _CartEvents extends State<CartEvents> {
                 ],
               ),
               const SizedBox(height: 30.0),
-              // Кнопка BUY
               const Center(
                 child: GradientAnimatedButton()
               ),
@@ -219,13 +213,11 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
   void initState() {
     super.initState();
 
-    // Создаем контроллер анимации
     _controller = AnimationController(
-      duration: const Duration(seconds: 5), // Длительность одного цикла анимации
+      duration: const Duration(seconds: 5),
       vsync: this,
     );
 
-    // Анимация будет идти от 0.0 до 1.0 и обратно
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
@@ -251,7 +243,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
           return Material(
             color: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0), // скругление углов
+              borderRadius: BorderRadius.circular(20.0),
             ),
             child: InkWell(
               onTap: () {
@@ -272,10 +264,10 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                   ),
                 ),
                 child: Container(
-                  width: 110, // Убираем фиксированную ширину
-                  height: 50, // Высота кнопки
+                  width: 110,
+                  height: 50,
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0), // Устанавливаем отступы внутри
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Text(
                     'BUY',
                     style: TextStyle(

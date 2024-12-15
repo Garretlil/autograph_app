@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../Courses.dart';
+
 
 class EventsOnline extends StatefulWidget {
   const EventsOnline({super.key});
@@ -13,36 +15,6 @@ class _EventsOnline extends State<EventsOnline> {
   void initState() {
     super.initState();
   }
-
-  List<Map<String, String>> listOfCatalogsForOnlineEvents = [
-    {
-      'PRO DESIGN': 'Full demonstration of photo editing,'
-          ' including color correction, defects removal,'
-          ' creating own brand logo,'
-          ' digital signature and etc.',
-    },
-    {
-      'PRO PHOTO': 'The largest review of cameras,'
-          ' photosets for different budget, dental photography,'
-          ' all about macro, manual stacking and usage of macrorails,'
-          ' camera flash analysis and etc.',
-    },
-    {
-      'LIGHT MASTER': 'Comprehensive guide to using studio lighting,'
-          ' outdoor lighting setups, and controlling natural light. '
-          'Tips for budget and professional setups.',
-    },
-    {
-      'VIDEO ART': 'Learn video editing, color grading,'
-          ' and cinematic techniques. Covers tools like Premiere Pro,'
-          ' DaVinci Resolve, and After Effects.',
-    },
-    {
-      'MOBILE PHOTO': 'Photography tips and tricks for smartphones,'
-          ' including using advanced apps, lens attachments, and'
-          ' post-processing on mobile devices.',
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +36,12 @@ class _EventsOnline extends State<EventsOnline> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Верхняя панель с кнопкой назад
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.pop(context); // Возврат на предыдущий экран
+                      Navigator.pop(context);
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new,
@@ -109,29 +80,37 @@ class _EventsOnline extends State<EventsOnline> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24), // Пустое место справа для баланса
+                  const SizedBox(width: 24),
                 ],
               ),
               SizedBox(height: 1.0 * MediaQuery.of(context).devicePixelRatio),
               Expanded(
                 child: ListView.builder(
-                  itemCount: listOfCatalogsForOnlineEvents.length,
+                  itemCount: CourseWebinars.instance.webinarsByCourse.length,
                   itemBuilder: (context, index) {
-                    final item = listOfCatalogsForOnlineEvents[index];
+
+                    final courseName = CourseWebinars.instance.webinarsByCourse.keys.elementAt(index);
+                    final webinars = CourseWebinars.instance.webinarsByCourse[courseName];
+
+                    final courseDescription = webinars?.firstWhere(
+                          (webinar) => webinar.containsKey('description'),
+                      orElse: () => {'description': 'No description available'},
+                    )['description'] ??
+                        'No description available';
+
                     return GestureDetector(
                       onTap: () {
-                        // Действие при нажатии на карточку
+
                         Navigator.pushNamed(
                           context,
                           '/DetailsScreenForSection',
                           arguments: {
-                            'section': item.keys.first,
+                            'section': courseName,
                           },
                         );
                       },
                       child: Card(
                         color: Colors.black.withOpacity(0.2),
-                        // Полупрозрачный фон
                         margin: EdgeInsets.symmetric(
                           vertical: 5.0 * MediaQuery.of(context).devicePixelRatio,
                         ),
@@ -143,23 +122,21 @@ class _EventsOnline extends State<EventsOnline> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                item.keys.first,
+                                courseName,
                                 style: TextStyle(
-                                  fontSize:
-                                  10.0 * MediaQuery.of(context).devicePixelRatio,
+                                  fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   fontFamily: 'Inria Serif',
                                 ),
                               ),
                               SizedBox(
-                                  height: 2.0 *
-                                      MediaQuery.of(context).devicePixelRatio),
+                                height: 2.0 * MediaQuery.of(context).devicePixelRatio,
+                              ),
                               Text(
-                                item.values.first,
+                                courseDescription,
                                 style: TextStyle(
-                                  fontSize:
-                                  8.0 * MediaQuery.of(context).devicePixelRatio,
+                                  fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
                                   color: Colors.white70,
                                   fontFamily: 'Inria Serif',
                                 ),
@@ -172,6 +149,7 @@ class _EventsOnline extends State<EventsOnline> {
                   },
                 ),
               ),
+
             ],
           ),
         ),
