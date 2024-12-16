@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 
-class CartChooseScreen extends StatefulWidget {
-  const CartChooseScreen({super.key});
+class OrderStatusScreen extends StatefulWidget {
+  const OrderStatusScreen({super.key});
 
   @override
-  State<CartChooseScreen> createState() => _CartChooseScreen();
+  State<OrderStatusScreen> createState() => _OrderStatusScreen();
 }
 
-class _CartChooseScreen extends State<CartChooseScreen> {
+class _OrderStatusScreen extends State<OrderStatusScreen> {
   @override
   void initState() {
     super.initState();
@@ -67,9 +67,9 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                         Navigator.pushNamed(context, '/CartEvents');
                       },
                       child: Text(
-                        'Events',
+                        'ORDER',
                         style: TextStyle(
-                          fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: 12.0 * MediaQuery.of(context).devicePixelRatio,
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
                           fontFamily: 'Inria Serif',
@@ -77,14 +77,30 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                       ),
                     ),
                     SizedBox(
-                        height: 70.0 * MediaQuery.of(context).devicePixelRatio),
+                        height: 1.0 * MediaQuery.of(context).devicePixelRatio),
                     Text(
-                      'Products',
+                      'COMPLETED',
                       style: TextStyle(
-                        fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: 12.0 * MediaQuery.of(context).devicePixelRatio,
                         fontWeight: FontWeight.normal,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
+                      ),
+                    ),
+                    SizedBox(height: 7.0 * MediaQuery.of(context).devicePixelRatio),
+                    Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.check_circle_outline,
+                          color: Colors.deepOrange,
+                          size: 50 * 0.9,
+                        ),
                       ),
                     ),
                   ],
@@ -96,6 +112,4 @@ class _CartChooseScreen extends State<CartChooseScreen> {
       ),
     );
   }
-
-
 }

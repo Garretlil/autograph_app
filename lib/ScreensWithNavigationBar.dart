@@ -86,9 +86,9 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
             builder = (context) {
               switch (settings.name) {
                 case '/':
-                  return const ProfilePage();
+                  return const ProfileScreen();
                 case '/editProfile':
-                  return const ProfilePage();
+                  return const ProfileScreen();
                 default:
                   throw Exception('Unknown route: ${settings.name}');
               }
