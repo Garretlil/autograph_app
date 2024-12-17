@@ -129,6 +129,9 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                           setState(() {
                             item['isOn'] = value;
                             if (value) {
+                              setState(() {
+                                LocalCart.instance.isProductsInCart=true;
+                              });
                               LocalCart.instance.addWebinarToCourse(widget.section, item);
                             } else {
                               LocalCart.instance.removeWebinarFromCourse(widget.section, item);
@@ -145,7 +148,8 @@ class _ListOfVebinars extends State<ListOfVebinars> {
             Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
+                  padding: EdgeInsets.only(left: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                      bottom: 40.0 * MediaQuery.of(context).devicePixelRatio),
                   child: Text(
                     'TOTAL:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ ',
                     style: const TextStyle(

@@ -6,6 +6,8 @@ import 'HomeScreens/EventsOnline.dart';
 import 'HomeScreens/EventsOnlineOfflineScreen.dart';
 import 'HomeScreens/HomePage.dart';
 import 'HomeScreens/ListOfVebinars.dart';
+import 'HomeScreens/LocalCart.dart';
+import 'ProfileScreens/ProfileMyEventsScreen.dart';
 import 'ProfileScreens/ProfilePage.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
@@ -17,7 +19,9 @@ class ScreensWithNavigationBar extends StatefulWidget {
 }
 
 class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
+
   int _selectedIndex = 0;
+  int cartItemCount = 0;
 
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
@@ -33,6 +37,28 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
       return true;
     }
     return false;
+  }
+
+  Widget _buildCartIcon() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        const Icon(Icons.shopping_cart),
+        if (LocalCart.instance.isProductsInCart)
+          Positioned(
+            right: -1,
+            top: 0,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: Colors.deepOrange,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _buildNavigator(int index) {
@@ -87,7 +113,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
               switch (settings.name) {
                 case '/':
                   return const ProfileScreen();
-                case '/editProfile':
+                case '/MY_EVENTS':
+                  return const ProfileMyEventsScreen();
+                case '/Orders':
+                  return const ProfileScreen();
+                case '/Settings':
                   return const ProfileScreen();
                 default:
                   throw Exception('Unknown route: ${settings.name}');
@@ -107,57 +137,71 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: List.generate(
-            _navigatorKeys.length,
-                (index) => _buildNavigator(index),
-          ),
-        ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            image: const DecorationImage(
-              image: AssetImage('assets/imageBottom.png'),
-              fit: BoxFit.cover,
-            ),
-            borderRadius: BorderRadius.circular(0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(25)),
-              child: BottomNavigationBar(
-                elevation: 0,
-                backgroundColor: Colors.black.withOpacity(0.5),
-                currentIndex: _selectedIndex,
-                selectedItemColor: Colors.deepOrange,
-                unselectedItemColor: Colors.white70,
-                iconSize: 33,
-                onTap: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-                items: const <BottomNavigationBarItem>[
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.account_balance_rounded),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.shopping_cart),
-                    label: 'Cart',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
-                    label: 'Profile',
-                  ),
-                ],
+        body: Stack(
+          children: [
+            IndexedStack(
+              index: _selectedIndex,
+              children: List.generate(
+                _navigatorKeys.length,
+                    (index) => _buildNavigator(index),
               ),
             ),
-          ),
+            Positioned(
+              left: 20,
+              right: 20,
+              bottom: 20,
+              child: Container(
+                decoration: BoxDecoration(
+                  image: const DecorationImage(
+                    image: AssetImage('assets/imageBottom.png'),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: BottomNavigationBar(
+                    elevation: 0,
+                    backgroundColor: Colors.black.withOpacity(0.5),
+                    currentIndex: _selectedIndex,
+                    selectedItemColor: Colors.deepOrange,
+                    unselectedItemColor: Colors.white70,
+                    iconSize: 33,
+                    onTap: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                    items: <BottomNavigationBarItem>[
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.account_balance_rounded),
+                        label: 'Home',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: _buildCartIcon(),
+                        label: 'Cart',
+                      ),
+                      const BottomNavigationBarItem(
+                        icon: Icon(Icons.person),
+                        label: 'Profile',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+
 
 }

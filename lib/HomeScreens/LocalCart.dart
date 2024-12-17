@@ -2,6 +2,7 @@ import '../Courses.dart';
 
 class LocalCart {
    LocalCart._privateConstructor();
+   bool isProductsInCart=false;
 
    static final LocalCart instance = LocalCart._privateConstructor();
 
@@ -54,6 +55,9 @@ class LocalCart {
 
          if (webinars.isEmpty) {
             _selectedWebinarsByCourse.remove(courseName);
+            if (getSelectedCourses().isEmpty){
+                isProductsInCart=false;
+            }
          }
       }
    }
@@ -72,4 +76,5 @@ class LocalCart {
    List<String> getSelectedCourses() {
       return _selectedWebinarsByCourse.keys.toList();
    }
+
 }

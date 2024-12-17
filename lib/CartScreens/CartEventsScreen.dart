@@ -95,84 +95,94 @@ class _CartEvents extends State<CartEvents> {
                     ),
                   ),
                 )
-                    : ListView.builder(
-                  itemCount: LocalCart.instance.getSelectedCourses().length,
-                  itemBuilder: (context, index) {
-                    final courseName = LocalCart.instance.getSelectedCourses()[index];
-                    final webinars = LocalCart.instance.getSelectedWebinars(courseName);
+                    : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(), // Отключаем прокрутку внутри
+                        shrinkWrap: true,
+                        itemCount: LocalCart.instance.getSelectedCourses().length,
+                        itemBuilder: (context, index) {
+                          final courseName = LocalCart.instance.getSelectedCourses()[index];
+                          final webinars = LocalCart.instance.getSelectedWebinars(courseName);
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0),
-                          child: Text(
-                            courseName,
-                            style: const TextStyle(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: 'Inria Serif',
-                            ),
-                          ),
-                        ),
-                        ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: webinars.length,
-                          itemBuilder: (context, webinarIndex) {
-                            final webinar = webinars[webinarIndex];
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            LocalCart.instance.removeWebinarFromCourse(courseName, webinar);
-                                          });
-                                        },
-                                        child: const Icon(
-                                          Icons.remove_circle_outline,
-                                          color: Colors.deepOrange,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10.0),
-                                      Text(
-                                        webinar['word'],
-                                        style: const TextStyle(
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.normal,
-                                          color: Colors.white,
-                                          fontFamily: 'Inria Serif',
-                                        ),
-                                      ),
-                                    ],
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                child: Text(
+                                  courseName,
+                                  style: const TextStyle(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontFamily: 'Inria Serif',
                                   ),
-                                  Text(
-                                    webinar['cost'].toString(),
-                                    style: const TextStyle(
-                                      fontSize: 18.0,
-                                      color: Colors.white,
-                                      fontFamily: 'Inria Serif',
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
+                              ListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: webinars.length,
+                                itemBuilder: (context, webinarIndex) {
+                                  final webinar = webinars[webinarIndex];
+
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  LocalCart.instance.removeWebinarFromCourse(courseName, webinar);
+                                                });
+                                              },
+                                              child: const Icon(
+                                                Icons.remove_circle_outline,
+                                                color: Colors.deepOrange,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10.0),
+                                            Text(
+                                              webinar['word'],
+                                              style: const TextStyle(
+                                                fontSize: 15.0,
+                                                fontWeight: FontWeight.normal,
+                                                color: Colors.white,
+                                                fontFamily: 'Inria Serif',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          webinar['cost'].toString(),
+                                          style: const TextStyle(
+                                            fontSize: 18.0,
+                                            color: Colors.white,
+                                            fontFamily: 'Inria Serif',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20.0),
+                    ],
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 20.0),
+              // TOTAL и кнопка
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -194,11 +204,11 @@ class _CartEvents extends State<CartEvents> {
                   ),
                 ],
               ),
-              const SizedBox(height: 30.0),
-              const Center(
-                child: GradientAnimatedButton()
-              ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 5.0),
+               Padding(padding: EdgeInsets.only(bottom: 40.0 * MediaQuery.of(context).devicePixelRatio),
+                child: const Center(child: GradientAnimatedButton()),
+              )
+
             ],
           ),
         ),

@@ -64,10 +64,60 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 50),
-                const MenuItem(title: 'MY EVENTS'),
-                const MenuItem(title: 'ORDERS'),
-                const MenuItem(title: 'SETTINGS'),
-                const MenuItem(title: 'SUPPORT'),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/MY_EVENTS');
+                  },
+                  child: Text(
+                    'MY EVENTS',
+                    style: TextStyle(
+                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.white,
+                      fontFamily: 'Inria Serif',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 7),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'ORDERS',
+                    style:  TextStyle(
+                      color: Colors.white,
+                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'Inria Serif',
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'SETTINGS',
+                    style:  TextStyle(
+                      color: Colors.white,
+                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'Inria Serif',
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'SUPPORT',
+                    style:  TextStyle(
+                      color: Colors.white,
+                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: 'Inria Serif',
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ),
                 const Spacer(),
                 const Text(
                   'EST. 2024',
@@ -82,29 +132,5 @@ class ProfileScreen extends StatelessWidget {
          ),
        ),
      );
-  }
-}
-
-// Виджет для пунктов меню
-class MenuItem extends StatelessWidget {
-  final String title;
-
-  const MenuItem({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Text(
-        title,
-        style:  TextStyle(
-          color: Colors.white,
-          fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-          fontWeight: FontWeight.normal,
-          fontFamily: 'Inria Serif',
-          letterSpacing: 1.5,
-        ),
-      ),
-    );
   }
 }
