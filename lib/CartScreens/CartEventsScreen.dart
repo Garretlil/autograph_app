@@ -1,16 +1,19 @@
 import 'dart:async';
 
+import 'package:autograph_app/CartScreens/PaymentVisible.dart';
 import 'package:flutter/material.dart';
 import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import '../Courses.dart';
-import '../HomeScreens/LocalCart.dart';
+import '../LocalCart.dart';
 import '../Theme/Colors.dart';
 import 'OrderStatus.dart';
 
 class CartEvents extends StatefulWidget {
-  const CartEvents({super.key});
+  final void Function(bool) toggleBottomNavigationBar;
+  final void Function(bool) toggleCircleCart;
+  const CartEvents({super.key, required this.toggleBottomNavigationBar,required this.toggleCircleCart});
 
   @override
   State<CartEvents> createState() => _CartEvents();
@@ -21,8 +24,6 @@ class _CartEvents extends State<CartEvents> {
   void initState() {
     super.initState();
   }
-
-
   @override
   Widget build(BuildContext context) {
     //final cartItems = LocalCart.instance.getCart();
@@ -138,7 +139,9 @@ class _CartEvents extends State<CartEvents> {
                                             GestureDetector(
                                               onTap: () {
                                                 setState(() {
-                                                  LocalCart.instance.removeWebinarFromCourse(courseName, webinar);
+                                                  if (LocalCart.instance.removeWebinarFromCourse(courseName, webinar)){
+                                                    widget.toggleCircleCart(false);
+                                                  }
                                                 });
                                               },
                                               child: const Icon(
@@ -206,9 +209,8 @@ class _CartEvents extends State<CartEvents> {
               ),
               const SizedBox(height: 5.0),
                Padding(padding: EdgeInsets.only(bottom: 40.0 * MediaQuery.of(context).devicePixelRatio),
-                child: const Center(child: GradientAnimatedButton()),
+                child:  Center(child: GradientAnimatedButton(toggleBottomNavigationBar: widget.toggleBottomNavigationBar)),
               )
-
             ],
           ),
         ),
@@ -217,7 +219,9 @@ class _CartEvents extends State<CartEvents> {
   }
 }
 class GradientAnimatedButton extends StatefulWidget {
-  const GradientAnimatedButton({super.key});
+
+  final void Function(bool) toggleBottomNavigationBar;
+  const GradientAnimatedButton({super.key, required this.toggleBottomNavigationBar});
 
   @override
   State<GradientAnimatedButton> createState() => _GradientAnimatedButtonState();
@@ -263,6 +267,25 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     }
     setState(() {});
   }
+  //bool isPaymentV=false;
+
+  Future<void> _showPaymentWidget() async {
+    setState(() {
+      widget.toggleBottomNavigationBar(false);
+    });
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: false,
+      //backgroundColor: Colors.transparent,
+      builder: (context) => SbpModalBottomSheetWidget(informations, url),
+    );
+
+    setState(() {
+      widget.toggleBottomNavigationBar(true);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -277,15 +300,19 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: InkWell(
-              onTap: () => showModalBottomSheet(
-                context: context,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                ),
-                builder: (ctx) => SbpModalBottomSheetWidget(informations, url),
-              ),
+               // onTap: () => showModalBottomSheet(
+               //   context: context,
+               //   shape: const RoundedRectangleBorder(
+               //     borderRadius: BorderRadius.vertical(
+               //       top: Radius.circular(20),
+               //     ),
+               //   ),
+               //   builder: (ctx) => SbpModalBottomSheetWidget(informations, url),
+               // ),
+
+              onTap: () async {
+                await _showPaymentWidget();
+              },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),
               child: Ink(
@@ -340,21 +367,23 @@ class SbpHeaderModalSheet extends StatelessWidget {
               borderRadius: BorderRadius.all(
                 Radius.circular(10),
               ),
-              color: Colors.black),
+              color: Colors.white),
         ),
         const SizedBox(height: 20),
-        Image.asset(
-          'assets/sbp.png',
-          width: 130,
-        ),
-        const SizedBox(height: 10),
-        const Text('Выберите банк для оплаты по СБП'),
+        // Image.asset(
+        //   'assets/sbp.png',
+        //   width: 130,
+        // ),
+        const Text('Выбери банк',style: TextStyle(
+                fontSize: 20.0,
+                fontFamily: 'Inria Serif',
+                fontWeight: FontWeight.w600,
+                color: Colors.white)),
         const SizedBox(height: 20),
       ],
     );
   }
 }
-
 class SbpModalBottomSheetEmptyListBankWidget extends StatelessWidget {
   const SbpModalBottomSheetEmptyListBankWidget({super.key});
 
@@ -362,7 +391,7 @@ class SbpModalBottomSheetEmptyListBankWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         decoration: const BoxDecoration(
-            color: Colors.black
+            color: Colors.black87
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -374,7 +403,7 @@ class SbpModalBottomSheetEmptyListBankWidget extends StatelessWidget {
                 child: Container(
                   height: 80,
                   decoration: const BoxDecoration(
-                    color: Colors.black,
+                    color: Colors.black87,
                     borderRadius: BorderRadius.all(
                       Radius.circular(10),
                     ),
@@ -390,21 +419,37 @@ class SbpModalBottomSheetEmptyListBankWidget extends StatelessWidget {
         )
     );
   }
+
+
 }
 
 ///  Окно с банками
-class SbpModalBottomSheetWidget extends StatelessWidget {
+class SbpModalBottomSheetWidget extends StatefulWidget {
   final List<C2bmemberModel> informations;
   final String url;
 
   const SbpModalBottomSheetWidget(this.informations, this.url, {super.key});
 
   @override
+  State<SbpModalBottomSheetWidget> createState() => _SbpModalBottomSheetWidget();
+
+}
+class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
+
+  int? _selectedBankIndex; // Хранит индекс выбранного банка
+
+  void _onBankSelected(int index) {
+    setState(() {
+      _selectedBankIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (informations.isNotEmpty) {
+    if (widget.informations.isNotEmpty) {
       return Container(
         decoration: const BoxDecoration(
-          color: sbpModal, // Устанавливаем оранжевый фон
+          color: Colors.black87, // Устанавливаем фон
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(20), // Закругленные верхние углы
           ),
@@ -414,42 +459,70 @@ class SbpModalBottomSheetWidget extends StatelessWidget {
             const SbpHeaderModalSheet(),
             Expanded(
               child: ListView.separated(
-                itemCount: informations.length,
+                itemCount: widget.informations.length,
                 itemBuilder: (ctx, index) {
-                  final information = informations[index];
-                  return Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white70,
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(20),
+                  final information = widget.informations[index];
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: Container(
+                      height: 60,
+                      decoration: const BoxDecoration(
+                        color: Colors.white70,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(10),
+                        ),
                       ),
-                    ),
-                    child: GestureDetector(
-                      onTap: () => openBank(context),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 60.0,
-                            height: 60.0,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(20.0),
-                              child: information.bitmap != null
-                                  ? Image.memory(information.bitmap!)
-                                  : information.icon.isNotEmpty
-                                  ? Image.asset(information.icon)
-                                  : Image.network(information.logoURL),
+                      child: GestureDetector(
+                        onTap: () => _onBankSelected(index), // Обработчик выбора
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 10),
+                            SizedBox(
+                              width: 40.0,
+                              height: 40.0,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(40.0),
+                                child: information.bitmap != null
+                                    ? Image.memory(
+                                  information.bitmap!,
+                                  height: 10,
+                                  width: 10,
+                                )
+                                    : information.icon.isNotEmpty
+                                    ? Image.asset(
+                                  information.icon,
+                                  height: 10,
+                                  width: 10,
+                                )
+                                    : Image.network(
+                                  information.logoURL,
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 28),
-                          Center(
-                            child: Text(
-                              information.bankName,
-                              style: const TextStyle(fontSize: 15, color: Colors.white),
+                            const SizedBox(width: 17),
+                            Expanded(
+                              child: Text(
+                                information.bankName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Inria Serif',
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                        ],
+                            Transform.scale(
+                              scale: 1.5,
+                              child: Radio<int>(
+                                value: index,
+                                groupValue: _selectedBankIndex,
+                                onChanged: (value) => _onBankSelected(value!),
+                                activeColor: Colors.deepOrange,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -464,9 +537,9 @@ class SbpModalBottomSheetWidget extends StatelessWidget {
     } else {
       return Container(
         decoration: const BoxDecoration(
-          color: Colors.deepOrange, // Устанавливаем оранжевый фон
+          color: Colors.deepOrange,
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(50), // Закругленные верхние углы
+            top: Radius.circular(50),
           ),
         ),
         child: const SbpModalBottomSheetEmptyListBankWidget(),

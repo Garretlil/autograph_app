@@ -79,42 +79,54 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 7),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'ORDERS',
-                    style:  TextStyle(
-                      color: Colors.white,
-                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
-                      letterSpacing: 1.5,
+                Padding(padding: const EdgeInsets.only(top: 20),
+                    child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/Orders');
+                        },
+                        child: Text(
+                          'ORDERS',
+                          style:  TextStyle(
+                            color: Colors.white,
+                            fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                            fontWeight: FontWeight.normal,
+                            fontFamily: 'Inria Serif',
+                            letterSpacing: 1.5,
+                          ),
+                       ),
+                    ),
+                ),
+                Padding(padding: const EdgeInsets.only(top: 20),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/ProfileSettings');
+                    },
+                    child: Text(
+                      'SETTINGS',
+                      style:  TextStyle(
+                        color: Colors.white,
+                        fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontWeight: FontWeight.normal,
+                        fontFamily: 'Inria Serif',
+                        letterSpacing: 1.5,
+                      ),
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'SETTINGS',
-                    style:  TextStyle(
-                      color: Colors.white,
-                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text(
-                    'SUPPORT',
-                    style:  TextStyle(
-                      color: Colors.white,
-                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
-                      letterSpacing: 1.5,
+                Padding(padding: const EdgeInsets.only(top: 20),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/Orders');
+                    },
+                    child: Text(
+                      'SUPPORT',
+                      style:  TextStyle(
+                        color: Colors.white,
+                        fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontWeight: FontWeight.normal,
+                        fontFamily: 'Inria Serif',
+                        letterSpacing: 1.5,
+                      ),
                     ),
                   ),
                 ),

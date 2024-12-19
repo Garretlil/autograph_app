@@ -15,11 +15,10 @@ class Registration extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 150, 20, 20),
+          padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Текст с заголовками
               const Center(
                 child: Column(
                   children: [
@@ -44,7 +43,7 @@ class Registration extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 150),
 
               _buildTextField('Name'),
               const SizedBox(height: 16),
@@ -63,7 +62,6 @@ class Registration extends StatelessWidget {
     );
   }
 
-  // Метод для создания текстового поля
   Widget _buildTextField(String label) {
     return TextField(
       decoration: InputDecoration(
@@ -135,7 +133,7 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
           return Material(
             color: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: InkWell(
               onTap: () {
@@ -146,11 +144,11 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
                   ),
                 );
               },
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(20),
               splashColor: Colors.white.withOpacity(0.3),
               child: Ink(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(20),
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -165,7 +163,7 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
                   height: 45,
                   alignment: Alignment.center,
                   child: const Text(
-                    'Зарегистрироваться',
+                    'Register',
                     style: TextStyle(color: Colors.white70, fontSize: 18),
                   ),
                 ),

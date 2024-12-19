@@ -1,3 +1,4 @@
+import 'package:autograph_app/CartScreens/PaymentVisible.dart';
 import 'package:flutter/material.dart';
 import 'CartScreens/CartChooseScreen.dart';
 import 'CartScreens/CartEventsScreen.dart';
@@ -6,9 +7,11 @@ import 'HomeScreens/EventsOnline.dart';
 import 'HomeScreens/EventsOnlineOfflineScreen.dart';
 import 'HomeScreens/HomePage.dart';
 import 'HomeScreens/ListOfVebinars.dart';
-import 'HomeScreens/LocalCart.dart';
+import 'LocalCart.dart';
 import 'ProfileScreens/ProfileMyEventsScreen.dart';
+import 'ProfileScreens/ProfileOrders.dart';
 import 'ProfileScreens/ProfilePage.dart';
+import 'ProfileScreens/ProfileSettings.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});
@@ -22,7 +25,14 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
 
   int _selectedIndex = 0;
   int cartItemCount = 0;
+  bool isBottomNavVisible = true;
+  bool isCircleVisible =false;
 
+  void _toggleBottomNavigationBar(bool isVisible) {
+    setState(() {
+      isBottomNavVisible = isVisible;
+    });
+  }
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -38,21 +48,26 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
     }
     return false;
   }
+  void _toggleCircleCart(bool isVisible) {
+    setState(() {
+      isCircleVisible = isVisible;
+    });
+  }
 
   Widget _buildCartIcon() {
     return Stack(
       clipBehavior: Clip.none,
       children: [
         const Icon(Icons.shopping_cart),
-        if (LocalCart.instance.isProductsInCart)
+        if (isCircleVisible)
           Positioned(
             right: -1,
             top: 0,
             child: Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                color: Colors.deepOrange,
+              width: 9,
+              height: 9,
+              decoration: BoxDecoration(
+                color: _selectedIndex == 1 ? Colors.orange : Colors.deepOrange,
                 shape: BoxShape.circle,
               ),
             ),
@@ -87,7 +102,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                    final args = settings.arguments as Map<String, dynamic>; // Cast arguments to Map
                    return MaterialPageRoute(
                      builder: (context) => ListOfVebinars(
-                       section: args['section'], // Access 'section' key
+                       section: args['section'], toggleCircleCart: _toggleCircleCart, // Access 'section' key
                      ),
                    );
                    default:
@@ -100,9 +115,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                 case '/':
                   return const CartChooseScreen();
                 case '/CartEvents':
-                  return const CartEvents();
+                  return CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                    toggleCircleCart: _toggleCircleCart,);
                 case '/Cart2':
-                  return const CartEvents();
+                  return  CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                    toggleCircleCart: _toggleCircleCart,);
                 default:
                   throw Exception('Unknown route: ${settings.name}');
               }
@@ -116,9 +133,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                 case '/MY_EVENTS':
                   return const ProfileMyEventsScreen();
                 case '/Orders':
-                  return const ProfileScreen();
-                case '/Settings':
-                  return const ProfileScreen();
+                  return const ProfileOrdersScreen();
+                case '/ProfileOrders':
+                  return const ProfileOrdersScreen();
+                case '/ProfileSettings':
+                  return const ProfileSettingsScreen();
                 default:
                   throw Exception('Unknown route: ${settings.name}');
               }
@@ -146,62 +165,61 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                     (index) => _buildNavigator(index),
               ),
             ),
-            Positioned(
-              left: 20,
-              right: 20,
-              bottom: 20,
-              child: Container(
-                decoration: BoxDecoration(
-                  image: const DecorationImage(
-                    image: AssetImage('assets/imageBottom.png'),
-                    fit: BoxFit.cover,
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
+            if (isBottomNavVisible) // Управляем отображением BottomNavigationBar
+              Positioned(
+                left: 20,
+                right: 20,
+                bottom: 20,
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: const DecorationImage(
+                      image: AssetImage('assets/imageBottom.png'),
+                      fit: BoxFit.cover,
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: BottomNavigationBar(
-                    elevation: 0,
-                    backgroundColor: Colors.black.withOpacity(0.5),
-                    currentIndex: _selectedIndex,
-                    selectedItemColor: Colors.deepOrange,
-                    unselectedItemColor: Colors.white70,
-                    iconSize: 33,
-                    onTap: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                    items: <BottomNavigationBarItem>[
-                      const BottomNavigationBarItem(
-                        icon: Icon(Icons.account_balance_rounded),
-                        label: 'Home',
-                      ),
-                      BottomNavigationBarItem(
-                        icon: _buildCartIcon(),
-                        label: 'Cart',
-                      ),
-                      const BottomNavigationBarItem(
-                        icon: Icon(Icons.person),
-                        label: 'Profile',
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
                       ),
                     ],
                   ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: BottomNavigationBar(
+                      elevation: 0,
+                      backgroundColor: Colors.black.withOpacity(0.5),
+                      currentIndex: _selectedIndex,
+                      selectedItemColor: Colors.deepOrange,
+                      unselectedItemColor: Colors.white70,
+                      iconSize: 35,
+                      onTap: (index) {
+                        setState(() {
+                          _selectedIndex = index;
+                        });
+                      },
+                      items: <BottomNavigationBarItem>[
+                        const BottomNavigationBarItem(
+                          icon: Icon(Icons.account_balance_rounded),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: _buildCartIcon(),
+                          label: 'Cart',
+                        ),
+                        const BottomNavigationBarItem(
+                          icon: Icon(Icons.person),
+                          label: 'Profile',
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
     );
   }
-
-
 }

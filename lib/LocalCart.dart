@@ -1,4 +1,4 @@
-import '../Courses.dart';
+import 'Courses.dart';
 
 class LocalCart {
    LocalCart._privateConstructor();
@@ -42,7 +42,7 @@ class LocalCart {
    }
 
    /// Удаление вебинара из курса
-   void removeWebinarFromCourse(String courseName, Map<String, dynamic> webinar) {
+   bool removeWebinarFromCourse(String courseName, Map<String, dynamic> webinar) {
       final webinars = _selectedWebinarsByCourse[courseName];
       if (webinars != null) {
          webinars.removeWhere((item) => item['word'] == webinar['word']);
@@ -50,16 +50,18 @@ class LocalCart {
                 (item) => item['word'] == webinar['word'],
          );
          if (webinarToUpdate != null) {
-            webinarToUpdate['isOn'] = false; // Устанавливаем 'isOn' в false
+            webinarToUpdate['isOn'] = false;
          }
 
          if (webinars.isEmpty) {
             _selectedWebinarsByCourse.remove(courseName);
             if (getSelectedCourses().isEmpty){
                 isProductsInCart=false;
+                return true;
             }
          }
       }
+      return false;
    }
    /// Очистка корзины
    void clearCart() {

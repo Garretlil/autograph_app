@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../Courses.dart';
-import 'LocalCart.dart';
+import '../LocalCart.dart';
 
 class ListOfVebinars extends StatefulWidget {
   final String section;
-
-  const ListOfVebinars({super.key, required this.section});
+  final void Function(bool) toggleCircleCart;
+  const ListOfVebinars({super.key, required this.section,required this.toggleCircleCart});
 
   @override
   State<ListOfVebinars> createState() => _ListOfVebinars();
@@ -131,10 +131,13 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                             if (value) {
                               setState(() {
                                 LocalCart.instance.isProductsInCart=true;
+                                widget.toggleCircleCart(true);
                               });
                               LocalCart.instance.addWebinarToCourse(widget.section, item);
                             } else {
-                              LocalCart.instance.removeWebinarFromCourse(widget.section, item);
+                              if (LocalCart.instance.removeWebinarFromCourse(widget.section, item)){
+                                widget.toggleCircleCart(false);
+                              };
                             }
                           });
                         },
