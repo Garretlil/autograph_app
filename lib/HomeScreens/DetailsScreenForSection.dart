@@ -18,6 +18,16 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -28,15 +38,14 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            15.0 * MediaQuery.of(context).devicePixelRatio,
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            0.0 * MediaQuery.of(context).devicePixelRatio,
+            paddingFactor*1.5,
+            paddingFactor * 1.8,
+            paddingFactor,
+            0,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -44,10 +53,13 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Icon(
-                      Icons.arrow_back_ios_new,
-                      size: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                      color: Colors.white,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: screenHeight * 0.001),  // Сдвиг вниз
+                      child: Icon(
+                        Icons.arrow_back_ios_new,
+                        size: iconSizeFactor,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   Column(
@@ -55,7 +67,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: 6.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor * 0.7,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -64,7 +76,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       Text(
                         'EVENTS',
                         style: TextStyle(
-                          fontSize: 20.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: titleSizeFactor * 2,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -73,7 +85,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       Text(
                         widget.section,
                         style: TextStyle(
-                          fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -81,12 +93,13 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                  SizedBox(width: screenWidth * 0.08),
                 ],
               ),
-              SizedBox(height: 60.0 * MediaQuery.of(context).devicePixelRatio),
+              SizedBox(height: spacingFactor * 2.2),
+              Center(child:
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -101,19 +114,18 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                     child: Text(
                       'TOPICS',
                       style: TextStyle(
-                        fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: subtitleSizeFactor * 1.3,
                         fontWeight: FontWeight.w100,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
                       ),
                     ),
                   ),
-                  SizedBox(
-                      height: 30.0 * MediaQuery.of(context).devicePixelRatio),
+                  SizedBox(height: spacingFactor*1.9),
                   Text(
                     'TRAILER',
                     style: TextStyle(
-                      fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: subtitleSizeFactor * 1.3,
                       fontWeight: FontWeight.w200,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
@@ -121,10 +133,12 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                   ),
                 ],
               ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
 }

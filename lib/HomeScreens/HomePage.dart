@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../CartScreens/OrderStatus.dart';
+import '../ScreensWithNavigationBar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,10 +15,22 @@ class _HomePage extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
   }
+
   @override
   Widget build(BuildContext context) {
-    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты для адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double smallTextFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -25,71 +40,96 @@ class _HomePage extends State<HomePage> {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(5.0 * MediaQuery.of(context).devicePixelRatio,
-            20.0 * MediaQuery.of(context).devicePixelRatio,
-            6.0 * MediaQuery.of(context).devicePixelRatio,
-            0.0 * MediaQuery.of(context).devicePixelRatio,),
+          padding: EdgeInsets.fromLTRB(
+            paddingFactor,
+            paddingFactor * 1.8,
+            paddingFactor,
+            0,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Column(
-                  children: [
-                    Text(
-                      'AUTOGRAPH ',
-                      style: TextStyle(
-                        fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Inria Serif',
-                        color: Colors.white,
-                      ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigator.pop(context);
+                  //   },
+                  //   child: Padding(
+                  //     padding: EdgeInsets.only(top: screenHeight * 0.08),  // Сдвиг вниз
+                  //     child: Opacity(
+                  //       opacity: 0,  // Иконка становится невидимой
+                  //       child: Icon(
+                  //         Icons.arrow_back_ios_new,  // Вернём иконку, чтобы сохранить тип
+                  //         size: iconSizeFactor*1.3,
+                  //         color: Colors.white,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          'AUTOGRAPH',
+                          style: TextStyle(
+                            fontSize: subtitleSizeFactor * 0.7,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Inria Serif',
+                            color: Colors.white,
+                          ),
+                        ),
+                        Text(
+                          'HOME',
+                          style: TextStyle(
+                            fontSize: titleSizeFactor * 2,
+                            fontWeight: FontWeight.normal,
+                            fontFamily: 'Inria Serif',
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      'HOME',
-                      style: TextStyle(
-                        fontSize: 20.0 * MediaQuery.of(context).devicePixelRatio,
-                        fontWeight: FontWeight.normal,
-                        fontFamily: 'Inria Serif',
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: screenWidth * 0.08),
+                ],
               ),
-              SizedBox(height: 20.0 * MediaQuery.of(context).devicePixelRatio),
+              SizedBox(height: spacingFactor),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'PRODUCTS',
                     style: TextStyle(
-                      fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: smallTextFactor,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
-                  SizedBox(height: 9.0 * MediaQuery.of(context).devicePixelRatio),
+                  SizedBox(height: spacingFactor * 0.5),
                   Text(
                     'PHANTOMS',
                     style: TextStyle(
-                      fontSize: 7.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: smallTextFactor * 0.8,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
-                  SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
+                  SizedBox(height: spacingFactor * 0.3),
                   Text(
                     'BRUSHES',
                     style: TextStyle(
-                      fontSize: 7.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: smallTextFactor * 0.8,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
-                  SizedBox(height: 12.0 * MediaQuery.of(context).devicePixelRatio),
+                  SizedBox(height: spacingFactor),
                   GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, '/EventsOnlineOffline');
@@ -97,28 +137,39 @@ class _HomePage extends State<HomePage> {
                     child: Text(
                       'EVENTS',
                       style: TextStyle(
-                        fontSize: 10 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: smallTextFactor,
                         fontWeight: FontWeight.normal,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
                       ),
                     ),
                   ),
-                  SizedBox(height: 9.0 * MediaQuery.of(context).devicePixelRatio),
-                  Text(
-                    'ONLINE',
-                    style: TextStyle(
-                      fontSize: 7.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.white,
-                      fontFamily: 'Inria Serif',
+                  SizedBox(height: spacingFactor * 0.5),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                          const OrderStatusScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'ONLINE',
+                      style: TextStyle(
+                        fontSize: smallTextFactor * 0.8,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.white,
+                        fontFamily: 'Inria Serif',
+                      ),
                     ),
                   ),
-                  SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
+                  SizedBox(height: spacingFactor * 0.3),
                   Text(
                     'OFFLINE',
                     style: TextStyle(
-                      fontSize: 7.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: smallTextFactor * 0.8,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
@@ -126,11 +177,12 @@ class _HomePage extends State<HomePage> {
                   ),
                 ],
               ),
-              SizedBox(height: 40 / devicePixelRatio),
+              SizedBox(height: spacingFactor * 2),
             ],
           ),
         ),
       ),
     );
   }
+
 }

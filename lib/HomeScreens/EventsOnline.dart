@@ -18,6 +18,17 @@ class _EventsOnline extends State<EventsOnline> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double cardMarginFactor = screenHeight * 0.06;
+    double cardPaddingFactor = screenWidth * 0.06;
+    double descriptionSizeFactor = screenWidth * 0.06;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -28,16 +39,16 @@ class _EventsOnline extends State<EventsOnline> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            15.0 * MediaQuery.of(context).devicePixelRatio,
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            0.0 * MediaQuery.of(context).devicePixelRatio,
+            paddingFactor*1.5,
+            paddingFactor * 1.8,
+            paddingFactor,
+            0,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -45,16 +56,17 @@ class _EventsOnline extends State<EventsOnline> {
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new,
-                      size: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                      size: iconSizeFactor,
                       color: Colors.white,
                     ),
                   ),
+                  SizedBox(width:paddingFactor*2.3 ,),
                   Column(
                     children: [
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: 6.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor * 0.7,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -63,7 +75,7 @@ class _EventsOnline extends State<EventsOnline> {
                       Text(
                         'EVENTS',
                         style: TextStyle(
-                          fontSize: 20.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: titleSizeFactor*2,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -72,7 +84,7 @@ class _EventsOnline extends State<EventsOnline> {
                       Text(
                         'ONLINE',
                         style: TextStyle(
-                          fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -80,27 +92,24 @@ class _EventsOnline extends State<EventsOnline> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                 // SizedBox(width: screenWidth * 0.1),
                 ],
               ),
-              SizedBox(height: 1.0 * MediaQuery.of(context).devicePixelRatio),
+              //SizedBox(height: screenHeight * 0.0001),
               Expanded(
                 child: ListView.builder(
                   itemCount: CourseWebinars.instance.webinarsByCourse.length,
                   itemBuilder: (context, index) {
-
                     final courseName = CourseWebinars.instance.webinarsByCourse.keys.elementAt(index);
                     final webinars = CourseWebinars.instance.webinarsByCourse[courseName];
 
                     final courseDescription = webinars?.firstWhere(
                           (webinar) => webinar.containsKey('description'),
                       orElse: () => {'description': 'No description available'},
-                    )['description'] ??
-                        'No description available';
+                    )['description'] ?? 'No description available';
 
                     return GestureDetector(
                       onTap: () {
-
                         Navigator.pushNamed(
                           context,
                           '/DetailsScreenForSection',
@@ -112,31 +121,29 @@ class _EventsOnline extends State<EventsOnline> {
                       child: Card(
                         color: Colors.black.withOpacity(0.2),
                         margin: EdgeInsets.symmetric(
-                          vertical: 5.0 * MediaQuery.of(context).devicePixelRatio,
+                          vertical: cardMarginFactor*0.25,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.all(
-                            5.0 * MediaQuery.of(context).devicePixelRatio,
-                          ),
+                          padding: EdgeInsets.all(cardPaddingFactor*0.5),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 courseName,
                                 style: TextStyle(
-                                  fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                                  fontSize: subtitleSizeFactor,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                   fontFamily: 'Inria Serif',
                                 ),
                               ),
                               SizedBox(
-                                height: 2.0 * MediaQuery.of(context).devicePixelRatio,
+                                height: screenHeight * 0.005,
                               ),
                               Text(
                                 courseDescription,
                                 style: TextStyle(
-                                  fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
+                                  fontSize: descriptionSizeFactor*0.8,
                                   color: Colors.white70,
                                   fontFamily: 'Inria Serif',
                                 ),
@@ -149,12 +156,13 @@ class _EventsOnline extends State<EventsOnline> {
                   },
                 ),
               ),
-
+              SizedBox(height: cardMarginFactor*1.6)
             ],
           ),
         ),
       ),
     );
   }
+
 }
 

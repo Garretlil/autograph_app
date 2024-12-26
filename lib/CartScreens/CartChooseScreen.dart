@@ -16,6 +16,12 @@ class _CartChooseScreen extends State<CartChooseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double paddingFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -26,22 +32,21 @@ class _CartChooseScreen extends State<CartChooseScreen> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            15.0 * MediaQuery.of(context).devicePixelRatio,
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            0.0 * MediaQuery.of(context).devicePixelRatio,
+            paddingFactor*1.3,
+            paddingFactor * 1.8,
+            paddingFactor,
+            0,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Центрирование AUTOGRAPH CART
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'AUTOGRAPH ',
                     style: TextStyle(
-                      fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: subtitleSizeFactor * 0.7,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Inria Serif',
                       color: Colors.white,
@@ -50,7 +55,7 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   Text(
                     'CART',
                     style: TextStyle(
-                      fontSize: 25.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: subtitleSizeFactor * 2,
                       fontWeight: FontWeight.normal,
                       fontFamily: 'Inria Serif',
                       color: Colors.white,
@@ -58,7 +63,7 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 60.0 * MediaQuery.of(context).devicePixelRatio),
+              SizedBox(height: spacingFactor * 2.2),
               Center(
                 child: Column(
                   children: [
@@ -69,7 +74,7 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                       child: Text(
                         'Events',
                         style: TextStyle(
-                          fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor * 1.3,
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
                           fontFamily: 'Inria Serif',
@@ -77,11 +82,11 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                       ),
                     ),
                     SizedBox(
-                        height: 70.0 * MediaQuery.of(context).devicePixelRatio),
+                        height: spacingFactor*3.5),
                     Text(
                       'Products',
                       style: TextStyle(
-                        fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: subtitleSizeFactor * 1.3,
                         fontWeight: FontWeight.normal,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
@@ -96,6 +101,4 @@ class _CartChooseScreen extends State<CartChooseScreen> {
       ),
     );
   }
-
-
 }

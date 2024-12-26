@@ -15,7 +15,6 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     //final cartItems = LocalCart.instance.getCart();

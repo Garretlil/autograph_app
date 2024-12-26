@@ -39,7 +39,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
     GlobalKey<NavigatorState>(),
   ];
 
-  // Обработка нажатия назад
   Future<bool> _onWillPop() async {
     final isFirstRouteInCurrentTab =
     !await _navigatorKeys[_selectedIndex].currentState!.maybePop();
@@ -66,13 +65,28 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
             child: Container(
               width: 9,
               height: 9,
-              decoration: BoxDecoration(
+              decoration:  BoxDecoration(
                 color: _selectedIndex == 1 ? Colors.orange : Colors.deepOrange,
                 shape: BoxShape.circle,
               ),
             ),
           ),
       ],
+    );
+  }
+  PageRouteBuilder customPageRoute(Widget page) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionDuration: const Duration(milliseconds: 400),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = const Offset(1.0, 0.0);
+        var end = Offset.zero;
+        var curve = Curves.ease;
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
     );
   }
 
@@ -88,27 +102,26 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                   case '/':
                     return MaterialPageRoute(builder: (context) => const HomePage());
                   case '/EventsOnlineOffline':
-                    return MaterialPageRoute(builder: (context) => const EventsOnlineOffline());
+                    return customPageRoute(const EventsOnlineOffline());
                   case '/EventsOnline':
                       return MaterialPageRoute(builder: (context) => const EventsOnline());
                   case '/DetailsScreenForSection':
-                    final args = settings.arguments as Map<String, dynamic>; // Cast arguments to Map
+                    final args = settings.arguments as Map<String, dynamic>;
                     return MaterialPageRoute(
                       builder: (context) => DetailsScreenForSection(
                         section: args['section'], // Access 'section' key
                        ),
                     );
                  case '/ListOfVebinars':
-                   final args = settings.arguments as Map<String, dynamic>; // Cast arguments to Map
+                   final args = settings.arguments as Map<String, dynamic>;
                    return MaterialPageRoute(
                      builder: (context) => ListOfVebinars(
-                       section: args['section'], toggleCircleCart: _toggleCircleCart, // Access 'section' key
+                       section: args['section'], toggleCircleCart: _toggleCircleCart,
                      ),
                    );
                    default:
                      throw Exception('Unknown route: ${settings.name}');
                  }
-               break;
           case 1:
             builder = (context) {
               switch (settings.name) {
@@ -153,6 +166,15 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -165,7 +187,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                     (index) => _buildNavigator(index),
               ),
             ),
-            if (isBottomNavVisible) // Управляем отображением BottomNavigationBar
+            if (isBottomNavVisible)
               Positioned(
                 left: 20,
                 right: 20,
@@ -193,7 +215,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                       currentIndex: _selectedIndex,
                       selectedItemColor: Colors.deepOrange,
                       unselectedItemColor: Colors.white70,
-                      iconSize: 35,
+                      iconSize: spacingFactor*0.7,
                       onTap: (index) {
                         setState(() {
                           _selectedIndex = index;
@@ -217,7 +239,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                   ),
                 ),
               ),
-          ],
+           ],
         ),
       ),
     );

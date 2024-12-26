@@ -1,13 +1,9 @@
 import 'dart:async';
-
-import 'package:autograph_app/CartScreens/PaymentVisible.dart';
 import 'package:flutter/material.dart';
 import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
-import '../Courses.dart';
 import '../LocalCart.dart';
-import '../Theme/Colors.dart';
 import 'OrderStatus.dart';
 
 class CartEvents extends StatefulWidget {
@@ -26,7 +22,14 @@ class _CartEvents extends State<CartEvents> {
   }
   @override
   Widget build(BuildContext context) {
-    //final cartItems = LocalCart.instance.getCart();
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -37,10 +40,10 @@ class _CartEvents extends State<CartEvents> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            15.0 * MediaQuery.of(context).devicePixelRatio,
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            0.0 * MediaQuery.of(context).devicePixelRatio,
+            paddingFactor*1.2,
+            paddingFactor * 1.8,
+            paddingFactor,
+            0,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,18 +55,19 @@ class _CartEvents extends State<CartEvents> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_ios_new,
                       color: Colors.white,
+                      size: iconSizeFactor,
                     ),
                   ),
                    Column(
                      mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                       Text(
                         'AUTOGRAPH',
                         style: TextStyle(
-                          fontSize: 18.0,
+                          fontSize: subtitleSizeFactor * 0.7,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -72,18 +76,18 @@ class _CartEvents extends State<CartEvents> {
                       Text(
                         'CART',
                         style: TextStyle(
-                          fontSize: 25.0 * MediaQuery.of(context).devicePixelRatio,
-                          fontWeight: FontWeight.w400,
+                          fontSize: subtitleSizeFactor * 2.2,
+                          fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                   SizedBox(width: spacingFactor*0.5),
                 ],
               ),
-              const SizedBox(height: 30.0),
+               SizedBox(height: spacingFactor*0.3),
               Expanded(
                 child: LocalCart.instance.getCart().isEmpty
                     ? Center(
@@ -91,7 +95,7 @@ class _CartEvents extends State<CartEvents> {
                     'Your cart is empty :(',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: subtitleSizeFactor,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
@@ -111,11 +115,11 @@ class _CartEvents extends State<CartEvents> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                padding:  EdgeInsets.symmetric(vertical: spacingFactor*0.4),
                                 child: Text(
                                   courseName,
-                                  style: const TextStyle(
-                                    fontSize: 20.0,
+                                  style:  TextStyle(
+                                    fontSize: subtitleSizeFactor,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
                                     fontFamily: 'Inria Serif',
@@ -130,7 +134,7 @@ class _CartEvents extends State<CartEvents> {
                                   final webinar = webinars[webinarIndex];
 
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                    padding:  EdgeInsets.symmetric(vertical: spacingFactor*0.1),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -152,8 +156,8 @@ class _CartEvents extends State<CartEvents> {
                                             const SizedBox(width: 10.0),
                                             Text(
                                               webinar['word'],
-                                              style: const TextStyle(
-                                                fontSize: 15.0,
+                                              style:  TextStyle(
+                                                fontSize: subtitleSizeFactor*0.7,
                                                 fontWeight: FontWeight.normal,
                                                 color: Colors.white,
                                                 fontFamily: 'Inria Serif',
@@ -163,8 +167,8 @@ class _CartEvents extends State<CartEvents> {
                                         ),
                                         Text(
                                           webinar['cost'].toString(),
-                                          style: const TextStyle(
-                                            fontSize: 18.0,
+                                          style:  TextStyle(
+                                            fontSize: subtitleSizeFactor*0.8,
                                             color: Colors.white,
                                             fontFamily: 'Inria Serif',
                                           ),
@@ -178,37 +182,36 @@ class _CartEvents extends State<CartEvents> {
                           );
                         },
                       ),
-                      const SizedBox(height: 20.0),
+                       SizedBox(height: spacingFactor),
                     ],
                   ),
                 ),
               ),
 
-              // TOTAL и кнопка
-              const SizedBox(height: 10.0),
+               SizedBox(height: spacingFactor),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                   Text(
                     'TOTAL:',
                     style: TextStyle(
-                      fontSize: 22.0,
+                      fontSize: subtitleSizeFactor,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
                   Text(
                     '${LocalCart.instance.getTotalPrice()} \$',
-                    style: const TextStyle(
-                      fontSize: 25.0,
+                    style:  TextStyle(
+                      fontSize: subtitleSizeFactor,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 5.0),
-               Padding(padding: EdgeInsets.only(bottom: 40.0 * MediaQuery.of(context).devicePixelRatio),
+               SizedBox(height: spacingFactor*0.5),
+               Padding(padding: EdgeInsets.only(bottom: spacingFactor*2),
                 child:  Center(child: GradientAnimatedButton(toggleBottomNavigationBar: widget.toggleBottomNavigationBar)),
               )
             ],
@@ -231,7 +234,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
   late AnimationController _controller;
   late Animation<double> _animation;
   final url =
-      'https://qr.nspk.ru/AS10003P3RH0LJ2A9ROO038L6NT5RU1T?type=01&bank100000000111&sum=10&cur=RUB&crc=F3D0';
+      'https://www.sberbank.com/sms/pbpn?requisiteNumber=79670999064';
   @override
   void initState() {
     super.initState();
@@ -291,10 +294,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     return GestureDetector(
       onTap: () {
       },
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Material(
+      child: Material(
             color: Colors.transparent,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
@@ -309,7 +309,6 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                //   ),
                //   builder: (ctx) => SbpModalBottomSheetWidget(informations, url),
                // ),
-
               onTap: () async {
                 await _showPaymentWidget();
               },
@@ -322,7 +321,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color.lerp(Colors.deepOrange, Colors.black, _animation.value)!,
+                      Color.lerp(Colors.deepOrange, Colors.brown, _animation.value)!,
                       Color.lerp(Colors.black, Colors.deepOrange, _animation.value)!,
                     ],
                   ),
@@ -333,7 +332,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: const Text(
-                    'BUY',
+                    'PAY',
                     style: TextStyle(
                       fontSize: 25.0,
                       fontFamily: 'Inria Serif',
@@ -344,9 +343,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
     );
   }
 }
@@ -449,9 +446,9 @@ class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
     if (widget.informations.isNotEmpty) {
       return Container(
         decoration: const BoxDecoration(
-          color: Colors.black87, // Устанавливаем фон
+          color: Colors.black87,
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(20), // Закругленные верхние углы
+            top: Radius.circular(20),
           ),
         ),
         child: Column(
@@ -534,6 +531,7 @@ class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
           ],
         ),
       );
+
     } else {
       return Container(
         decoration: const BoxDecoration(

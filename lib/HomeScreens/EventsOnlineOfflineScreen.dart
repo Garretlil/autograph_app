@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class EventsOnlineOffline extends StatefulWidget {
   const EventsOnlineOffline({super.key});
 
@@ -16,6 +15,16 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -26,28 +35,27 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            15.0 * MediaQuery.of(context).devicePixelRatio,
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            0.0 * MediaQuery.of(context).devicePixelRatio,
+            paddingFactor*1.5,
+            paddingFactor * 1.8,
+            paddingFactor,
+            0,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Верхняя панель с кнопкой назад
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 15.0 * MediaQuery.of(context).devicePixelRatio), // Отступ сверху только для кнопки
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context); // Возврат на предыдущий экран
-                      },
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(top: screenHeight * 0.03),  // Сдвиг вниз
                       child: Icon(
                         Icons.arrow_back_ios_new,
-                        size: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                        color: Colors.white,
+                        size: iconSizeFactor,
+                        color: Colors.deepOrange,
                       ),
                     ),
                   ),
@@ -56,7 +64,7 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: 6.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor * 0.7,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -65,7 +73,7 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       Text(
                         'EVENTS',
                         style: TextStyle(
-                          fontSize: 20.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: titleSizeFactor * 2,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -73,13 +81,13 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24), // Пустое место справа для баланса
+                  SizedBox(width: screenWidth * 0.08),
                 ],
               ),
-              SizedBox(height: 60.0 * MediaQuery.of(context).devicePixelRatio),
+              SizedBox(height: spacingFactor * 2.2),
               Center(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -88,19 +96,18 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       child: Text(
                         'ONLINE',
                         style: TextStyle(
-                          fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor * 1.3,
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
                           fontFamily: 'Inria Serif',
                         ),
                       ),
                     ),
-                    SizedBox(
-                        height: 70.0 * MediaQuery.of(context).devicePixelRatio),
+                    SizedBox(height: spacingFactor * 3.6),
                     Text(
                       'OFFLINE',
                       style: TextStyle(
-                        fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: subtitleSizeFactor * 1.3,
                         fontWeight: FontWeight.normal,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
@@ -115,5 +122,4 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
       ),
     );
   }
-
 }

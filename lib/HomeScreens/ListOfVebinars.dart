@@ -6,7 +6,7 @@ import '../LocalCart.dart';
 class ListOfVebinars extends StatefulWidget {
   final String section;
   final void Function(bool) toggleCircleCart;
-  const ListOfVebinars({super.key, required this.section,required this.toggleCircleCart});
+  const ListOfVebinars({super.key, required this.section, required this.toggleCircleCart});
 
   @override
   State<ListOfVebinars> createState() => _ListOfVebinars();
@@ -15,6 +15,7 @@ class ListOfVebinars extends StatefulWidget {
 class _ListOfVebinars extends State<ListOfVebinars> {
 
   late List<Map<String, dynamic>> vebinarChooseList;
+
   @override
   void initState() {
     super.initState();
@@ -23,17 +24,26 @@ class _ListOfVebinars extends State<ListOfVebinars> {
 
   /// Синхронизация выбранных вебинаров с данными в корзине
   void _syncWebinarsWithCart() {
-    super.initState();
-    // Получение вебинаров выбранного курса из CourseWebinars
     vebinarChooseList = CourseWebinars.instance.getWebinars(widget.section)
         .where((webinar) => webinar.containsKey('word')) // Фильтруем только вебинары
         .toList();
     setState(() {});
   }
 
-
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double listTilePaddingFactor = screenWidth * 0.06;
+    double totalTextSizeFactor = screenWidth * 0.05;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -47,9 +57,9 @@ class _ListOfVebinars extends State<ListOfVebinars> {
           children: [
             Padding(
               padding: EdgeInsets.fromLTRB(
-                12.0 * MediaQuery.of(context).devicePixelRatio,
-                15.0 * MediaQuery.of(context).devicePixelRatio,
-                12.0 * MediaQuery.of(context).devicePixelRatio,
+                paddingFactor*1.3,
+                paddingFactor*1.8,
+                paddingFactor,
                 0.0,
               ),
               child: Row(
@@ -61,7 +71,7 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new,
-                      size: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                      size: iconSizeFactor,
                       color: Colors.white,
                     ),
                   ),
@@ -70,7 +80,7 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: 6.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: titleSizeFactor*0.7,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -79,7 +89,7 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                       Text(
                         'EVENTS',
                         style: TextStyle(
-                          fontSize: 20.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: titleSizeFactor * 2,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -88,7 +98,7 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                       Text(
                         widget.section,
                         style: TextStyle(
-                          fontSize: 10.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize: subtitleSizeFactor,
                           fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
@@ -100,7 +110,7 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                 ],
               ),
             ),
-            SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
+            SizedBox(height: spacingFactor),
             Expanded(
               child: ListView.builder(
                 itemCount: vebinarChooseList.length,
@@ -108,13 +118,13 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                   final item = vebinarChooseList[index];
                   return Card(
                     color: Colors.transparent,
-                    margin: EdgeInsets.zero,
+                    //margin: EdgeInsets.zero,
                     child: ListTile(
-                      contentPadding: const EdgeInsets.fromLTRB(15, 0, 0, 0),
+                      contentPadding: EdgeInsets.fromLTRB(listTilePaddingFactor, 0, 0, 0),
                       title: Text(
                         item['word'],
-                        style: const TextStyle(
-                          fontSize: 17,
+                        style: TextStyle(
+                          fontSize: titleSizeFactor*0.7,
                           color: Colors.white,
                           fontFamily: 'Inria Serif',
                         ),
@@ -130,14 +140,14 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                             item['isOn'] = value;
                             if (value) {
                               setState(() {
-                                LocalCart.instance.isProductsInCart=true;
+                                LocalCart.instance.isProductsInCart = true;
                                 widget.toggleCircleCart(true);
                               });
                               LocalCart.instance.addWebinarToCourse(widget.section, item);
                             } else {
-                              if (LocalCart.instance.removeWebinarFromCourse(widget.section, item)){
+                              if (LocalCart.instance.removeWebinarFromCourse(widget.section, item)) {
                                 widget.toggleCircleCart(false);
-                              };
+                              }
                             }
                           });
                         },
@@ -147,23 +157,24 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                 },
               ),
             ),
-
             Row(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(left: 10.0 * MediaQuery.of(context).devicePixelRatio,
-                      bottom: 40.0 * MediaQuery.of(context).devicePixelRatio),
+                  padding: EdgeInsets.only(
+                    left: paddingFactor,
+                    bottom: paddingFactor * 4.3,
+                  ),
                   child: Text(
                     'TOTAL:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ ',
-                    style: const TextStyle(
-                      fontSize: 22,
+                    style: TextStyle(
+                      fontSize: totalTextSizeFactor*1.1,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

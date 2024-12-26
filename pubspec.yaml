@@ -20,6 +20,7 @@ dependencies:
   flutter_native_splash: ^2.4.2
   provider: ^6.1.2
   sbp: ^0.1.0
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
