@@ -11,7 +11,7 @@ class Registration extends StatelessWidget {
 
     double titleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
-
+    
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -164,12 +164,12 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
                   Navigator.push(
                     context,
                     PageRouteBuilder(
-                      transitionDuration: const Duration(milliseconds: 500),
                       pageBuilder: (context, animation, secondaryAnimation) => const ScreensWithNavigationBar(),
+                      transitionDuration: const Duration(milliseconds: 400),
                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
                         var begin = const Offset(1.0, 0.0);
                         var end = Offset.zero;
-                        var curve = Curves.linear;
+                        var curve = Curves.ease;
                         var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
                         var offsetAnimation = animation.drive(tween);
 

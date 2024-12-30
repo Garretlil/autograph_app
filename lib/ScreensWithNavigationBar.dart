@@ -1,5 +1,6 @@
-import 'package:autograph_app/CartScreens/PaymentVisible.dart';
+
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'CartScreens/CartChooseScreen.dart';
 import 'CartScreens/CartEventsScreen.dart';
 import 'HomeScreens/DetailsScreenForSection.dart';
@@ -12,6 +13,7 @@ import 'ProfileScreens/ProfileMyEventsScreen.dart';
 import 'ProfileScreens/ProfileOrders.dart';
 import 'ProfileScreens/ProfilePage.dart';
 import 'ProfileScreens/ProfileSettings.dart';
+import 'dart:io';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});
@@ -27,12 +29,16 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
   int cartItemCount = 0;
   bool isBottomNavVisible = true;
   bool isCircleVisible =false;
+// Контроллер для анимации
+  late AnimationController _animationController;
+  late Animation<double> _iconAnimation;
 
   void _toggleBottomNavigationBar(bool isVisible) {
     setState(() {
       isBottomNavVisible = isVisible;
     });
   }
+  
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -100,22 +106,20 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
           case 0:
                switch (settings.name) {
                   case '/':
-                    return MaterialPageRoute(builder: (context) => const HomePage());
+                    return customPageRoute(const HomePage());
                   case '/EventsOnlineOffline':
                     return customPageRoute(const EventsOnlineOffline());
                   case '/EventsOnline':
-                      return MaterialPageRoute(builder: (context) => const EventsOnline());
+                      return customPageRoute(const EventsOnline());
                   case '/DetailsScreenForSection':
                     final args = settings.arguments as Map<String, dynamic>;
-                    return MaterialPageRoute(
-                      builder: (context) => DetailsScreenForSection(
+                    return customPageRoute( DetailsScreenForSection(
                         section: args['section'], // Access 'section' key
                        ),
                     );
                  case '/ListOfVebinars':
                    final args = settings.arguments as Map<String, dynamic>;
-                   return MaterialPageRoute(
-                     builder: (context) => ListOfVebinars(
+                   return customPageRoute( ListOfVebinars(
                        section: args['section'], toggleCircleCart: _toggleCircleCart,
                      ),
                    );
@@ -123,58 +127,48 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                      throw Exception('Unknown route: ${settings.name}');
                  }
           case 1:
-            builder = (context) {
               switch (settings.name) {
                 case '/':
-                  return const CartChooseScreen();
+                  return customPageRoute(const CartChooseScreen());
                 case '/CartEvents':
-                  return CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                    toggleCircleCart: _toggleCircleCart,);
+                  return customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                    toggleCircleCart: _toggleCircleCart,));
                 case '/Cart2':
-                  return  CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                    toggleCircleCart: _toggleCircleCart,);
+                  return  customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                    toggleCircleCart: _toggleCircleCart,));
                 default:
                   throw Exception('Unknown route: ${settings.name}');
-              }
             };
             break;
           case 2:
-            builder = (context) {
               switch (settings.name) {
                 case '/':
-                  return const ProfileScreen();
+                  return customPageRoute(const ProfileScreen());
                 case '/MY_EVENTS':
-                  return const ProfileMyEventsScreen();
+                  return customPageRoute(const ProfileMyEventsScreen());
                 case '/Orders':
-                  return const ProfileOrdersScreen();
+                  return customPageRoute(const ProfileOrdersScreen());
                 case '/ProfileOrders':
-                  return const ProfileOrdersScreen();
+                  return customPageRoute(const ProfileOrdersScreen());
                 case '/ProfileSettings':
-                  return const ProfileSettingsScreen();
+                  return customPageRoute(const ProfileSettingsScreen());
                 default:
                   throw Exception('Unknown route: ${settings.name}');
-              }
             };
             break;
           default:
             throw Exception('Unknown tab index: $index');
         }
-        return MaterialPageRoute(builder: builder, settings: settings);
+        //return MaterialPageRoute(builder: builder, settings: settings);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
-    // Коэффициенты адаптации
-    double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-    double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
+
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -189,57 +183,72 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
             ),
             if (isBottomNavVisible)
               Positioned(
-                left: 20,
-                right: 20,
-                bottom: 20,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: const DecorationImage(
-                      image: AssetImage('assets/imageBottom.png'),
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10,
-                        offset: Offset(0, 5),
+                left: 35,
+                right: 35,
+                bottom: Platform.isIOS ? -10 : 20,
+                child: SafeArea(
+                  maintainBottomViewPadding: true,
+                  bottom: true,
+                  top: true,
+                  child: Container(
+                    height: spacingFactor * 1.3,
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                        image: AssetImage('assets/imageBottom.png'),
+                        fit: BoxFit.cover,
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: BottomNavigationBar(
-                      elevation: 0,
-                      backgroundColor: Colors.black.withOpacity(0.5),
-                      currentIndex: _selectedIndex,
-                      selectedItemColor: Colors.deepOrange,
-                      unselectedItemColor: Colors.white70,
-                      iconSize: spacingFactor*0.7,
-                      onTap: (index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
-                      items: <BottomNavigationBarItem>[
-                        const BottomNavigationBarItem(
-                          icon: Icon(Icons.account_balance_rounded),
-                          label: 'Home',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: _buildCartIcon(),
-                          label: 'Cart',
-                        ),
-                        const BottomNavigationBarItem(
-                          icon: Icon(Icons.person),
-                          label: 'Profile',
+                      borderRadius: BorderRadius.circular(35),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
                         ),
                       ],
                     ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(35),
+                      child: GNav(
+                        iconSize: spacingFactor*0.5,
+                        backgroundColor: Colors.black.withOpacity(0.5),
+                        color: Colors.white70,
+                        activeColor: Colors.deepOrange,
+                        tabBackgroundColor: Colors.white.withOpacity(0.7),
+                        //tabBackgroundColor: Colors.transparent,
+                        //hoverColor: Colors.green,
+                        rippleColor: Colors.transparent,
+                        gap: 8,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 15, vertical: spacingFactor * 0.25),
+                        selectedIndex: _selectedIndex,
+                        onTabChange: (index) {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                        tabs: const [
+                          GButton(
+                            icon: Icons.account_balance_rounded,
+                            text: 'Home',
+                            haptic: true,
+                          ),
+                          GButton(
+                            icon: Icons.shopping_cart,
+                            text: 'Cart',
+                            haptic: true,
+                          ),
+                          GButton(
+                            icon: Icons.person,
+                            text: 'Profile',
+                            haptic: true,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-           ],
+              )
+          ],
         ),
       ),
     );
