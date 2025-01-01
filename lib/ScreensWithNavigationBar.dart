@@ -1,4 +1,5 @@
 
+import 'package:autograph_app/ProfileScreens/MyEventsVebinars.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'CartScreens/CartChooseScreen.dart';
@@ -146,6 +147,12 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                   return customPageRoute(const ProfileScreen());
                 case '/MY_EVENTS':
                   return customPageRoute(const ProfileMyEventsScreen());
+                case '/MyEventsVebinars':
+                  final args = settings.arguments as Map<String, dynamic>;
+                  return customPageRoute( MyEventsVebinarsScreens(
+                    courseName: args['courseName'], 
+                    ),
+                  );
                 case '/Orders':
                   return customPageRoute(const ProfileOrdersScreen());
                 case '/ProfileOrders':
@@ -167,8 +174,9 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
     double spacingFactor = screenHeight * 0.06;
-
+    double spacingFactorW = screenWidth * 0.06;
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
@@ -183,13 +191,15 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
             ),
             if (isBottomNavVisible)
               Positioned(
-                left: 35,
-                right: 35,
+                left: 40,
+                right: 40,
                 bottom: Platform.isIOS ? -10 : 20,
                 child: SafeArea(
-                  maintainBottomViewPadding: true,
+                  maintainBottomViewPadding: false,
                   bottom: true,
                   top: true,
+                  left: true,
+                  right: true,
                   child: Container(
                     height: spacingFactor * 1.3,
                     decoration: BoxDecoration(
@@ -202,7 +212,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                         BoxShadow(
                           color: Colors.black26,
                           blurRadius: 10,
-                          offset: Offset(0, 5),
+                          offset: Offset(0, 1),
                         ),
                       ],
                     ),
@@ -212,6 +222,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                         iconSize: spacingFactor*0.5,
                         backgroundColor: Colors.black.withOpacity(0.5),
                         color: Colors.white70,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         activeColor: Colors.deepOrange,
                         tabBackgroundColor: Colors.white.withOpacity(0.7),
                         //tabBackgroundColor: Colors.transparent,
@@ -219,7 +230,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                         rippleColor: Colors.transparent,
                         gap: 8,
                         padding: EdgeInsets.symmetric(
-                            horizontal: 15, vertical: spacingFactor * 0.25),
+                            horizontal: 20, vertical: spacingFactor * 0.25),
                         selectedIndex: _selectedIndex,
                         onTabChange: (index) {
                           setState(() {

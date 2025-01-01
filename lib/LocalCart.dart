@@ -79,4 +79,8 @@ class LocalCart {
       return _selectedWebinarsByCourse.keys.toList();
    }
 
+   Map<String, List<Map<String, dynamic>>> getCoureseFromRemote(){
+      return _selectedWebinarsByCourse;
+   }
+
 }

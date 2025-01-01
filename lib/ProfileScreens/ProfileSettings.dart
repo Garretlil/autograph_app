@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../UserData.dart';
 
 
 class ProfileSettingsScreen extends StatefulWidget {
@@ -10,9 +13,21 @@ class ProfileSettingsScreen extends StatefulWidget {
 
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   bool isEnglish = true;
-
+  late SharedPreferences prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+  @override
+  void initState() {
+    super.initState();
+    setPref();
+    UserData.instance.initUser();
+  }
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double spacingFactor = screenHeight * 0.06;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -49,20 +64,19 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                 ),
               ),
               const SizedBox(height: 30),
-              // Личная информация
               _buildInfoSection("PERSONAL INFORMATION:", ""),
               SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-              _buildInfoSection("NAME:", "EMILIA"),
+              _buildInfoSection("NAME:", UserData.instance.name),
               SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-              _buildInfoSection("SURNAME:", "BOBROVICH"),
+              _buildInfoSection("SURNAME:", UserData.instance.surname),
               SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-              _buildInfoSection("PHONE NUMBER:", "89999999999"),
+              _buildInfoSection("PHONE NUMBER:", UserData.instance.phoneNumber),
               SizedBox(height: 15.0 * MediaQuery.of(context).devicePixelRatio),
-              _buildInfoSection("EMAIL:", "SHESAIDEMMA@GMAIL.COM"),
+              _buildInfoSection("EMAIL:", UserData.instance.email),
               SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-              _buildInfoSection("COUNTRY:", "RUSSIA"),
-              SizedBox(height: 70.0 * MediaQuery.of(context).devicePixelRatio),
-              // Переключение языков
+              _buildInfoSection("COUNTRY:", UserData.instance.country),
+              SizedBox(height: spacingFactor),
+              //rus-0,eng-1
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +103,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     );
   }
 
-  // Функция для создания секции информации
   Widget _buildInfoSection(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -124,6 +137,12 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       onTap: () {
         setState(() {
           isEnglish = (language == "ENG");
+          if (language=="ENG"){
+            prefs.setBool('LangParams', true);
+          }
+          else {
+            prefs.setBool('LangParams', false);
+          }
         });
       },
       child: Container(

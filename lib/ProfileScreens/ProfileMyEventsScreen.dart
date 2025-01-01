@@ -109,7 +109,12 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                         5.0 * MediaQuery.of(context).devicePixelRatio,
                         5.0 * MediaQuery.of(context).devicePixelRatio,
                       ),
-                      child: Text(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/MyEventsVebinars',
+                              arguments:{'courseName': courseName});
+                        },
+                        child:Text(
                         courseName,
                         style:  TextStyle(
                           fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
@@ -118,6 +123,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                           fontFamily: 'Inria Serif',
                         ),
                       ),
+                      )
                     );
                   },
                 ),

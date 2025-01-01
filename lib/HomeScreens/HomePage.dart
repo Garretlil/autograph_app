@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../CartScreens/OrderStatus.dart';
 import '../ScreensWithNavigationBar.dart';
 
@@ -11,11 +12,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage> {
+  SharedPreferences? prefs;
+
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});  // Обновляем состояние после загрузки prefs
+  }
 
   @override
   void initState() {
     super.initState();
-
+    setPref();
   }
 
   @override
@@ -82,7 +89,7 @@ class _HomePage extends State<HomePage> {
                           ),
                         ),
                         Text(
-                          'HOME',
+                          prefs?.getBool('LangParams')==true? 'HOME':'КУРСЫ',
                           style: TextStyle(
                             fontSize: titleSizeFactor * 2,
                             fontWeight: FontWeight.normal,
