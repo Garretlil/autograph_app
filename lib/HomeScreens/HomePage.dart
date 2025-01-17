@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mesh_gradient/mesh_gradient.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../CartScreens/OrderStatus.dart';
 import '../ScreensWithNavigationBar.dart';
@@ -13,16 +14,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   SharedPreferences? prefs;
-
+  late final AnimatedMeshGradientController _controller = AnimatedMeshGradientController();
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {});  // Обновляем состояние после загрузки prefs
+    setState(() {});
   }
 
   @override
   void initState() {
+    _controller.start();
     super.initState();
     setPref();
+
   }
 
   @override
@@ -37,44 +40,41 @@ class _HomePage extends State<HomePage> {
     double titleSizeFactor = screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
-
+    //late final AnimatedMeshGradientController _controller = AnimatedMeshGradientController();
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            paddingFactor,
-            paddingFactor * 1.8,
-            paddingFactor,
-            0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
+      body: Stack(
+          children: [
+            Positioned.fill(
+                child: AnimatedMeshGradient(
+                  colors: const [
+                    Colors.black12,
+                    Colors.deepOrange,
+                    Colors.deepOrange,
+                    Colors.black12,
+                  ],
+                  options: AnimatedMeshGradientOptions(
+                    speed: 0.01,
+                    grain: 0,
+                    amplitude: 30,
+                    frequency: 5,
+                  ),
+                  controller: _controller,
+                )
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(
+                paddingFactor,
+                paddingFactor * 1.8,
+                paddingFactor,
+               0,
+            ),
+            child:
+            Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.pop(context);
-                  //   },
-                  //   child: Padding(
-                  //     padding: EdgeInsets.only(top: screenHeight * 0.08),  // Сдвиг вниз
-                  //     child: Opacity(
-                  //       opacity: 0,  // Иконка становится невидимой
-                  //       child: Icon(
-                  //         Icons.arrow_back_ios_new,  // Вернём иконку, чтобы сохранить тип
-                  //         size: iconSizeFactor*1.3,
-                  //         color: Colors.white,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   Center(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -110,17 +110,18 @@ class _HomePage extends State<HomePage> {
                   Text(
                     'PRODUCTS',
                     style: TextStyle(
-                      fontSize: smallTextFactor,
+                      fontSize: smallTextFactor*1.2,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
+                      //decoration: TextDecoration.underline,
                     ),
                   ),
                   SizedBox(height: spacingFactor * 0.5),
                   Text(
                     'PHANTOMS',
                     style: TextStyle(
-                      fontSize: smallTextFactor * 0.8,
+                      fontSize: smallTextFactor ,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
@@ -130,7 +131,7 @@ class _HomePage extends State<HomePage> {
                   Text(
                     'BRUSHES',
                     style: TextStyle(
-                      fontSize: smallTextFactor * 0.8,
+                      fontSize: smallTextFactor ,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
@@ -144,7 +145,7 @@ class _HomePage extends State<HomePage> {
                     child: Text(
                       'EVENTS',
                       style: TextStyle(
-                        fontSize: smallTextFactor,
+                        fontSize: smallTextFactor*1.2,
                         fontWeight: FontWeight.normal,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
@@ -165,7 +166,7 @@ class _HomePage extends State<HomePage> {
                     child: Text(
                       'ONLINE',
                       style: TextStyle(
-                        fontSize: smallTextFactor * 0.8,
+                        fontSize: smallTextFactor ,
                         fontWeight: FontWeight.normal,
                         color: Colors.white,
                         fontFamily: 'Inria Serif',
@@ -176,7 +177,7 @@ class _HomePage extends State<HomePage> {
                   Text(
                     'OFFLINE',
                     style: TextStyle(
-                      fontSize: smallTextFactor * 0.8,
+                      fontSize: smallTextFactor ,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
@@ -187,7 +188,8 @@ class _HomePage extends State<HomePage> {
               SizedBox(height: spacingFactor * 2),
             ],
           ),
-        ),
+            )
+        ],
       ),
     );
   }

@@ -74,7 +74,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                   const SizedBox(width: 24),
                 ],
               ),
-               SizedBox(height: 15.0 * MediaQuery.of(context).devicePixelRatio),
+               SizedBox(height: 10.0 * MediaQuery.of(context).devicePixelRatio),
               Center(
                 child: Text(
                     'MY EVENTS',
@@ -86,8 +86,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                     ),
                   ),
               ),
-
-              SizedBox(height: 15.0 * MediaQuery.of(context).devicePixelRatio),
+              SizedBox(height: 10.0 * MediaQuery.of(context).devicePixelRatio),
               Text(
                 'ONLINE:',
                 style: TextStyle(

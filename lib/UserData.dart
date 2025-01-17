@@ -1,12 +1,13 @@
 class UserData{
   UserData._privateConstructor();
   static final UserData instance = UserData._privateConstructor();
-
+   int id=0;
    String name = '';
    String surname = '';
    String email = '';
    String phoneNumber = '';
    String country = '';
+
 
   void getNameFromDB(){
     name='EMILIA';

@@ -1,3 +1,5 @@
+import '../NetworkLayer.dart';
+import 'package:dio/dio.dart';
 class CourseWebinars {
 
   static final CourseWebinars _instance = CourseWebinars._internal();
@@ -9,6 +11,13 @@ class CourseWebinars {
   CourseWebinars._privateConstructor();
 
   static final CourseWebinars instance = CourseWebinars._privateConstructor();
+  Future<void> getCourses() async{
+    final dio = Dio();
+    final client = CourseVideoService(dio);
+
+    CourseResponse response = await client.getCourses();
+    webinarsByCourse=response.courses;
+  }
 
   Map<String, List<Map<String, dynamic>>> webinarsByCourse = {
     'PRO DESIGN': [
@@ -16,22 +25,21 @@ class CourseWebinars {
            ' including color correction, defects removal,'
            ' creating own brand logo,'
            ' digital signature and etc.'},
-      {'word': 'Color Correction Mastery', 'isOn': false, 'cost': 5},
-      {'word': 'Defects Removal Techniques', 'isOn': false, 'cost': 4},
-      {'word': 'Creating a Brand Logo', 'isOn': false, 'cost': 6},
-      {'word': 'Digital Signature Basics', 'isOn': false, 'cost': 3},
-      {'word': 'Advanced Photoshop Tricks', 'isOn': false, 'cost': 5},
+      {'word': 'Color Correction Mastery', 'isOn': false, 'cost': 5,'id':'1'},
+      {'word': 'Creating a Brand Logo', 'isOn': false, 'cost': 6,'id':'2'},
+      {'word': 'Digital Signature Basics', 'isOn': false, 'cost': 3,'id':'3'},
+      {'word': 'Advanced Photoshop Tricks', 'isOn': false, 'cost': 5,'id':'4'},
     ],
     'PRO PHOTO': [
       {'description': 'Full demonstration of photo editing,'
           ' including color correction, defects removal,'
           ' creating own brand logo,'
           ' digital signature and etc.'},
-      {'word': 'Top Camera Reviews', 'isOn': false, 'cost': 7},
-      {'word': 'Budget-Friendly Photosets', 'isOn': false, 'cost': 6},
-      {'word': 'Dental Photography Essentials', 'isOn': false, 'cost': 5},
-      {'word': 'Macro Photography Guide', 'isOn': false, 'cost': 8},
-      {'word': 'Using Macrorails Effectively', 'isOn': false, 'cost': 7},
+      {'word': 'Top Camera Reviews', 'isOn': false, 'cost': 7,'id':'5'},
+      {'word': 'Budget-Friendly Photosets', 'isOn': false, 'cost': 6,'id':'6'},
+      {'word': 'Dental Photography Essentials', 'isOn': false, 'cost': 5,'id':'7'},
+      {'word': 'Macro Photography Guide', 'isOn': false, 'cost': 8,'id':'8'},
+      {'word': 'Using Macrorails Effectively', 'isOn': false, 'cost': 7,'id':'9'},
     ],
     'LIGHT MASTER': [
       {'description': 'Full demonstration of photo editing,'
@@ -41,8 +49,8 @@ class CourseWebinars {
       {'word': 'Studio Lighting Basics', 'isOn': false, 'cost': 4},
       {'word': 'Outdoor Lighting Setups', 'isOn': false, 'cost': 5},
       {'word': 'Controlling Natural Light', 'isOn': false, 'cost': 6},
-      {'word': 'Budget Lighting Techniques', 'isOn': false, 'cost': 3},
-      {'word': 'Professional Lighting Tricks', 'isOn': false, 'cost': 7},
+      {'word': 'Budget Lighting Techniques', 'isOn': false, 'cost': 7},
+      {'word': 'Professional Lighting Tricks', 'isOn': false, 'cost': 8},
     ],
     'VIDEO ART': [
       {'description': 'Full demonstration of photo editing,'
@@ -68,17 +76,14 @@ class CourseWebinars {
     ],
   };
 
-  // Метод для установки вебинаров для конкретного курса
   void setWebinars(String courseName, List<Map<String, dynamic>> webinars) {
     webinarsByCourse[courseName] = webinars;
   }
 
-  // Метод для получения вебинаров для конкретного курса
   List<Map<String, dynamic>> getWebinars(String courseName) {
     return webinarsByCourse[courseName] ?? [];
   }
 
-  // Метод для сброса состояний всех вебинаров
   void resetWebinars(String courseName) {
     final webinars = webinarsByCourse[courseName];
     if (webinars != null) {

@@ -4,6 +4,7 @@ import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import '../LocalCart.dart';
+import '../PurchasedСourses.dart';
 import 'OrderStatus.dart';
 
 class CartEvents extends StatefulWidget {
@@ -149,7 +150,7 @@ class _CartEvents extends State<CartEvents> {
                                                 });
                                               },
                                               child: const Icon(
-                                                Icons.remove_circle_outline,
+                                                Icons.dangerous_outlined,
                                                 color: Colors.deepOrange,
                                               ),
                                             ),
@@ -311,6 +312,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                // ),
               onTap: () async {
                 await _showPaymentWidget();
+                PurchasedCourses.instance.addToPurchased();
               },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),
@@ -348,9 +350,16 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
   }
 }
 
+class SbpHeaderModalSheet extends StatefulWidget{
+  final List<C2bmemberModel> informations;
+  const SbpHeaderModalSheet({super.key,required this.informations});
 
-class SbpHeaderModalSheet extends StatelessWidget {
-  const SbpHeaderModalSheet({super.key});
+  @override
+  State<SbpHeaderModalSheet> createState() => _SbpHeaderModalSheet();
+
+}
+
+class _SbpHeaderModalSheet extends State<SbpHeaderModalSheet> {
 
   @override
   Widget build(BuildContext context) {
@@ -371,55 +380,69 @@ class SbpHeaderModalSheet extends StatelessWidget {
         //   'assets/sbp.png',
         //   width: 130,
         // ),
-        const Text('Выбери банк',style: TextStyle(
-                fontSize: 20.0,
-                fontFamily: 'Inria Serif',
-                fontWeight: FontWeight.w600,
-                color: Colors.white)),
+        if (widget.informations.isNotEmpty)
+          const Text(
+            'Выбери банк',
+            style: TextStyle(
+              fontSize: 20.0,
+              fontFamily: 'Inria Serif',
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
         const SizedBox(height: 20),
       ],
     );
   }
 }
-class SbpModalBottomSheetEmptyListBankWidget extends StatelessWidget {
-  const SbpModalBottomSheetEmptyListBankWidget({super.key});
+class SbpModalBottomSheetEmptyListBankWidget extends StatefulWidget{
+  final List<C2bmemberModel> informations;
+  const SbpModalBottomSheetEmptyListBankWidget({super.key,required this.informations});
+
+  @override
+  State<SbpModalBottomSheetEmptyListBankWidget> createState() => _SbpModalBottomSheetEmptyListBankWidget();
+}
+class _SbpModalBottomSheetEmptyListBankWidget extends State<SbpModalBottomSheetEmptyListBankWidget> {
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(
-            color: Colors.black87
+      decoration: const BoxDecoration(
+        color: Colors.black87,  // Серый фон
+        borderRadius: BorderRadius.all(
+          Radius.circular(25),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SbpHeaderModalSheet(),
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Container(
-                  height: 80,
-                  decoration: const BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(10),
-                    ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SbpHeaderModalSheet(informations: widget.informations),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Container(
+                height: 80,
+                decoration: const BoxDecoration(
+                  color: Colors.white70,
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(25),
                   ),
-                  child: const Center(
-                    child: Text('У вас нет банков для оплаты по СБП'),
+                ),
+                child: const Center(
+                  child: Text(
+                    'У вас нет банков для оплаты по СБП',
+                    style: TextStyle(color: Colors.black87),
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 50),
-          ],
-        )
+          ),
+          const SizedBox(height: 50),
+        ],
+      ),
     );
   }
-
-
 }
-
 ///  Окно с банками
 class SbpModalBottomSheetWidget extends StatefulWidget {
   final List<C2bmemberModel> informations;
@@ -433,7 +456,7 @@ class SbpModalBottomSheetWidget extends StatefulWidget {
 }
 class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
 
-  int? _selectedBankIndex; // Хранит индекс выбранного банка
+  int? _selectedBankIndex;
 
   void _onBankSelected(int index) {
     setState(() {
@@ -453,7 +476,7 @@ class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
         ),
         child: Column(
           children: [
-            const SbpHeaderModalSheet(),
+             SbpHeaderModalSheet(informations:widget.informations,),
             Expanded(
               child: ListView.separated(
                 itemCount: widget.informations.length,
@@ -470,7 +493,7 @@ class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
                         ),
                       ),
                       child: GestureDetector(
-                        onTap: () => _onBankSelected(index), // Обработчик выбора
+                        onTap: () => _onBankSelected(index),
                         child: Row(
                           children: [
                             const SizedBox(width: 10),
@@ -535,12 +558,12 @@ class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
     } else {
       return Container(
         decoration: const BoxDecoration(
-          color: Colors.deepOrange,
+          color: Colors.white70,
           borderRadius: BorderRadius.vertical(
-            top: Radius.circular(50),
+            top: Radius.circular(25),
           ),
         ),
-        child: const SbpModalBottomSheetEmptyListBankWidget(),
+        child:  SbpModalBottomSheetEmptyListBankWidget(informations:widget.informations),
       );
     }
   }

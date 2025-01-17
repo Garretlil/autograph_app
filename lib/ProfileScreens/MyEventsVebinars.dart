@@ -1,6 +1,10 @@
+import 'dart:io';
+import 'package:autograph_app/Consts.dart';
+import 'package:autograph_app/NetworkLayer.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
+import '../PurchasedСourses.dart';
 
 class MyEventsVebinarsScreens extends StatefulWidget {
   final String courseName;
@@ -11,11 +15,12 @@ class MyEventsVebinarsScreens extends StatefulWidget {
 }
 
 class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
-  final List<Map<String, String>> videos = [
-    {'title': 'Color Correction Mastery', 'url': 'https://yandex.ru/video/preview/4978389184545378870'},
-    {'title': 'Defects Removal Techniques', 'url': 'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_2mb.mp4'},
-    {'title': 'Digital Signature Basics', 'url': 'https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_3mb.mp4'},
-  ];
+
+  final Map<String, List<Map<String, dynamic>>> videos = PurchasedCourses.instance.getPurchasedWebinars();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +64,8 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                   ),
                   Text(
                     widget.courseName,
-                    style: const TextStyle(
-                      fontSize: 24,
+                    style: TextStyle(
+                      fontSize: subtitleSizeFactor,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -71,14 +76,23 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
               const SizedBox(height: 20),
               Expanded(
                 child: ListView.builder(
-                  itemCount: videos.length,
+                  itemCount: videos[widget.courseName]?.length,
                   itemBuilder: (context, index) {
+                    final item = videos[widget.courseName];
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20.0),
-                      child: VideoListItem(
-                        title: videos[index]['title']!,
-                        url: videos[index]['url']!,
-                      ),
+                      child: Column(
+                         children: [
+                           Text(item![index]['word'],style: TextStyle(
+                               color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
+                           SizedBox(height: spacingFactor*0.2,),
+                           VideoPlayerView(
+                              url: baseUrl+'/video/'+item[index]['id'],
+                              thumbnailUrl: 'assets/preview.png',
+                              dataSourceType: DataSourceType.network,
+                            ),
+                         ]
+                      )
                     );
                   },
                 ),
@@ -114,7 +128,7 @@ class _VideoListItemState extends State<VideoListItem> {
       _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController,
         aspectRatio: 16 / 9,
-        autoPlay: false,
+        autoPlay: true,
         looping: false,
       );
     });
@@ -127,7 +141,7 @@ class _VideoListItemState extends State<VideoListItem> {
       children: [
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
+            borderRadius: BorderRadius.circular(15.0),
             child: AspectRatio(
               aspectRatio: 16 / 9,
               child: Container(
@@ -136,7 +150,9 @@ class _VideoListItemState extends State<VideoListItem> {
                     ? Chewie(controller: _chewieController!)
                     : const Center(
                   child: CircularProgressIndicator(
-                    color: Colors.deepOrange,
+                    color: Colors.white70,
+                    strokeWidth: 3,
+
                   ),
                 ),
               ),
@@ -164,4 +180,138 @@ class _VideoListItemState extends State<VideoListItem> {
     _chewieController?.dispose();
     super.dispose();
   }
+}
+class VideoPlayerView extends StatefulWidget{
+  const VideoPlayerView ({
+    super.key,
+    required this.url,
+    required this.thumbnailUrl,
+    required this.dataSourceType,
+  });
+  final String url;
+  final DataSourceType dataSourceType;
+  final String thumbnailUrl;
+
+  @override
+  State<VideoPlayerView> createState() => _VideoPlayerViewState();
+}
+
+class _VideoPlayerViewState extends State<VideoPlayerView> {
+  late VideoPlayerController _videoPlayerController;
+  late ChewieController _chewieController;
+  bool _isVideoPlaying = false;
+  late Duration videoDuration;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeVideoPlayer();
+    videoDuration = _videoPlayerController.value.duration;
+  }
+
+  Future<void> _initializeVideoPlayer() async {
+    switch (widget.dataSourceType) {
+      case DataSourceType.assets:
+        _videoPlayerController = VideoPlayerController.asset(widget.url);
+        break;
+      case DataSourceType.network:
+        _videoPlayerController = VideoPlayerController.network(widget.url);
+        break;
+      case DataSourceType.file:
+        _videoPlayerController = VideoPlayerController.file(File(widget.url));
+        break;
+      case DataSourceType.contentUrl:
+        _videoPlayerController = VideoPlayerController.contentUri(Uri.parse(widget.url));
+        break;
+
+    }
+
+
+
+    _videoPlayerController.initialize();
+    _videoPlayerController.setLooping(true);
+
+    // Инициализация Chewie
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      aspectRatio: 16 / 9,
+      materialProgressColors: ChewieProgressColors(
+        playedColor: Colors.white70,
+        handleColor: Colors.white70,
+        backgroundColor: Colors.white24,
+        bufferedColor: Colors.grey.shade300,
+      ),
+
+    );
+
+    _videoPlayerController.addListener(() {
+      setState(() {
+        if (_videoPlayerController.value.position == _videoPlayerController.value.duration) {
+          _isVideoPlaying = false;
+        }
+      });
+    });
+
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController.dispose();
+    super.dispose();
+  }
+
+  void _playVideo() {
+    setState(() {
+      _isVideoPlaying = true;
+    });
+    _videoPlayerController.play();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20.0),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Chewie(controller: _chewieController),
+                if (!_isVideoPlaying)
+                  GestureDetector(
+                    onTap: _playVideo,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(widget.thumbnailUrl),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.play_arrow,
+                        color: Colors.deepOrange,
+                        size: 45.0,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+enum DataSourceType {
+  assets,
+  network,
+  file,
+  contentUrl
 }

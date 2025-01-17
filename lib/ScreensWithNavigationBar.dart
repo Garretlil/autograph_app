@@ -1,5 +1,6 @@
 
 import 'package:autograph_app/ProfileScreens/MyEventsVebinars.dart';
+import 'package:autograph_app/Theme/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'CartScreens/CartChooseScreen.dart';
@@ -203,16 +204,16 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                   child: Container(
                     height: spacingFactor * 1.3,
                     decoration: BoxDecoration(
-                      image: const DecorationImage(
-                        image: AssetImage('assets/imageBottom.png'),
-                        fit: BoxFit.cover,
-                      ),
+                      // image: const DecorationImage(
+                      //   image: AssetImage('assets/imageBottom.png'),
+                      //   fit: BoxFit.cover,
+                      // ),
                       borderRadius: BorderRadius.circular(35),
-                      boxShadow: const [
+                      boxShadow:  [
                         BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10,
-                          offset: Offset(0, 1),
+                          color: Colors.white.withOpacity(0.6),
+                          blurRadius: 5,
+                          offset: const Offset(0, 1),
                         ),
                       ],
                     ),
@@ -220,11 +221,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                       borderRadius: BorderRadius.circular(35),
                       child: GNav(
                         iconSize: spacingFactor*0.5,
-                        backgroundColor: Colors.black.withOpacity(0.5),
-                        color: Colors.white70,
+                        backgroundColor: Colors.transparent,
+                        color: Colors.white,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        activeColor: Colors.deepOrange,
-                        tabBackgroundColor: Colors.white.withOpacity(0.7),
+                        activeColor: Colors.black,
+                        tabBackgroundColor: Colors.white.withOpacity(0.5),
                         //tabBackgroundColor: Colors.transparent,
                         //hoverColor: Colors.green,
                         rippleColor: Colors.transparent,
