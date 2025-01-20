@@ -16,11 +16,19 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   late SharedPreferences prefs;
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
+    if(prefs.getBool('LangParams')==true){
+      isEnglish=true;
+    }
+    else{
+      isEnglish=false;
+    }
   }
   @override
   void initState() {
     super.initState();
-    setPref();
+    setPref().then((_) {
+      setState(() {});
+    });
     UserData.instance.initUser();
   }
   @override
@@ -77,6 +85,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
               _buildInfoSection("COUNTRY:", UserData.instance.country),
               SizedBox(height: spacingFactor),
               //rus-0,eng-1
+
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

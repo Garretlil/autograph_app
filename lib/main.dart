@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/registration',
       routes: {
-        '/registration': (context) => const RegistrationScreen(),
-        '/home': (context) => const HomePage(),
+        '/registration': (context) => const ScreensWithNavigationBar(),
+        //'/home': (context) => const HomePage(),
         '/events': (context) => const EventsOnlineOffline(),
       },
       home: const ScreensWithNavigationBar(),

@@ -59,4 +59,6 @@ flutter:
     - family: Inria Serif
       fonts:
         - asset: assets/fonts/InriaSerif-Regular.ttf
-
+    - family: TestSerif
+      fonts:
+        - asset: assets/fonts/testserif.ttf

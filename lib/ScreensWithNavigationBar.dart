@@ -1,8 +1,10 @@
-
+import 'package:autograph_app/LoginRegisterScreens/RegistrationScreen.dart';
 import 'package:autograph_app/ProfileScreens/MyEventsVebinars.dart';
 import 'package:autograph_app/Theme/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:mesh_gradient/mesh_gradient.dart';
+import 'AnimationSyncManager.dart';
 import 'CartScreens/CartChooseScreen.dart';
 import 'CartScreens/CartEventsScreen.dart';
 import 'HomeScreens/DetailsScreenForSection.dart';
@@ -15,7 +17,8 @@ import 'ProfileScreens/ProfileMyEventsScreen.dart';
 import 'ProfileScreens/ProfileOrders.dart';
 import 'ProfileScreens/ProfilePage.dart';
 import 'ProfileScreens/ProfileSettings.dart';
-import 'dart:io';
+import 'dart:io'; // Импортируем AnimatedMeshGradient
+import 'package:provider/provider.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});
@@ -29,9 +32,9 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
 
   int _selectedIndex = 0;
   int cartItemCount = 0;
-  bool isBottomNavVisible = true;
+  bool isBottomNavVisible = false;
   bool isCircleVisible =false;
-// Контроллер для анимации
+
   late AnimationController _animationController;
   late Animation<double> _iconAnimation;
 
@@ -40,7 +43,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
       isBottomNavVisible = isVisible;
     });
   }
-  
+
   final List<GlobalKey<NavigatorState>> _navigatorKeys = [
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
@@ -55,6 +58,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
     }
     return false;
   }
+
   void _toggleCircleCart(bool isVisible) {
     setState(() {
       isCircleVisible = isVisible;
@@ -82,6 +86,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
       ],
     );
   }
+
   PageRouteBuilder customPageRoute(Widget page) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,
@@ -106,68 +111,72 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
         WidgetBuilder builder;
         switch (index) {
           case 0:
-               switch (settings.name) {
-                  case '/':
-                    return customPageRoute(const HomePage());
-                  case '/EventsOnlineOffline':
-                    return customPageRoute(const EventsOnlineOffline());
-                  case '/EventsOnline':
-                      return customPageRoute(const EventsOnline());
-                  case '/DetailsScreenForSection':
-                    final args = settings.arguments as Map<String, dynamic>;
-                    return customPageRoute( DetailsScreenForSection(
-                        section: args['section'], // Access 'section' key
-                       ),
-                    );
-                 case '/ListOfVebinars':
-                   final args = settings.arguments as Map<String, dynamic>;
-                   return customPageRoute( ListOfVebinars(
-                       section: args['section'], toggleCircleCart: _toggleCircleCart,
-                     ),
-                   );
-                   default:
-                     throw Exception('Unknown route: ${settings.name}');
-                 }
+            switch (settings.name) {
+              case '/':
+                return customPageRoute(const RegistrationScreen());
+              case '/HomePage':
+                _toggleBottomNavigationBar(true);
+                //isBottomNavVisible=true;
+                return customPageRoute( HomePage(
+                    toggleBottomNavigationBar: _toggleBottomNavigationBar,));
+              case '/EventsOnlineOffline':
+                return customPageRoute(const EventsOnlineOffline());
+              case '/EventsOnline':
+                return customPageRoute(const EventsOnline());
+              case '/DetailsScreenForSection':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute( DetailsScreenForSection(
+                  section: args['section'], // Access 'section' key
+                ),
+                );
+              case '/ListOfVebinars':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute( ListOfVebinars(
+                  section: args['section'], toggleCircleCart: _toggleCircleCart,
+                ),
+                );
+              default:
+                throw Exception('Unknown route: ${settings.name}');
+            }
           case 1:
-              switch (settings.name) {
-                case '/':
-                  return customPageRoute(const CartChooseScreen());
-                case '/CartEvents':
-                  return customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                    toggleCircleCart: _toggleCircleCart,));
-                case '/Cart2':
-                  return  customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                    toggleCircleCart: _toggleCircleCart,));
-                default:
-                  throw Exception('Unknown route: ${settings.name}');
+            switch (settings.name) {
+              case '/':
+                return customPageRoute(const CartChooseScreen());
+              case '/CartEvents':
+                return customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCircleCart: _toggleCircleCart,));
+              case '/Cart2':
+                return  customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCircleCart: _toggleCircleCart,));
+              default:
+                throw Exception('Unknown route: ${settings.name}');
             };
             break;
           case 2:
-              switch (settings.name) {
-                case '/':
-                  return customPageRoute(const ProfileScreen());
-                case '/MY_EVENTS':
-                  return customPageRoute(const ProfileMyEventsScreen());
-                case '/MyEventsVebinars':
-                  final args = settings.arguments as Map<String, dynamic>;
-                  return customPageRoute( MyEventsVebinarsScreens(
-                    courseName: args['courseName'], 
-                    ),
-                  );
-                case '/Orders':
-                  return customPageRoute(const ProfileOrdersScreen());
-                case '/ProfileOrders':
-                  return customPageRoute(const ProfileOrdersScreen());
-                case '/ProfileSettings':
-                  return customPageRoute(const ProfileSettingsScreen());
-                default:
-                  throw Exception('Unknown route: ${settings.name}');
+            switch (settings.name) {
+              case '/':
+                return customPageRoute(const ProfileScreen());
+              case '/MY_EVENTS':
+                return customPageRoute(const ProfileMyEventsScreen());
+              case '/MyEventsVebinars':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute( MyEventsVebinarsScreens(
+                  courseName: args['courseName'],
+                ),
+                );
+              case '/Orders':
+                return customPageRoute(const ProfileOrdersScreen());
+              case '/ProfileOrders':
+                return customPageRoute(const ProfileOrdersScreen());
+              case '/ProfileSettings':
+                return customPageRoute(const ProfileSettingsScreen());
+              default:
+                throw Exception('Unknown route: ${settings.name}');
             };
             break;
           default:
             throw Exception('Unknown tab index: $index');
         }
-        //return MaterialPageRoute(builder: builder, settings: settings);
       },
     );
   }
@@ -183,6 +192,23 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
       child: Scaffold(
         body: Stack(
           children: [
+            Positioned.fill(
+              child: AnimatedMeshGradient(
+                colors: const [
+                  back,
+                  Colors.black12,
+                  back2,
+                  back,
+                ],
+                options: AnimatedMeshGradientOptions(
+                  speed: 2,
+                  grain: 0,
+                  amplitude: 30,
+                  frequency: 3,
+                ),
+                controller: context.watch<AnimationSyncManager>().controller,
+              ),
+            ),
             IndexedStack(
               index: _selectedIndex,
               children: List.generate(
@@ -190,6 +216,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                     (index) => _buildNavigator(index),
               ),
             ),
+
             if (isBottomNavVisible)
               Positioned(
                 left: 40,
@@ -204,10 +231,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                   child: Container(
                     height: spacingFactor * 1.3,
                     decoration: BoxDecoration(
-                      // image: const DecorationImage(
-                      //   image: AssetImage('assets/imageBottom.png'),
-                      //   fit: BoxFit.cover,
-                      // ),
                       borderRadius: BorderRadius.circular(35),
                       boxShadow:  [
                         BoxShadow(
@@ -226,8 +249,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         activeColor: Colors.black,
                         tabBackgroundColor: Colors.white.withOpacity(0.5),
-                        //tabBackgroundColor: Colors.transparent,
-                        //hoverColor: Colors.green,
                         rippleColor: Colors.transparent,
                         gap: 8,
                         padding: EdgeInsets.symmetric(
