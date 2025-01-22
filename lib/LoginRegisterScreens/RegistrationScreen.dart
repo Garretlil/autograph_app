@@ -84,10 +84,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
         backgroundColor: Colors.white.withOpacity(0.4),
       ));
 
-      // Запуск анимации исчезновения при успешной регистрации
       _fadeController.forward();
-
-      // После завершения анимации, переход на следующий экран
       _fadeController.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           Navigator.pushReplacement(
@@ -103,7 +100,6 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                 var tween =
                 Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
                 var offsetAnimation = animation.drive(tween);
-
                 return SlideTransition(position: offsetAnimation, child: child);
               },
             ),

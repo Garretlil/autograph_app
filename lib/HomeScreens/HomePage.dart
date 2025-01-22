@@ -14,9 +14,10 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePage();
 }
 
-class _HomePage extends State<HomePage> {
+class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
   SharedPreferences? prefs;
-
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {});
@@ -24,6 +25,7 @@ class _HomePage extends State<HomePage> {
 
   @override
   void initState() {
+
     super.initState();
     setPref();
   }

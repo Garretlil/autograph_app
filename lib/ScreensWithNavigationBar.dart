@@ -28,7 +28,7 @@ class ScreensWithNavigationBar extends StatefulWidget {
       _ScreensWithNavigationBarState();
 }
 
-class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
+class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> with SingleTickerProviderStateMixin{
 
   int _selectedIndex = 0;
   int cartItemCount = 0;
@@ -37,6 +37,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
 
   late AnimationController _animationController;
   late Animation<double> _iconAnimation;
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   void _toggleBottomNavigationBar(bool isVisible) {
     setState(() {
@@ -63,6 +65,19 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
     setState(() {
       isCircleVisible = isVisible;
     });
+  }
+  @override
+  void initState(){
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
+      CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
+    );
+
   }
 
   Widget _buildCartIcon() {
@@ -97,7 +112,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> {
         var curve = Curves.ease;
         var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
         var offsetAnimation = animation.drive(tween);
-
         return SlideTransition(position: offsetAnimation, child: child);
       },
     );
