@@ -9,3 +9,7 @@ const Color shadowColorLight = Color(0xC0BABABA);
 const Color shadowColorDark = Colors.black;
 const Color back =Color(0xC0DF9157);
 const Color back2=Color(0xC05A341E);
+const Color back3=Color(0xC01E1A1A);
+const Color backOrange=Color(0xFFFF7300);
+const Color backOrange2=Color(0xFFE45C13);
+

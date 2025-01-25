@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Courses.dart';
 
@@ -11,9 +12,15 @@ class EventsOnline extends StatefulWidget {
 }
 
 class _EventsOnline extends State<EventsOnline> {
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
+    setPref();
   }
 
   @override
@@ -73,7 +80,9 @@ class _EventsOnline extends State<EventsOnline> {
                         ),
                       ),
                       Text(
-                        'EVENTS',
+                        prefs?.getBool('LangParams') == true
+                            ? 'EVENTS'
+                            : 'хз((',
                         style: TextStyle(
                           fontSize: titleSizeFactor*2,
                           fontWeight: FontWeight.normal,
@@ -82,7 +91,9 @@ class _EventsOnline extends State<EventsOnline> {
                         ),
                       ),
                       Text(
-                        'ONLINE',
+                        prefs?.getBool('LangParams') == true
+                            ? 'ONLINE'
+                            : '',
                         style: TextStyle(
                           fontSize: subtitleSizeFactor,
                           fontWeight: FontWeight.normal,
@@ -102,12 +113,10 @@ class _EventsOnline extends State<EventsOnline> {
                   itemBuilder: (context, index) {
                     final courseName = CourseWebinars.instance.webinarsByCourse.keys.elementAt(index);
                     final webinars = CourseWebinars.instance.webinarsByCourse[courseName];
-
                     final courseDescription = webinars?.firstWhere(
                           (webinar) => webinar.containsKey('description'),
                       orElse: () => {'description': 'No description available'},
                     )['description'] ?? 'No description available';
-
                     return GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(

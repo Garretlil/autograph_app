@@ -32,6 +32,7 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
     _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
     );
+    setPref();
     super.initState();
   }
 
@@ -39,6 +40,12 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
   void dispose() {
     _fadeController.dispose();
     super.dispose();
+  }
+  SharedPreferences? prefs;
+
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
   }
 
   @override
@@ -52,7 +59,9 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: LayoutBuilder(
+      body:
+      Stack(children: [
+        LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: ConstrainedBox(
@@ -98,7 +107,17 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
                           ),
                           SizedBox(height: spacingFactor * 2.6),
                           const OtpInputFields(),
-                          SizedBox(height: spacingFactor),
+                          SizedBox(height: spacingFactor*1),
+                          Center(child: Text(
+                            prefs?.getBool('LangParams') == true
+                                ? 'The verification code'
+                                : 'Код подтверждения отправлен на ваш E-mail',
+                            style:  TextStyle(fontFamily: 'Inria Serif',fontSize: titleSizeFactor*0.85,color: Colors.white),),),
+                          Center(child: Text(
+                            prefs?.getBool('LangParams') == true
+                                ? 'was sent to your E-mail'
+                                : 'Код подтверждения отправлен на ваш E-mail',
+                            style:  TextStyle(fontFamily: 'Inria Serif',fontSize: titleSizeFactor*0.85,color: Colors.white),),),
                           const Spacer(),
                         ],
                       ),
@@ -110,6 +129,8 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
           );
         },
       ),
+      ],
+      )
     );
   }
 }

@@ -35,7 +35,6 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     context.watch<AnimationSyncManager>().controller.stop();
-    // Коэффициенты для адаптации
     double paddingFactor = screenWidth * 0.06;
     double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
@@ -80,7 +79,7 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                                 Text(
                                   prefs?.getBool('LangParams') == true
                                       ? 'HOME'
-                                      : 'КУРСЫ',
+                                      : '',
                                   style: TextStyle(
                                     fontSize: titleSizeFactor * 2,
                                     fontWeight: FontWeight.normal,
@@ -96,7 +95,9 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'PRODUCTS',
+                                prefs?.getBool('LangParams') == true
+                                    ? 'PRODUCTS'
+                                    : 'Магазин',
                                 style: TextStyle(
                                   fontSize: smallTextFactor * 1.2,
                                   fontWeight: FontWeight.normal,
@@ -106,7 +107,9 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                               ),
                               SizedBox(height: spacingFactor * 0.5),
                               Text(
-                                'PHANTOMS',
+                                prefs?.getBool('LangParams') == true
+                                    ? 'PHANTOMS'
+                                    : 'хз((',
                                 style: TextStyle(
                                   fontSize: smallTextFactor,
                                   fontWeight: FontWeight.normal,
@@ -116,7 +119,9 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                               ),
                               SizedBox(height: spacingFactor * 0.3),
                               Text(
-                                'BRUSHES',
+                                prefs?.getBool('LangParams') == true
+                                    ? 'BRUSHES'
+                                    : 'хз((',
                                 style: TextStyle(
                                   fontSize: smallTextFactor,
                                   fontWeight: FontWeight.normal,
@@ -131,7 +136,9 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                                       context, '/EventsOnlineOffline');
                                 },
                                 child: Text(
-                                  'EVENTS',
+                                  prefs?.getBool('LangParams') == true
+                                      ? 'EVENTS'
+                                      : 'хз((',
                                   style: TextStyle(
                                     fontSize: smallTextFactor * 1.2,
                                     fontWeight: FontWeight.normal,
@@ -152,7 +159,9 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                                   );
                                 },
                                 child: Text(
-                                  'ONLINE',
+                                  prefs?.getBool('LangParams') == true
+                                      ? 'ONLINE'
+                                      : 'хз((',
                                   style: TextStyle(
                                     fontSize: smallTextFactor,
                                     fontWeight: FontWeight.normal,
@@ -163,7 +172,9 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                               ),
                               SizedBox(height: spacingFactor * 0.3),
                               Text(
-                                'OFFLINE',
+                                prefs?.getBool('LangParams') == true
+                                    ? 'OFFLINE'
+                                    : 'хз((',
                                 style: TextStyle(
                                   fontSize: smallTextFactor,
                                   fontWeight: FontWeight.normal,

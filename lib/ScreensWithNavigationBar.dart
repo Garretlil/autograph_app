@@ -66,11 +66,12 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
       isCircleVisible = isVisible;
     });
   }
+
   @override
   void initState(){
     super.initState();
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 100),
       vsync: this,
     );
 
@@ -209,10 +210,10 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
             Positioned.fill(
               child: AnimatedMeshGradient(
                 colors: const [
-                  back,
-                  Colors.black12,
-                  back2,
-                  back,
+                  backOrange2,
+                  back3,
+                  back3,
+                  backOrange,
                 ],
                 options: AnimatedMeshGradientOptions(
                   speed: 2,
@@ -249,7 +250,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                       boxShadow:  [
                         BoxShadow(
                           color: Colors.white.withOpacity(0.6),
-                          blurRadius: 5,
+                          blurRadius: 0,
                           offset: const Offset(0, 1),
                         ),
                       ],

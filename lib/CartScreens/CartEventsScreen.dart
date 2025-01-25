@@ -5,6 +5,7 @@ import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import '../LocalCart.dart';
 import '../PurchasedСourses.dart';
+import '../Theme/Colors.dart';
 import 'OrderStatus.dart';
 
 class CartEvents extends StatefulWidget {
@@ -318,13 +319,13 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
               splashColor: Colors.black.withOpacity(0.1),
               child: Ink(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color.lerp(Colors.deepOrange, Colors.brown, _animation.value)!,
-                      Color.lerp(Colors.black, Colors.deepOrange, _animation.value)!,
+                      Color.lerp(back3, back3, _animation.value)!,
+                      Color.lerp(back3, back3, _animation.value)!,
                     ],
                   ),
                 ),

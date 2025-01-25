@@ -6,16 +6,17 @@ import 'package:mesh_gradient/mesh_gradient.dart';
 import '../AnimationSyncManager.dart';
 import '../NetworkLayer.dart';
 import '../Theme/Colors.dart';
-import 'CheckCode.dart';
+import 'LoginRegisterScreens/CheckCode.dart';
+//import 'CheckCode.dart';
 
-class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+class a extends StatefulWidget {
+  const a({super.key});
 
   @override
-  State<RegistrationScreen> createState() => _RegistrationScreen();
+  State<a> createState() => _a();
 }
 
-class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerProviderStateMixin {
+class _a extends State<a> with SingleTickerProviderStateMixin {
   SharedPreferences? prefs;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
