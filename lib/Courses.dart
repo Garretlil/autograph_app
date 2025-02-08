@@ -1,80 +1,90 @@
-import '../NetworkLayer.dart';
 import 'package:dio/dio.dart';
-class CourseWebinars {
 
-  static final CourseWebinars _instance = CourseWebinars._internal();
-  CourseWebinars._internal();
+import 'NetworkLayer.dart';
+
+class CourseWebinars {
+  static final CourseWebinars instance = CourseWebinars._internal();
+
+  CourseWebinars._internal() {
+    _initializeAsync();
+  }
 
   factory CourseWebinars() {
-    return _instance;
+    return instance;
   }
-  CourseWebinars._privateConstructor();
 
-  static final CourseWebinars instance = CourseWebinars._privateConstructor();
-  Future<void> getCourses() async{
+  Future<void> _initializeAsync() async {
+    try {
+      await getCourses();
+      webinarsByCourse = transformCourses();
+      //throw Exception();
+    } catch (error) {
+      print('Ошибка инициализации CourseWebinars: $error');
+      webinarsByCourse = {
+        'PRO DESIGN': [
+          {'description': 'Full demonstration of photo editing, including color correction, defects removal, creating own brand logo, digital signature and etc.'},
+          {'word': 'Color Correction Mastery', 'isOn': false, 'cost': 5, 'id': '1'},
+          {'word': 'Creating a Brand Logo', 'isOn': false, 'cost': 6, 'id': '2'},
+          {'word': 'Digital Signature Basics', 'isOn': false, 'cost': 3, 'id': '3'},
+        ],
+        'PRO PHOTO': [
+          {'description': 'Full demonstration of photo editing, including color correction, defects removal, creating own brand logo, digital signature and etc.'},
+          {'word': 'Top Camera Reviews', 'isOn': false, 'cost': 7, 'id': '5'},
+          {'word': 'Budget-Friendly Photosets', 'isOn': false, 'cost': 6, 'id': '6'},
+          {'word': 'Dental Photography Essentials', 'isOn': false, 'cost': 5, 'id': '7'},
+        ],
+      };
+    }
+  }
+
+  late Map<String, List<Map<String, dynamic>>> webinarsByCourse;
+  late List<Course> courses;
+
+  Map<String, List<Map<String, dynamic>>> transformCourses() {
+    final result = <String, List<Map<String, dynamic>>>{};
+    for (final course in courses) {
+      if (course.title != null) {
+        final webinarsList = <Map<String, dynamic>>[];
+
+        if (course.description != null) {
+          webinarsList.add({'description': course.description!});
+        }
+        if (course.webinars != null) {
+          for (final webinar in course.webinars!) {
+            final webinarMap = <String, dynamic>{};
+            if (webinar.title != null) {
+              webinarMap['word'] = webinar.title;
+              webinarMap['isOn'] = false;
+            }
+            if (webinar.id != null) {
+              webinarMap['id'] = webinar.id.toString();
+            }
+            if (webinar.price != null) {
+              webinarMap['cost'] = webinar.price;
+            }
+            webinarsList.add(webinarMap);
+          }
+        }
+        result[course.title!] = webinarsList;
+      }
+    }
+    return result;
+  }
+
+
+
+  Future<void> getCourses() async {
     final dio = Dio();
     final client = CourseVideoService(dio);
+    try {
+      List<Course> response = await client.getCourses();
+      courses = response;
+    } catch (error) {
+      print('Ошибка при загрузке курсов: $error');
 
-    CourseResponse response = await client.getCourses();
-    webinarsByCourse=response.courses;
+      courses = [];
+    }
   }
-
-  Map<String, List<Map<String, dynamic>>> webinarsByCourse = {
-    'PRO DESIGN': [
-      {'description': 'Full demonstration of photo editing,'
-           ' including color correction, defects removal,'
-           ' creating own brand logo,'
-           ' digital signature and etc.'},
-      {'word': 'Color Correction Mastery', 'isOn': false, 'cost': 5,'id':'1'},
-      {'word': 'Creating a Brand Logo', 'isOn': false, 'cost': 6,'id':'2'},
-      {'word': 'Digital Signature Basics', 'isOn': false, 'cost': 3,'id':'3'},
-      {'word': 'Advanced Photoshop Tricks', 'isOn': false, 'cost': 5,'id':'4'},
-    ],
-    'PRO PHOTO': [
-      {'description': 'Full demonstration of photo editing,'
-          ' including color correction, defects removal,'
-          ' creating own brand logo,'
-          ' digital signature and etc.'},
-      {'word': 'Top Camera Reviews', 'isOn': false, 'cost': 7,'id':'5'},
-      {'word': 'Budget-Friendly Photosets', 'isOn': false, 'cost': 6,'id':'6'},
-      {'word': 'Dental Photography Essentials', 'isOn': false, 'cost': 5,'id':'7'},
-      {'word': 'Macro Photography Guide', 'isOn': false, 'cost': 8,'id':'8'},
-      {'word': 'Using Macrorails Effectively', 'isOn': false, 'cost': 7,'id':'9'},
-    ],
-    'LIGHT MASTER': [
-      {'description': 'Full demonstration of photo editing,'
-          ' including color correction, defects removal,'
-          ' creating own brand logo,'
-          ' digital signature and etc.'},
-      {'word': 'Studio Lighting Basics', 'isOn': false, 'cost': 4},
-      {'word': 'Outdoor Lighting Setups', 'isOn': false, 'cost': 5},
-      {'word': 'Controlling Natural Light', 'isOn': false, 'cost': 6},
-      {'word': 'Budget Lighting Techniques', 'isOn': false, 'cost': 7},
-      {'word': 'Professional Lighting Tricks', 'isOn': false, 'cost': 8},
-    ],
-    'VIDEO ART': [
-      {'description': 'Full demonstration of photo editing,'
-          ' including color correction, defects removal,'
-          ' creating own brand logo,'
-          ' digital signature and etc.'},
-      {'word': 'Premiere Pro Essentials', 'isOn': false, 'cost': 6},
-      {'word': 'DaVinci Resolve Basics', 'isOn': false, 'cost': 5},
-      {'word': 'After Effects Techniques', 'isOn': false, 'cost': 7},
-      {'word': 'Color Grading Workshop', 'isOn': false, 'cost': 8},
-      {'word': 'Cinematic Video Techniques', 'isOn': false, 'cost': 6},
-    ],
-    'MOBILE PHOTO': [
-      {'description': 'Full demonstration of photo editing,'
-          ' including color correction, defects removal,'
-          ' creating own brand logo,'
-          ' digital signature and etc.'},
-      {'word': 'Smartphone Photography Tips', 'isOn': false, 'cost': 4},
-      {'word': 'Advanced Mobile Apps for Editing', 'isOn': false, 'cost': 5},
-      {'word': 'Lens Attachments Guide', 'isOn': false, 'cost': 6},
-      {'word': 'Mobile Post-Processing', 'isOn': false, 'cost': 5},
-      {'word': 'Creating Stunning Mobile Photos', 'isOn': false, 'cost': 7},
-    ],
-  };
 
   void setWebinars(String courseName, List<Map<String, dynamic>> webinars) {
     webinarsByCourse[courseName] = webinars;
@@ -92,7 +102,7 @@ class CourseWebinars {
       }
     }
   }
-  // Метод для проверки существования вебинаров для курса
+
   bool hasWebinars(String courseName) {
     return webinarsByCourse.containsKey(courseName);
   }

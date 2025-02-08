@@ -1,3 +1,4 @@
+import 'package:autograph_app/HomeScreens/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,7 +10,8 @@ import '../Theme/Colors.dart';
 import 'CheckCode.dart';
 
 class RegistrationScreen extends StatefulWidget {
-  const RegistrationScreen({super.key});
+  final void Function(bool) toggleBottomNavigationBar;
+  const RegistrationScreen({super.key,required this.toggleBottomNavigationBar});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreen();
@@ -23,7 +25,10 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
 
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
@@ -36,6 +41,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
     _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
     );
+    setPref();
   }
 
   @override
@@ -43,7 +49,6 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
     _fadeController.dispose();
     super.dispose();
   }
-
   Future<void> _registerUser() async {
     const String name = 't'; //_nameController.text;
     const String surname = 't'; // _surnameController.text;
@@ -51,11 +56,16 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
 
     if (name.isEmpty || surname.isEmpty || email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Center(
-            child: Text(
-              'Please fill all fields',
-              style: TextStyle(fontSize: 18),
-            )),
+        content:  Center(
+            child: Text(prefs?.getBool('LangParams') == true
+                ? 'Please fill all fields'
+                : 'Заполните все поля',
+              style: TextStyle(fontSize:14,fontFamily:
+              prefs?.getBool('LangParams') == true
+                  ? 'Inria Serif'
+                  : 'ChUR',)
+              ),
+            ),
         duration: const Duration(milliseconds: 2000),
         backgroundColor: Colors.white.withOpacity(0.4),
       ));
@@ -73,15 +83,19 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
       final client = AuthService(dio);
       RegisterResponse response = await client.registerUser(registrationData);
       print(response.message);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Center(
-            child: Text(
-              'Registration successful!',
-              style: TextStyle(fontSize: 18),
-            )),
-        duration: const Duration(milliseconds: 2000),
-        backgroundColor: Colors.white.withOpacity(0.4),
-      ));
+      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      //   content:  Center(
+      //       child: Text(prefs?.getBool('LangParams') == true
+      //           ? 'Registration successful'
+      //           : 'Регистрация успешна',
+      //           style: TextStyle(fontSize:14,fontFamily:
+      //           prefs?.getBool('LangParams') == true
+      //               ? 'Inria Serif'
+      //               : 'Inria Serif',)
+      //       ),),
+      //   duration: const Duration(milliseconds: 2000),
+      //   backgroundColor: Colors.white.withOpacity(0.4),
+      // ));
 
       _fadeController.forward();
       _fadeController.addStatusListener((status) {
@@ -90,7 +104,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-              const CheckCodeScreen(),
+               CheckCodeScreen(toggleBottomNavigationBar: widget.toggleBottomNavigationBar,),
               transitionDuration: const Duration(milliseconds: 400),
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 var begin = const Offset(1.0, 0.0);
@@ -107,11 +121,15 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: const Center(
-            child: Text(
-              'Registration failed, try again',
-              style: TextStyle(fontSize: 18),
-            )),
+        content:  Center(
+            child: Text(prefs?.getBool('LangParams') == true
+                ? 'Registration failed,try again'
+                : 'Ошибка регистрации',
+                style: TextStyle(fontSize:14,fontFamily:
+                prefs?.getBool('LangParams') == true
+                    ? 'Inria Serif'
+                    : 'ChUR',)
+            ),),
         duration: const Duration(milliseconds: 1000),
         backgroundColor: Colors.white.withOpacity(0.4),
       ));
@@ -128,6 +146,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
     double spacingFactor = screenHeight * 0.06;
 
     return Scaffold(
+      backgroundColor: Colors.transparent, // Прозрачный фон
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -141,35 +160,12 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                   builder: (context, child) {
                     return Stack(
                       children: [
-                        Positioned.fill(
-                          child: AnimatedMeshGradient(
-                            // colors: const [
-                            //   Colors.black12,
-                            //   back,
-                            //   back,
-                            //   Colors.black12,
-                            // ],
-                            colors: const [
-                              backOrange2,
-                              back3,
-                              back3,
-                              backOrange,
-                            ],
-                            options: AnimatedMeshGradientOptions(
-                              speed: 2,
-                              grain: 0,
-                              amplitude: 40,
-                              frequency: 5,
-                            ),
-                            controller: context.watch<AnimationSyncManager>().controller,
-                          ),
-                        ),
                         FadeTransition(
                           opacity: _fadeAnimation,
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(
                               paddingFactor * 1.2,
-                              paddingFactor * 2.8,
+                              paddingFactor * 2.4,
                               paddingFactor,
                               0,
                             ),
@@ -182,34 +178,46 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                       Text(
                                         'AUTOGRAPH',
                                         style: TextStyle(
-                                          fontSize: titleSizeFactor * 0.7,
+                                          fontSize: titleSizeFactor * 0.8,
                                           fontWeight: FontWeight.bold,
                                           fontFamily: 'Inria Serif',
                                           color: Colors.white,
                                         ),
                                       ),
                                       Text(
-                                        'REGISTRATION',
+                                        prefs?.getBool('LangParams') == true
+                                            ? 'Registration'
+                                            : 'Регистрация',
                                         style: TextStyle(
                                           fontSize: titleSizeFactor,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'Inria Serif',
                                           color: Colors.white,
+                                          fontFamily:
+                                          prefs?.getBool('LangParams') == true
+                                              ? 'Inria Serif'
+                                              : 'Masvol',
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 SizedBox(height: spacingFactor * 2),
-                                _buildTextField('Name', _nameController),
+                                _buildTextField(
+                                    prefs?.getBool('LangParams') == true
+                                        ? 'Name'
+                                        : 'Имя',
+                                    _nameController),
                                 SizedBox(height: spacingFactor * 0.27),
-                                _buildTextField('Surname', _surnameController),
+                                _buildTextField(
+                                    prefs?.getBool('LangParams') == true
+                                        ? 'Surname'
+                                        : 'Фамилия',
+                                    _surnameController),
                                 SizedBox(height: spacingFactor * 0.27),
                                 _buildTextField('Email', _emailController),
                                 SizedBox(height: spacingFactor * 5),
                                 Center(
                                   child: InfiniteGradientButton(
-                                    onTap: _registerUser, // Обработчик кнопки
+                                    onTap: _registerUser,
                                   ),
                                 ),
                                 SizedBox(height: spacingFactor),
@@ -228,6 +236,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
         },
       ),
     );
+
   }
 
   Widget _buildTextField(String label, TextEditingController controller) {
@@ -235,7 +244,9 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
+        labelStyle:  TextStyle(color: Colors.white,fontFamily:prefs?.getBool('LangParams') == true
+            ? 'Inria Serif'
+            : 'Masvol'),
         filled: true,
         fillColor: Colors.white.withOpacity(0.3),
         border: OutlineInputBorder(
@@ -289,6 +300,7 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
       CurvedAnimation(parent: _controller, curve: Curves.ease),
     );
     _controller.repeat();
+    setPref();
   }
 
   @override
@@ -317,7 +329,7 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(15),
               ),
               child: InkWell(
                 onTap: () {
@@ -327,20 +339,24 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
                 child: Ink(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
+                    color: Colors.transparent,
                   ),
                   child: Container(
                     width: spacingFactor * 3.7,
                     height: spacingFactor * 0.9,
                     alignment: Alignment.center,
-                    child: Text(
+                    child:Text(
                       prefs?.getBool('LangParams') == true
-                          ? 'CONTINUE'
+                          ? 'Continue'
                           : 'Продолжить',
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: titleSizeFactor * 0.9,
-                          fontFamily: 'Inria Serif'),
+                        fontSize: titleSizeFactor,
+                        color: Colors.white,
+                        fontFamily:
+                        prefs?.getBool('LangParams') == true
+                            ? 'Inria Serif'
+                            : 'ChUR',
+                      ),
                     ),
                   ),
                 ),
@@ -383,3 +399,46 @@ class BorderPainter extends CustomPainter {
     return oldDelegate.animationValue != animationValue;
   }
 }
+// @override
+// Widget build(BuildContext context) {
+//   double screenWidth = MediaQuery.of(context).size.width;
+//   double screenHeight = MediaQuery.of(context).size.height;
+//
+//   double titleSizeFactor = screenWidth * 0.06;
+//   double spacingFactor = screenHeight * 0.06;
+//   int t=5;
+//   return GestureDetector(child:
+//   Center(
+//     child: Container(
+//       decoration: BoxDecoration(
+//         borderRadius: BorderRadius.circular(20),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.white.withOpacity(0.5),
+//             blurRadius: 10,
+//             spreadRadius: 5,
+//           ),
+//         ],
+//       ),
+//       child: ElevatedButton(
+//         onPressed: () {const CheckCodeScreen();},
+//         style: ElevatedButton.styleFrom(
+//           backgroundColor: Colors.white.withOpacity(0.5),
+//           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+//           shape: RoundedRectangleBorder(
+//             borderRadius: BorderRadius.circular(20),
+//           ),
+//         ),
+//         child: const Text(
+//           "Продолжить",
+//           style: TextStyle(
+//               fontSize: 22,
+//               color: Colors.white,
+//               fontFamily: 'Inria Serif'
+//           ),
+//         ),
+//       ),
+//     ),
+//   )
+//   );
+// }

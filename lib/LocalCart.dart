@@ -56,8 +56,8 @@ class LocalCart {
          if (webinars.isEmpty) {
             _selectedWebinarsByCourse.remove(courseName);
             if (getSelectedCourses().isEmpty){
-                isProductsInCart=false;
-                return true;
+               isProductsInCart=false;
+               return true;
             }
          }
       }

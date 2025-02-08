@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../LocalCart.dart';
 import '../PurchasedСourses.dart';
 import '../Theme/Colors.dart';
@@ -18,9 +19,15 @@ class CartEvents extends StatefulWidget {
 }
 
 class _CartEvents extends State<CartEvents> {
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
+    setPref();
   }
   @override
   Widget build(BuildContext context) {
@@ -43,7 +50,7 @@ class _CartEvents extends State<CartEvents> {
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             paddingFactor*1.2,
-            paddingFactor * 1.8,
+            paddingFactor * 2.4,
             paddingFactor,
             0,
           ),
@@ -69,21 +76,16 @@ class _CartEvents extends State<CartEvents> {
                        Text(
                         'AUTOGRAPH',
                         style: TextStyle(
-                          fontSize: subtitleSizeFactor * 0.7,
+                          fontSize: titleSizeFactor * 0.8,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        'CART',
-                        style: TextStyle(
-                          fontSize: subtitleSizeFactor * 2.2,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
+                      SizedBox(height: spacingFactor*0.2,),
+
+                      Icon(Icons.shopping_cart_outlined,color: Colors.white,
+                        size: spacingFactor*0.6,)
                     ],
                   ),
                    SizedBox(width: spacingFactor*0.5),
@@ -93,20 +95,20 @@ class _CartEvents extends State<CartEvents> {
               Expanded(
                 child: LocalCart.instance.getCart().isEmpty
                     ? Center(
-                  child: Text(
-                    'Your cart is empty :(',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: subtitleSizeFactor,
-                      fontFamily: 'Inria Serif',
-                    ),
+                  child: Text(prefs?.getBool('LangParams') == true
+                      ? 'Your cart is empty :('
+                      : 'Корзина пуста :(',
+                      style: TextStyle(fontSize:titleSizeFactor*1.05,color:Colors.white,fontFamily:
+                      prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR',)
                   ),
                 )
                     : SingleChildScrollView(
                   child: Column(
                     children: [
                       ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(), // Отключаем прокрутку внутри
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: LocalCart.instance.getSelectedCourses().length,
                         itemBuilder: (context, index) {
@@ -194,13 +196,13 @@ class _CartEvents extends State<CartEvents> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   Text(
-                    'TOTAL:',
-                    style: TextStyle(
-                      fontSize: subtitleSizeFactor,
-                      color: Colors.white,
-                      fontFamily: 'Inria Serif',
-                    ),
+                  Text(prefs?.getBool('LangParams') == true
+                      ? 'TOTAL:    '
+                      : 'Сумма:    ',
+                      style: TextStyle(fontSize:titleSizeFactor*1.05,color:Colors.white,fontFamily:
+                      prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR',)
                   ),
                   Text(
                     '${LocalCart.instance.getTotalPrice()} \$',
@@ -293,6 +295,16 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double spacingFactorW = screenWidth*0.06;
+    double listTilePaddingFactor = screenWidth * 0.06;
+    double totalTextSizeFactor = screenWidth * 0.05;
     return GestureDetector(
       onTap: () {
       },
@@ -324,20 +336,20 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color.lerp(back3, back3, _animation.value)!,
-                      Color.lerp(back3, back3, _animation.value)!,
+                      Color.lerp(Colors.grey, Colors.grey, _animation.value)!,
+                      Color.lerp(Colors.grey, Colors.grey, _animation.value)!,
                     ],
                   ),
                 ),
                 child: Container(
-                  width: 110,
-                  height: 50,
+                  width: spacingFactorW*4.4,
+                  height: spacingFactor*0.95,
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: const Text(
+                  //padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child:  Text(
                     'PAY',
                     style: TextStyle(
-                      fontSize: 25.0,
+                      fontSize: subtitleSizeFactor,
                       fontFamily: 'Inria Serif',
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -361,37 +373,58 @@ class SbpHeaderModalSheet extends StatefulWidget{
 }
 
 class _SbpHeaderModalSheet extends State<SbpHeaderModalSheet> {
-
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
+  @override
+  @override
+  void initState() {
+    super.initState();
+    setPref();
+  }
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double spacingFactorW = screenWidth*0.06;
+    double listTilePaddingFactor = screenWidth * 0.06;
+    double totalTextSizeFactor = screenWidth * 0.05;
     return Column(
       children: [
         const SizedBox(height: 10),
         Container(
-          height: 5,
-          width: 50,
+          height: spacingFactor*0.1,
+          width: spacingFactorW*1.8,
           decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(
                 Radius.circular(10),
               ),
               color: Colors.white),
         ),
-        const SizedBox(height: 20),
+         SizedBox(height: spacingFactor*0.5),
         // Image.asset(
         //   'assets/sbp.png',
         //   width: 130,
         // ),
         if (widget.informations.isNotEmpty)
-          const Text(
-            'Выбери банк',
-            style: TextStyle(
-              fontSize: 20.0,
-              fontFamily: 'Inria Serif',
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
+          Text(prefs?.getBool('LangParams') == true
+              ? "Choose a bank"
+              : 'Выбери банк',
+              style: TextStyle(fontWeight: FontWeight.w600,fontSize:titleSizeFactor*0.7,color:Colors.white,fontFamily:
+              prefs?.getBool('LangParams') == true
+                  ? 'Inria Serif'
+                  : 'ChUR',)
           ),
-        const SizedBox(height: 20),
+        SizedBox(height: spacingFactor*0.5),
       ],
     );
   }
@@ -404,14 +437,36 @@ class SbpModalBottomSheetEmptyListBankWidget extends StatefulWidget{
   State<SbpModalBottomSheetEmptyListBankWidget> createState() => _SbpModalBottomSheetEmptyListBankWidget();
 }
 class _SbpModalBottomSheetEmptyListBankWidget extends State<SbpModalBottomSheetEmptyListBankWidget> {
-
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
+  @override
+  void initState(){
+    super.initState();
+    setPref();
+  }
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Коэффициенты адаптации
+    double paddingFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double spacingFactorW = screenWidth*0.06;
+    double listTilePaddingFactor = screenWidth * 0.06;
+    double totalTextSizeFactor = screenWidth * 0.05;
+
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.black87,  // Серый фон
-        borderRadius: BorderRadius.all(
-          Radius.circular(25),
+        color: Colors.black87,
+        borderRadius: BorderRadius.only(topLeft:
+          Radius.circular(25),topRight: Radius.circular(25),
         ),
       ),
       child: Column(
@@ -429,10 +484,14 @@ class _SbpModalBottomSheetEmptyListBankWidget extends State<SbpModalBottomSheetE
                     Radius.circular(25),
                   ),
                 ),
-                child: const Center(
-                  child: Text(
-                    'У вас нет банков для оплаты по СБП',
-                    style: TextStyle(color: Colors.black87),
+                child:  Center(
+                  child: Text(prefs?.getBool('LangParams') == true
+                      ? "You don't have a banks for SBP payment"
+                      : 'У вас нет банков для оплаты по СБП',
+                      style: TextStyle(fontWeight: FontWeight.w600,fontSize:titleSizeFactor*0.7,color:Colors.white,fontFamily:
+                      prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR',)
                   ),
                 ),
               ),
@@ -453,8 +512,8 @@ class SbpModalBottomSheetWidget extends StatefulWidget {
 
   @override
   State<SbpModalBottomSheetWidget> createState() => _SbpModalBottomSheetWidget();
-
 }
+
 class _SbpModalBottomSheetWidget extends State<SbpModalBottomSheetWidget>{
 
   int? _selectedBankIndex;

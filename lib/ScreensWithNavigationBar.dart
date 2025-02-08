@@ -1,3 +1,4 @@
+import 'package:autograph_app/LoginRegisterScreens/CheckCode.dart';
 import 'package:autograph_app/LoginRegisterScreens/RegistrationScreen.dart';
 import 'package:autograph_app/ProfileScreens/MyEventsVebinars.dart';
 import 'package:autograph_app/Theme/Colors.dart';
@@ -12,7 +13,6 @@ import 'HomeScreens/EventsOnline.dart';
 import 'HomeScreens/EventsOnlineOfflineScreen.dart';
 import 'HomeScreens/HomePage.dart';
 import 'HomeScreens/ListOfVebinars.dart';
-import 'LocalCart.dart';
 import 'ProfileScreens/ProfileMyEventsScreen.dart';
 import 'ProfileScreens/ProfileOrders.dart';
 import 'ProfileScreens/ProfilePage.dart';
@@ -66,12 +66,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
       isCircleVisible = isVisible;
     });
   }
-
   @override
   void initState(){
     super.initState();
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
 
@@ -128,12 +127,15 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
           case 0:
             switch (settings.name) {
               case '/':
-                return customPageRoute(const RegistrationScreen());
+                return customPageRoute( RegistrationScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
+              // case '/RegistrationScreen':
+              //   return customPageRoute( RegistrationScreen());
+              case '/CheckCodeScreen':
+                return customPageRoute(CheckCodeScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/HomePage':
                 _toggleBottomNavigationBar(true);
-                //isBottomNavVisible=true;
-                return customPageRoute( HomePage(
-                    toggleBottomNavigationBar: _toggleBottomNavigationBar,));
+                isBottomNavVisible=true;
+                return customPageRoute( const HomePage());
               case '/EventsOnlineOffline':
                 return customPageRoute(const EventsOnlineOffline());
               case '/EventsOnline':
@@ -165,7 +167,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                   toggleCircleCart: _toggleCircleCart,));
               default:
                 throw Exception('Unknown route: ${settings.name}');
-            };
+            } {}
             break;
           case 2:
             switch (settings.name) {
@@ -187,7 +189,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                 return customPageRoute(const ProfileSettingsScreen());
               default:
                 throw Exception('Unknown route: ${settings.name}');
-            };
+            } {}
             break;
           default:
             throw Exception('Unknown tab index: $index');
@@ -218,8 +220,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                 options: AnimatedMeshGradientOptions(
                   speed: 2,
                   grain: 0,
-                  amplitude: 30,
-                  frequency: 3,
+                  amplitude: 40,
+                  frequency: 5,
                 ),
                 controller: context.watch<AnimationSyncManager>().controller,
               ),
@@ -234,8 +236,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
 
             if (isBottomNavVisible)
               Positioned(
-                left: 40,
-                right: 40,
+                left: 50,
+                right: 50,
                 bottom: Platform.isIOS ? -10 : 20,
                 child: SafeArea(
                   maintainBottomViewPadding: false,
@@ -244,13 +246,14 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                   left: true,
                   right: true,
                   child: Container(
-                    height: spacingFactor * 1.3,
+                    height: spacingFactor * 1.2,
+                    width: spacingFactorW*0.5,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(35),
+                      borderRadius: BorderRadius.circular(30),
                       boxShadow:  [
                         BoxShadow(
                           color: Colors.white.withOpacity(0.6),
-                          blurRadius: 0,
+                          blurRadius: 5,
                           offset: const Offset(0, 1),
                         ),
                       ],
@@ -262,7 +265,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                         backgroundColor: Colors.transparent,
                         color: Colors.white,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        activeColor: Colors.black,
+                        activeColor: Colors.deepOrange,
                         tabBackgroundColor: Colors.white.withOpacity(0.5),
                         rippleColor: Colors.transparent,
                         gap: 8,

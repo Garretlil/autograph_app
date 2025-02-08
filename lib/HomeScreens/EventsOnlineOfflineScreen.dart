@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsOnlineOffline extends StatefulWidget {
   const EventsOnlineOffline({super.key});
@@ -8,39 +9,48 @@ class EventsOnlineOffline extends StatefulWidget {
 }
 
 class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
-  @override
-  void initState() {
-    super.initState();
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
   }
 
+  @override
+  void initState() {
+
+    super.initState();
+    setPref();
+  }
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // Коэффициенты адаптации
     double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
+    double smallTextFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double cardMarginFactor = screenHeight * 0.06;
+    double cardPaddingFactor = screenWidth * 0.06;
 
     return Scaffold(
       backgroundColor: Colors.transparent, // Прозрачный фон
       body: Stack(
         children: [
-          // Container(
-          //   decoration: const BoxDecoration(
-          //     image: DecorationImage(
-          //       image: AssetImage('assets/image.png'),
-          //       fit: BoxFit.cover,
-          //     ),
-          //   ),
-          // ),
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/image.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           Padding(
             padding: EdgeInsets.fromLTRB(
-              paddingFactor * 1.2,
-              paddingFactor * 2.8,
+              paddingFactor*1.8,
+              paddingFactor * 2.4,
               paddingFactor,
               0,
             ),
@@ -54,34 +64,30 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: Padding(
-                        padding: EdgeInsets.only(top: screenHeight * 0.03),
                         child: Icon(
                           Icons.arrow_back_ios_new,
                           size: iconSizeFactor,
                           color: Colors.white,
                         ),
                       ),
-                    ),
                     Column(
                       children: [
                         Text(
                           'AUTOGRAPH ',
                           style: TextStyle(
-                            fontSize: subtitleSizeFactor * 0.7,
+                            fontSize: titleSizeFactor * 0.8,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'Inria Serif',
                             color: Colors.white,
                           ),
                         ),
-                        Text(
-                          'EVENTS',
-                          style: TextStyle(
-                            fontSize: titleSizeFactor * 2,
-                            fontWeight: FontWeight.normal,
-                            fontFamily: 'Inria Serif',
-                            color: Colors.white,
-                          ),
+                        Text(prefs?.getBool('LangParams') == true
+                            ? 'EVENTS'
+                            : 'Мероприятия',
+                            style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                            prefs?.getBool('LangParams') == true
+                                ? 'Inria Serif'
+                                : 'ChUR',)
                         ),
                       ],
                     ),
@@ -97,25 +103,23 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                         onTap: () {
                           Navigator.pushNamed(context, '/EventsOnline');
                         },
-                        child: Text(
-                          'ONLINE',
-                          style: TextStyle(
-                            fontSize: subtitleSizeFactor * 1.3,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.white,
-                            fontFamily: 'Inria Serif',
-                          ),
+                        child: Text(prefs?.getBool('LangParams') == true
+                            ? 'ONLINE'
+                            : 'Онлайн',
+                            style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                            prefs?.getBool('LangParams') == true
+                                ? 'Inria Serif'
+                                : 'ChUR',)
                         ),
                       ),
                       SizedBox(height: spacingFactor * 3.6),
-                      Text(
-                        'OFFLINE',
-                        style: TextStyle(
-                          fontSize: subtitleSizeFactor * 1.3,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontFamily: 'Inria Serif',
-                        ),
+                      Text(prefs?.getBool('LangParams') == true
+                          ? 'OFFLINE'
+                          : 'Оффлайн',
+                          style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                          prefs?.getBool('LangParams') == true
+                              ? 'Inria Serif'
+                              : 'ChUR',)
                       ),
                     ],
                   ),

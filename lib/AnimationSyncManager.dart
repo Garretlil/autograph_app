@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
 
 class AnimationSyncManager with ChangeNotifier {
-  double _progress = 0.0;
+  final double _progress = 0.0;
   late final AnimatedMeshGradientController _controller;
   late Timer _timer;
   double get progress => _progress;
@@ -19,6 +19,7 @@ class AnimationSyncManager with ChangeNotifier {
   //     notifyListeners();
   //   });
   // }
+  @override
   void dispose() {
     super.dispose();
     _timer.cancel();

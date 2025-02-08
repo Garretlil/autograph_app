@@ -21,6 +21,7 @@ class _EventsOnline extends State<EventsOnline> {
   void initState() {
     super.initState();
     setPref();
+    print(CourseWebinars.instance.webinarsByCourse);
   }
 
   @override
@@ -44,17 +45,17 @@ class _EventsOnline extends State<EventsOnline> {
             fit: BoxFit.cover,
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            paddingFactor*1.5,
-            paddingFactor * 1.8,
-            paddingFactor,
-            0,
-          ),
-          child: Column(
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  paddingFactor*1.6,
+                  paddingFactor * 2.4,
+                  paddingFactor,
+                  0,
+              ),
+              child:Row(
                 //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   GestureDetector(
@@ -67,46 +68,32 @@ class _EventsOnline extends State<EventsOnline> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(width:paddingFactor*2.3 ,),
+                  SizedBox(width:paddingFactor*2.7 ,),
                   Column(
                     children: [
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: subtitleSizeFactor * 0.7,
+                          fontSize: titleSizeFactor * 0.8,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        prefs?.getBool('LangParams') == true
-                            ? 'EVENTS'
-                            : 'хз((',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor*2,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        prefs?.getBool('LangParams') == true
-                            ? 'ONLINE'
-                            : '',
-                        style: TextStyle(
-                          fontSize: subtitleSizeFactor,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
+                      Text(prefs?.getBool('LangParams') == true
+                          ? 'EVENTS'
+                          : 'Мероприятия',
+                          style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                          prefs?.getBool('LangParams') == true
+                              ? 'Inria Serif'
+                              : 'ChUR',)
                       ),
                     ],
                   ),
-                 // SizedBox(width: screenWidth * 0.1),
                 ],
+               ),
               ),
-              //SizedBox(height: screenHeight * 0.0001),
+
               Expanded(
                 child: ListView.builder(
                   itemCount: CourseWebinars.instance.webinarsByCourse.length,
@@ -127,51 +114,54 @@ class _EventsOnline extends State<EventsOnline> {
                           },
                         );
                       },
-                      child: Card(
-                        color: Colors.black.withOpacity(0.2),
-                        margin: EdgeInsets.symmetric(
-                          vertical: cardMarginFactor*0.25,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(cardPaddingFactor*0.5),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                courseName,
-                                style: TextStyle(
-                                  fontSize: subtitleSizeFactor,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontFamily: 'Inria Serif',
+                      child:Center(
+                        child: Card(
+                          color: Colors.black.withOpacity(0.2),
+                          margin: EdgeInsets.only(
+                            top: cardMarginFactor*0.25,
+                            right: cardPaddingFactor,
+                            bottom: cardMarginFactor*0.2,
+                            left: cardPaddingFactor
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(cardPaddingFactor*0.5),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  courseName,
+                                  style: TextStyle(
+                                    fontSize: subtitleSizeFactor,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontFamily: 'Inria Serif',
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: screenHeight * 0.005,
-                              ),
-                              Text(
-                                courseDescription,
-                                style: TextStyle(
-                                  fontSize: descriptionSizeFactor*0.8,
-                                  color: Colors.white70,
-                                  fontFamily: 'Inria Serif',
+                                SizedBox(
+                                  height: screenHeight * 0.005,
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  courseDescription,
+                                  style: TextStyle(
+                                    fontSize: descriptionSizeFactor*0.8,
+                                    color: Colors.white70,
+                                    fontFamily: 'Inria Serif',
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
+                      )
+
                     );
                   },
                 ),
               ),
-              SizedBox(height: cardMarginFactor*1.6)
             ],
           ),
         ),
-      ),
     );
   }
 
 }
-

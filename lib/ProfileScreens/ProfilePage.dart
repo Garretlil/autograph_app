@@ -5,6 +5,17 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double paddingFactor = screenWidth * 0.06;
+    double smallTextFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double spacingFactorW=screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double cardMarginFactor = screenHeight * 0.06;
+    double cardPaddingFactor = screenWidth * 0.06;
     return Scaffold(
       body:
           Container(
@@ -16,10 +27,10 @@ class ProfileScreen extends StatelessWidget {
             ),
            child: Padding(
               padding: EdgeInsets.fromLTRB(
-              12.0 * MediaQuery.of(context).devicePixelRatio,
-              15.0 * MediaQuery.of(context).devicePixelRatio,
-              12.0 * MediaQuery.of(context).devicePixelRatio,
-              0.0 * MediaQuery.of(context).devicePixelRatio,
+                paddingFactor*1.2,
+                paddingFactor*2.4,
+                paddingFactor,
+                0
              ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -27,43 +38,40 @@ class ProfileScreen extends StatelessWidget {
                   Text(
                     'AUTOGRAPH ',
                     style: TextStyle(
-                      fontSize: 8.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.w600,
+                      fontSize: titleSizeFactor * 0.8,
+                      fontWeight: FontWeight.bold,
                       fontFamily: 'Inria Serif',
                       color: Colors.white,
                     ),
                   ),
-                  Text(
-                    'PROFILE',
-                    style: TextStyle(
-                      fontSize: 23.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
-                    ),
-                  ),
-                SizedBox(height: 15.0 * MediaQuery.of(context).devicePixelRatio),
+                SizedBox(height: spacingFactor*0.2,),
+                 Icon(
+                  Icons.person,
+                  color: Colors.white,
+                  size: spacingFactor*0.6,
+                ),
+                SizedBox(height: paddingFactor),
                 Center(
                   child: Container(
                     alignment: Alignment.center,
-                    width: 130 * MediaQuery.of(context).devicePixelRatio,
-                    padding: EdgeInsets.symmetric( horizontal: 3.0 * MediaQuery.of(context).devicePixelRatio),
+                    width: spacingFactorW*10,
+                    padding: EdgeInsets.symmetric( horizontal: spacingFactorW),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade800,
+                      color: Colors.white.withOpacity(0.4),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child:  Text(
                       'OLIVIA',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 15.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: titleSizeFactor*1.6,
                         fontWeight: FontWeight.normal,
                         fontFamily: 'Inria Serif',
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 50),
+                 SizedBox(height: paddingFactor*1.5),
                 GestureDetector(
                   onTap: () {
                     Navigator.pushNamed(context, '/MY_EVENTS');
@@ -71,15 +79,15 @@ class ProfileScreen extends StatelessWidget {
                   child: Text(
                     'MY EVENTS',
                     style: TextStyle(
-                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                      fontSize: titleSizeFactor,
                       fontWeight: FontWeight.normal,
                       color: Colors.white,
                       fontFamily: 'Inria Serif',
                     ),
                   ),
                 ),
-                const SizedBox(height: 7),
-                Padding(padding: const EdgeInsets.only(top: 20),
+                 SizedBox(height: paddingFactor*0.4),
+                Padding(padding:  EdgeInsets.only(top: paddingFactor),
                     child: GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(context, '/Orders');
@@ -88,7 +96,7 @@ class ProfileScreen extends StatelessWidget {
                           'ORDERS',
                           style:  TextStyle(
                             color: Colors.white,
-                            fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                            fontSize:titleSizeFactor,
                             fontWeight: FontWeight.normal,
                             fontFamily: 'Inria Serif',
                             letterSpacing: 1.5,
@@ -96,7 +104,7 @@ class ProfileScreen extends StatelessWidget {
                        ),
                     ),
                 ),
-                Padding(padding: const EdgeInsets.only(top: 20),
+                Padding(padding:  EdgeInsets.only(top: paddingFactor*1.3),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, '/ProfileSettings');
@@ -105,7 +113,7 @@ class ProfileScreen extends StatelessWidget {
                       'SETTINGS',
                       style:  TextStyle(
                         color: Colors.white,
-                        fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: titleSizeFactor,
                         fontWeight: FontWeight.normal,
                         fontFamily: 'Inria Serif',
                         letterSpacing: 1.5,
@@ -113,7 +121,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(padding: const EdgeInsets.only(top: 20),
+                Padding(padding:  EdgeInsets.only(top: paddingFactor*1.3),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.pushNamed(context, '/Orders');
@@ -122,7 +130,7 @@ class ProfileScreen extends StatelessWidget {
                       'SUPPORT',
                       style:  TextStyle(
                         color: Colors.white,
-                        fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                        fontSize: titleSizeFactor,
                         fontWeight: FontWeight.normal,
                         fontFamily: 'Inria Serif',
                         letterSpacing: 1.5,
@@ -131,14 +139,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                const Text(
-                  'EST. 2024',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 20),
+                SizedBox(height: spacingFactor),
               ],
             ),
          ),

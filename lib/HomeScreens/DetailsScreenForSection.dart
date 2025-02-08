@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class DetailsScreenForSection extends StatefulWidget {
@@ -11,10 +12,17 @@ class DetailsScreenForSection extends StatefulWidget {
 }
 
 class _DetailsScreenForSection extends State<DetailsScreenForSection> {
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
+    setPref();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +47,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             paddingFactor*1.5,
-            paddingFactor * 1.8,
+            paddingFactor * 2.4,
             paddingFactor,
             0,
           ),
@@ -67,17 +75,8 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: subtitleSizeFactor * 0.7,
+                          fontSize: titleSizeFactor * 0.8,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'EVENTS',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 2,
-                          fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
                         ),
@@ -111,25 +110,23 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                         },
                       );
                     },
-                    child: Text(
-                      'TOPICS',
-                      style: TextStyle(
-                        fontSize: subtitleSizeFactor * 1.3,
-                        fontWeight: FontWeight.w100,
-                        color: Colors.white,
-                        fontFamily: 'Inria Serif',
-                      ),
+                    child: Text(prefs?.getBool('LangParams') == true
+                        ? 'Webinars'
+                        : 'Программа',
+                        style: TextStyle(fontSize:titleSizeFactor*1.3,color:Colors.white,fontFamily:
+                        prefs?.getBool('LangParams') == true
+                            ? 'Inria Serif'
+                            : 'ChUR',)
                     ),
                   ),
                   SizedBox(height: spacingFactor*1.9),
-                  Text(
-                    'TRAILER',
-                    style: TextStyle(
-                      fontSize: subtitleSizeFactor * 1.3,
-                      fontWeight: FontWeight.w200,
-                      color: Colors.white,
-                      fontFamily: 'Inria Serif',
-                    ),
+                  Text(prefs?.getBool('LangParams') == true
+                      ? 'TRAILER'
+                      : 'Трейлер',
+                      style: TextStyle(fontSize:titleSizeFactor*1.3,color:Colors.white,fontFamily:
+                      prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR',)
                   ),
                 ],
               ),

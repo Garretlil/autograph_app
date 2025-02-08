@@ -1,4 +1,3 @@
-import 'Courses.dart';
 import 'LocalCart.dart';
 import 'package:dio/dio.dart';
 
@@ -9,14 +8,7 @@ class PurchasedCourses {
 
   static final PurchasedCourses instance = PurchasedCourses._privateConstructor();
 
-  Future<void> getCourses() async{
-    final dio = Dio();
-    final client = CourseVideoService(dio);
-
-    CourseResponse response = await client.getCourses();
-    _purchasedWebinarsByCourse=response.courses;
-  }
-   Map<String, List<Map<String, dynamic>>> _purchasedWebinarsByCourse = {};
+   final Map<String, List<Map<String, dynamic>>> _purchasedWebinarsByCourse = {};
   /// добавления вебинаров в список купленных
   void addToPurchased() {
     final cart = LocalCart.instance.getCart();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class CartChooseScreen extends StatefulWidget {
@@ -9,9 +10,15 @@ class CartChooseScreen extends StatefulWidget {
 }
 
 class _CartChooseScreen extends State<CartChooseScreen> {
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
+    setPref();
   }
 
   @override
@@ -20,8 +27,13 @@ class _CartChooseScreen extends State<CartChooseScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     double paddingFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
+    double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double cardMarginFactor = screenHeight * 0.06;
+    double cardPaddingFactor = screenWidth * 0.06;
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -33,7 +45,7 @@ class _CartChooseScreen extends State<CartChooseScreen> {
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             paddingFactor*1.3,
-            paddingFactor * 1.8,
+            paddingFactor * 2.4,
             paddingFactor,
             0,
           ),
@@ -46,21 +58,27 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   Text(
                     'AUTOGRAPH ',
                     style: TextStyle(
-                      fontSize: subtitleSizeFactor * 0.7,
+                      fontSize: titleSizeFactor * 0.8,
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Inria Serif',
                       color: Colors.white,
                     ),
                   ),
-                  Text(
-                    'CART',
-                    style: TextStyle(
-                      fontSize: subtitleSizeFactor * 2,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
-                    ),
+                  SizedBox(height: spacingFactor*0.2,),
+                   Icon(
+                    Icons.shopping_cart_outlined,
+                    color: Colors.white,
+                    size: spacingFactor*0.6,
                   ),
+                  // Text(
+                  //   'CART',
+                  //   style: TextStyle(
+                  //     fontSize: subtitleSizeFactor * 2,
+                  //     fontWeight: FontWeight.normal,
+                  //     fontFamily: 'Inria Serif',
+                  //     color: Colors.white,
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(height: spacingFactor * 2.2),
@@ -71,26 +89,24 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                       onTap: () {
                         Navigator.pushNamed(context, '/CartEvents');
                       },
-                      child: Text(
-                        'Events',
-                        style: TextStyle(
-                          fontSize: subtitleSizeFactor * 1.3,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontFamily: 'Inria Serif',
-                        ),
+                      child: Text(prefs?.getBool('LangParams') == true
+                          ? 'Events'
+                          : 'Мероприятия',
+                          style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                          prefs?.getBool('LangParams') == true
+                              ? 'Inria Serif'
+                              : 'ChUR',)
                       ),
                     ),
                     SizedBox(
                         height: spacingFactor*3.5),
-                    Text(
-                      'Products',
-                      style: TextStyle(
-                        fontSize: subtitleSizeFactor * 1.3,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.white,
-                        fontFamily: 'Inria Serif',
-                      ),
+                    Text(prefs?.getBool('LangParams') == true
+                        ? 'Products'
+                        : 'Продукция',
+                        style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                        prefs?.getBool('LangParams') == true
+                            ? 'Inria Serif'
+                            : 'ChUR',)
                     ),
                   ],
                 ),

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../AnimationSyncManager.dart';
-import '../CartScreens/OrderStatus.dart';
-import '../ScreensWithNavigationBar.dart';
 
 class HomePage extends StatefulWidget {
-  final void Function(bool) toggleBottomNavigationBar;
-  const HomePage({super.key, required this.toggleBottomNavigationBar});
+  //final void Function(bool) toggleBottomNavigationBar;
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePage();
@@ -16,8 +13,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
   SharedPreferences? prefs;
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {});
@@ -36,15 +31,20 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
     double screenHeight = MediaQuery.of(context).size.height;
     context.watch<AnimationSyncManager>().controller.stop();
     double paddingFactor = screenWidth * 0.06;
-    double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-
+    double cardMarginFactor = screenHeight * 0.06;
+    double cardPaddingFactor = screenWidth * 0.06;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: LayoutBuilder(
+      body: Stack(
+        children: [
+        Positioned.fill(
+        child: Image.asset(
+          'assets/image.png',
+          fit: BoxFit.cover,
+        ),
+      ),
+      LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: ConstrainedBox(
@@ -57,7 +57,7 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                     Padding(
                       padding: EdgeInsets.fromLTRB(
                         paddingFactor * 1.2,
-                        paddingFactor * 2.8,
+                        paddingFactor * 2.4,
                         paddingFactor,
                         0,
                       ),
@@ -70,122 +70,205 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
                                 Text(
                                   'AUTOGRAPH',
                                   style: TextStyle(
-                                    fontSize: subtitleSizeFactor * 0.7,
+                                    fontSize: titleSizeFactor * 0.8,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Inria Serif',
                                     color: Colors.white,
                                   ),
                                 ),
-                                Text(
-                                  prefs?.getBool('LangParams') == true
-                                      ? 'HOME'
-                                      : '',
-                                  style: TextStyle(
-                                    fontSize: titleSizeFactor * 2,
-                                    fontWeight: FontWeight.normal,
-                                    fontFamily: 'TestSerif',
-                                    color: Colors.white,
-                                  ),
+                                SizedBox(height: spacingFactor*0.2,),
+                                 Icon(
+                                  Icons.account_balance_rounded,
+                                  color: Colors.white,
+                                  size: spacingFactor*0.6,
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: spacingFactor),
+                          SizedBox(height: spacingFactor*0.3),
+                          Center(child:
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                prefs?.getBool('LangParams') == true
-                                    ? 'PRODUCTS'
-                                    : 'Магазин',
-                                style: TextStyle(
-                                  fontSize: smallTextFactor * 1.2,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                  fontFamily: 'Inria Serif',
+                              Card(
+                              color: Colors.black.withOpacity(0.3),
+                                borderOnForeground: false,
+                                margin: EdgeInsets.symmetric(
+                                  vertical: cardMarginFactor * 0.25,
                                 ),
-                              ),
-                              SizedBox(height: spacingFactor * 0.5),
-                              Text(
-                                prefs?.getBool('LangParams') == true
-                                    ? 'PHANTOMS'
-                                    : 'хз((',
-                                style: TextStyle(
-                                  fontSize: smallTextFactor,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                  fontFamily: 'Inria Serif',
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(color: Colors.white, width: 3),
+                                  borderRadius: BorderRadius.circular(40),
                                 ),
-                              ),
-                              SizedBox(height: spacingFactor * 0.3),
-                              Text(
-                                prefs?.getBool('LangParams') == true
-                                    ? 'BRUSHES'
-                                    : 'хз((',
-                                style: TextStyle(
-                                  fontSize: smallTextFactor,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                  fontFamily: 'Inria Serif',
-                                ),
-                              ),
-                              SizedBox(height: spacingFactor),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, '/EventsOnlineOffline');
-                                },
-                                child: Text(
-                                  prefs?.getBool('LangParams') == true
-                                      ? 'EVENTS'
-                                      : 'хз((',
-                                  style: TextStyle(
-                                    fontSize: smallTextFactor * 1.2,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.white,
-                                    fontFamily: 'Inria Serif',
+                                shadowColor: Colors.white.withOpacity(0.5),
+                                elevation: 0,
+                                child: Padding(
+                                  padding: EdgeInsets.all(cardPaddingFactor * 0.5),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Center(child:
+                                        Text(
+                                         prefs?.getBool('LangParams') == true
+                                            ? 'PHANTOMS'
+                                            : 'Фантомы',
+                                         style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: titleSizeFactor ,
+                                            fontFamily: prefs?.getBool('LangParams') == true
+                                                ? 'Inria Serif'
+                                                : 'ChUR'),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: screenHeight * 0.22,
+                                        width: screenWidth * 0.7,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              SizedBox(height: spacingFactor * 0.5),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                      const OrderStatusScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  prefs?.getBool('LangParams') == true
-                                      ? 'ONLINE'
-                                      : 'хз((',
-                                  style: TextStyle(
-                                    fontSize: smallTextFactor,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.white,
-                                    fontFamily: 'Inria Serif',
+                              SizedBox(height: spacingFactor *0.01),
+                              Card(
+                                color: Colors.black.withOpacity(0.3),
+                                margin: EdgeInsets.symmetric(
+                                  vertical: cardMarginFactor * 0.25,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(color: Colors.white, width: 3),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                shadowColor: Colors.white.withOpacity(0.5),
+                                elevation: 0,
+                                child: Padding(
+                                  padding: EdgeInsets.all(cardPaddingFactor * 0.5),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Center(child:
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/EventsOnlineOffline',
+                                          );
+                                        },
+                                        child: Text(
+                                         prefs?.getBool('LangParams') == true
+                                            ? 'EVENTS'
+                                            : 'Мероприятия',
+                                         style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: titleSizeFactor ,
+                                            fontFamily: prefs?.getBool('LangParams') == true
+                                                ? 'Inria Serif'
+                                                : 'ChUR'),
+                                        ),
+                                       ),
+                                      ),
+                                      SizedBox(
+                                        height: screenHeight * 0.22,
+                                        width: screenWidth * 0.7,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              SizedBox(height: spacingFactor * 0.3),
-                              Text(
-                                prefs?.getBool('LangParams') == true
-                                    ? 'OFFLINE'
-                                    : 'хз((',
-                                style: TextStyle(
-                                  fontSize: smallTextFactor,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.white,
-                                  fontFamily: 'Inria Serif',
+                              Card(
+                                color: Colors.black.withOpacity(0.3),
+                                margin: EdgeInsets.symmetric(
+                                  vertical: cardMarginFactor * 0.25,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(color: Colors.white, width: 3),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                shadowColor: Colors.white.withOpacity(0.5),
+                                elevation: 0,
+                                child: Padding(
+                                  padding: EdgeInsets.all(cardPaddingFactor * 0.5),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Center(child:
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/EventsOnlineOffline',
+                                          );
+                                        },
+                                        child: Text(
+                                          prefs?.getBool('LangParams') == true
+                                              ? 'EVENTS'
+                                              : 'Мероприятия',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: titleSizeFactor ,
+                                              fontFamily: prefs?.getBool('LangParams') == true
+                                                  ? 'Inria Serif'
+                                                  : 'ChUR'),
+                                        ),
+                                      ),
+                                      ),
+                                      SizedBox(
+                                        height: screenHeight * 0.22,
+                                        width: screenWidth * 0.7,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Card(
+                                color: Colors.black.withOpacity(0.3),
+                                margin: EdgeInsets.symmetric(
+                                  vertical: cardMarginFactor * 0.25,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(color: Colors.white, width: 3),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                shadowColor: Colors.white.withOpacity(0.5),
+                                elevation: 0,
+                                child: Padding(
+                                  padding: EdgeInsets.all(cardPaddingFactor * 0.5),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Center(child:
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                            context,
+                                            '/EventsOnlineOffline',
+                                          );
+                                        },
+                                        child: Text(
+                                          prefs?.getBool('LangParams') == true
+                                              ? 'EVENTS'
+                                              : 'Мероприятия',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: titleSizeFactor ,
+                                              fontFamily: prefs?.getBool('LangParams') == true
+                                                  ? 'Inria Serif'
+                                                  : 'ChUR'),
+                                        ),
+                                      ),
+                                      ),
+                                      SizedBox(
+                                        height: screenHeight * 0.22,
+                                        width: screenWidth * 0.7,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                          ),
+                        ]
+                      )
                     ),
                   ],
                 ),
@@ -194,6 +277,8 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin{
           );
         },
       ),
+     ],
+    ),
     );
   }
 }

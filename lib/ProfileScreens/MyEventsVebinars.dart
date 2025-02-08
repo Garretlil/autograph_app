@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:autograph_app/Consts.dart';
-import 'package:autograph_app/NetworkLayer.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -87,7 +86,7 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                                color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
                            SizedBox(height: spacingFactor*0.2,),
                            VideoPlayerView(
-                              url: baseUrl+'/video/'+item[index]['id'],
+                              url: '$baseUrl/video/'+item[index]['id'],
                               thumbnailUrl: 'assets/preview.png',
                               dataSourceType: DataSourceType.network,
                             ),

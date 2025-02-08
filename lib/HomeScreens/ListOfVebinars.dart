@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Courses.dart';
 import '../LocalCart.dart';
@@ -13,19 +14,24 @@ class ListOfVebinars extends StatefulWidget {
 }
 
 class _ListOfVebinars extends State<ListOfVebinars> {
-
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   late List<Map<String, dynamic>> vebinarChooseList;
 
   @override
   void initState() {
     super.initState();
     _syncWebinarsWithCart();
+    setPref();
   }
 
   /// Синхронизация выбранных вебинаров с данными в корзине
   void _syncWebinarsWithCart() {
     vebinarChooseList = CourseWebinars.instance.getWebinars(widget.section)
-        .where((webinar) => webinar.containsKey('word')) // Фильтруем только вебинары
+        .where((webinar) => webinar.containsKey('word'))
         .toList();
     setState(() {});
   }
@@ -35,14 +41,12 @@ class _ListOfVebinars extends State<ListOfVebinars> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // Коэффициенты адаптации
     double paddingFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double listTilePaddingFactor = screenWidth * 0.06;
-    double totalTextSizeFactor = screenWidth * 0.05;
 
     return Scaffold(
       body: Container(
@@ -57,10 +61,10 @@ class _ListOfVebinars extends State<ListOfVebinars> {
           children: [
             Padding(
               padding: EdgeInsets.fromLTRB(
-                paddingFactor*1.3,
-                paddingFactor*1.8,
+                paddingFactor*1.6,
+                paddingFactor * 2.4,
                 paddingFactor,
-                0.0,
+                0,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,22 +79,14 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                       color: Colors.white,
                     ),
                   ),
+                  SizedBox(width:paddingFactor*2.1 ,),
                   Column(
                     children: [
                       Text(
                         'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: titleSizeFactor*0.7,
+                          fontSize: titleSizeFactor * 0.8,
                           fontWeight: FontWeight.w600,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'EVENTS',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 2,
-                          fontWeight: FontWeight.normal,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
                         ),
@@ -106,11 +102,11 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                   SizedBox(width: spacingFactor*1.9),
                 ],
               ),
             ),
-            SizedBox(height: spacingFactor),
+
             Expanded(
               child: ListView.builder(
                 itemCount: vebinarChooseList.length,
@@ -164,13 +160,14 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                     left: paddingFactor,
                     bottom: paddingFactor * 4.3,
                   ),
-                  child: Text(
-                    'TOTAL:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ ',
-                    style: TextStyle(
-                      fontSize: totalTextSizeFactor*1.1,
-                      color: Colors.white,
-                      fontFamily: 'Inria Serif',
-                    ),
+                  child:
+                  Text(prefs?.getBool('LangParams') == true
+                      ? 'TOTAL:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ '
+                      : 'Сумма:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ ',
+                      style: TextStyle(fontSize:titleSizeFactor*1.05,color:Colors.white,fontFamily:
+                      prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR',)
                   ),
                 ),
               ],

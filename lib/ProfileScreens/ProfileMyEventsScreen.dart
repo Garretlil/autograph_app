@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../LocalCart.dart';
 
@@ -10,13 +11,30 @@ class ProfileMyEventsScreen extends StatefulWidget {
 }
 
 class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
+    setPref();
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double paddingFactor = screenWidth * 0.06;
+    double smallTextFactor = screenWidth * 0.06;
+    double spacingFactor = screenHeight * 0.06;
+    double spacingFactorW=screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    double subtitleSizeFactor = screenWidth * 0.06;
+    double iconSizeFactor = screenWidth * 0.06;
+    double cardMarginFactor = screenHeight * 0.06;
+    double cardPaddingFactor = screenWidth * 0.06;
     //final cartItems = LocalCart.instance.getCart();
     return Scaffold(
       body: Container(
@@ -28,10 +46,10 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            15.0 * MediaQuery.of(context).devicePixelRatio,
-            12.0 * MediaQuery.of(context).devicePixelRatio,
-            50.0 * MediaQuery.of(context).devicePixelRatio,
+              paddingFactor*1.2,
+              paddingFactor*2.4,
+              paddingFactor,
+              0
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,58 +61,58 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: const Icon(
+                    child:  Icon(
                       Icons.arrow_back_ios_new,
                       color: Colors.white,
+                      size: spacingFactor*0.6,
                     ),
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        'AUTOGRAPH',
+                      Text(
+                        'AUTOGRAPH ',
                         style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.w600,
+                          fontSize: titleSizeFactor * 0.8,
+                          fontWeight: FontWeight.bold,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
                         ),
                       ),
-                      Text(
-                        'PROFILE',
-                        style: TextStyle(
-                          fontSize: 22.0 * MediaQuery.of(context).devicePixelRatio,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
+                      const Icon(
+                        Icons.person,
+                        color: Colors.orange,
                       ),
                     ],
                   ),
-                  const SizedBox(width: 24),
+                   SizedBox(width: spacingFactorW),
                 ],
               ),
-               SizedBox(height: 10.0 * MediaQuery.of(context).devicePixelRatio),
+              SizedBox(height: spacingFactor*0.3),
               Center(
                 child: Text(
-                    'MY EVENTS',
-                    style: TextStyle(
-                      fontSize: 13.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Inria Serif',
+                  prefs?.getBool('LangParams') == true
+                      ? 'MY EVENTS'
+                      : 'События',
+                  style: TextStyle(
                       color: Colors.white,
-                    ),
-                  ),
-              ),
-              SizedBox(height: 10.0 * MediaQuery.of(context).devicePixelRatio),
-              Text(
-                'ONLINE:',
-                style: TextStyle(
-                  fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'Inria Serif',
-                  color: Colors.white,
+                      fontSize: titleSizeFactor*1.2 ,
+                      fontFamily: prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR'),
                 ),
+              ),
+              SizedBox(height:spacingFactor*0.5),
+              Text(
+                prefs?.getBool('LangParams') == true
+                    ? 'ONLINE:'
+                    : 'Онлайн:',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: titleSizeFactor*1.2 ,
+                    fontFamily: prefs?.getBool('LangParams') == true
+                        ? 'Inria Serif'
+                        : 'ChUR'),
               ),
               Expanded(
                 child: ListView.builder(
@@ -103,10 +121,10 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                     final courseName = LocalCart.instance.getSelectedCourses()[index];
                     return Padding(
                       padding: EdgeInsets.fromLTRB(
-                        5.0 * MediaQuery.of(context).devicePixelRatio,
-                        5.0 * MediaQuery.of(context).devicePixelRatio,
-                        5.0 * MediaQuery.of(context).devicePixelRatio,
-                        5.0 * MediaQuery.of(context).devicePixelRatio,
+                       paddingFactor*0.7,
+                          paddingFactor*0.1,
+                          paddingFactor*0.5,
+                          paddingFactor*0.2
                       ),
                       child: GestureDetector(
                         onTap: () {
@@ -116,7 +134,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                         child:Text(
                         courseName,
                         style:  TextStyle(
-                          fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
+                          fontSize:titleSizeFactor*0.9,
                           fontWeight: FontWeight.normal,
                           color: Colors.white,
                           fontFamily: 'Inria Serif',
@@ -127,17 +145,18 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                   },
                 ),
               ),
-              //SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
               Text(
-                'OFFLINE:',
+                prefs?.getBool('LangParams') == true
+                    ? 'OFFLINE:'
+                    : 'Оффлайн:',
                 style: TextStyle(
-                  fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-                  fontWeight: FontWeight.w400,
-                  fontFamily: 'Inria Serif',
-                  color: Colors.white,
-                ),
+                    color: Colors.white,
+                    fontSize: titleSizeFactor*1.2 ,
+                    fontFamily: prefs?.getBool('LangParams') == true
+                        ? 'Inria Serif'
+                        : 'ChUR'),
               ),
-              Padding(padding: EdgeInsets.only(left: 9.0 * MediaQuery.of(context).devicePixelRatio,top:9.0 * MediaQuery.of(context).devicePixelRatio ),
+              Padding(padding: EdgeInsets.only(left: 9.0 * MediaQuery.of(context).devicePixelRatio,bottom: spacingFactor*4),
                   child: Text(
                     '32 FEBRUARY 2026 '
                         'MODELLING TECHNIQUES',
