@@ -229,6 +229,7 @@ class _OtpInputFieldsState extends State<OtpInputFields> {
 
         prefs?.setString('session_key', response.session_key);
         // MeResponse aboutMe = await client.getMe(response.session_key);
+        _navigateToNextScreen();
         for (var controller in _controllers) {
           controller.clear();
         }
@@ -241,12 +242,6 @@ class _OtpInputFieldsState extends State<OtpInputFields> {
           width: double.infinity,
           height: double.infinity,
         );
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Error: $error')),
-        // );
-        // if (kDebugMode) {
-        //   print(error);
-        // }
       }
     }
   }

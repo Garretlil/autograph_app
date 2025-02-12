@@ -31,6 +31,7 @@ dependencies:
 
   dio: any
   google_nav_bar: any
+  gradient_borders: ^1.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -40,6 +41,7 @@ dev_dependencies:
   retrofit_generator: ^9.0.0
   build_runner: ^2.3.3
   json_serializable: ^6.8.0
+  gradient_borders: ^1.0.1
 
 
 flutter_native_splash:

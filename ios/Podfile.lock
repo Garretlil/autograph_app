@@ -6,8 +6,6 @@ PODS:
     - Flutter
   - sbp (0.0.1):
     - Flutter
-  - screenshot_test (0.0.1):
-    - Flutter
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -22,7 +20,6 @@ DEPENDENCIES:
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - sbp (from `.symlinks/plugins/sbp/ios`)
-  - screenshot_test (from `.symlinks/plugins/screenshot_test/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
@@ -36,8 +33,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   sbp:
     :path: ".symlinks/plugins/sbp/ios"
-  screenshot_test:
-    :path: ".symlinks/plugins/screenshot_test/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   video_player_avfoundation:
@@ -50,7 +45,6 @@ SPEC CHECKSUMS:
   flutter_native_splash: 6cad9122ea0fad137d23137dd14b937f3e90b145
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   sbp: 71455e556f97c3e5f73f0077d21918f0328fb2ff
-  screenshot_test: 9e662dbd67c09de60d2ed542e0e0bf817f132260
   shared_preferences_foundation: 9e1978ff2562383bd5676f64ec4e9aa8fa06a6f7
   video_player_avfoundation: 2cef49524dd1f16c5300b9cd6efd9611ce03639b
   wakelock_plus: 04623e3f525556020ebd4034310f20fe7fda8b49

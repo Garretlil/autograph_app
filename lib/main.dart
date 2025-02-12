@@ -24,8 +24,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/screenNavigationBar',
-      home: AScreen(),
+      //initialRoute: '/screenNavigationBar',
+      home: ScreensWithNavigationBar(),
     );
   }
 }

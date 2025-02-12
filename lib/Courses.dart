@@ -19,7 +19,7 @@ class CourseWebinars {
       webinarsByCourse = transformCourses();
       //throw Exception();
     } catch (error) {
-      print('Ошибка инициализации CourseWebinars: $error');
+      //print('Ошибка инициализации CourseWebinars: $error');
       webinarsByCourse = {
         'PRO DESIGN': [
           {'description': 'Full demonstration of photo editing, including color correction, defects removal, creating own brand logo, digital signature and etc.'},
@@ -56,11 +56,12 @@ class CourseWebinars {
               webinarMap['word'] = webinar.title;
               webinarMap['isOn'] = false;
             }
+            //throw Exception();
             if (webinar.id != null) {
               webinarMap['id'] = webinar.id.toString();
             }
             if (webinar.price != null) {
-              webinarMap['cost'] = webinar.price;
+              webinarMap['cost'] =int.tryParse(webinar.price.toString()) ?? 0;
             }
             webinarsList.add(webinarMap);
           }
@@ -80,8 +81,7 @@ class CourseWebinars {
       List<Course> response = await client.getCourses();
       courses = response;
     } catch (error) {
-      print('Ошибка при загрузке курсов: $error');
-
+      //print('Ошибка при загрузке курсов: $error');
       courses = [];
     }
   }

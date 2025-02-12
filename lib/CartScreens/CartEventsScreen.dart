@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../LocalCart.dart';
+import '../NetworkLayer.dart';
 import '../PurchasedСourses.dart';
 import '../Theme/Colors.dart';
 import 'OrderStatus.dart';
@@ -83,7 +86,6 @@ class _CartEvents extends State<CartEvents> {
                         ),
                       ),
                       SizedBox(height: spacingFactor*0.2,),
-
                       Icon(Icons.shopping_cart_outlined,color: Colors.white,
                         size: spacingFactor*0.6,)
                     ],
@@ -91,7 +93,7 @@ class _CartEvents extends State<CartEvents> {
                    SizedBox(width: spacingFactor*0.5),
                 ],
               ),
-               SizedBox(height: spacingFactor*0.3),
+               //SizedBox(height: spacingFactor*0.3),
               Expanded(
                 child: LocalCart.instance.getCart().isEmpty
                     ? Center(
@@ -154,7 +156,7 @@ class _CartEvents extends State<CartEvents> {
                                               },
                                               child: const Icon(
                                                 Icons.dangerous_outlined,
-                                                color: Colors.deepOrange,
+                                                color: Colors.black,
                                               ),
                                             ),
                                             const SizedBox(width: 10.0),
@@ -237,11 +239,16 @@ class GradientAnimatedButton extends StatefulWidget {
 class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  final url =
-      'https://www.sberbank.com/sms/pbpn?requisiteNumber=79670999064';
+  final url = 'https://www.sberbank.com/sms/pbpn?requisiteNumber=79670999064';
+  late SharedPreferences prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
+    setPref();
     getInstalledBanks();
     _controller = AnimationController(
       duration: const Duration(seconds: 5),
@@ -275,7 +282,9 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     setState(() {});
   }
   //bool isPaymentV=false;
-
+  List<int> getPurchasedIndexes(){
+    return PurchasedCourses.instance.getPurchasedIndexes();
+  }
   Future<void> _showPaymentWidget() async {
     setState(() {
       widget.toggleBottomNavigationBar(false);
@@ -297,14 +306,10 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-    double titleSizeFactor = screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW = screenWidth*0.06;
-    double listTilePaddingFactor = screenWidth * 0.06;
-    double totalTextSizeFactor = screenWidth * 0.05;
+
     return GestureDetector(
       onTap: () {
       },
@@ -314,18 +319,17 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: InkWell(
-               // onTap: () => showModalBottomSheet(
-               //   context: context,
-               //   shape: const RoundedRectangleBorder(
-               //     borderRadius: BorderRadius.vertical(
-               //       top: Radius.circular(20),
-               //     ),
-               //   ),
-               //   builder: (ctx) => SbpModalBottomSheetWidget(informations, url),
-               // ),
               onTap: () async {
                 await _showPaymentWidget();
                 PurchasedCourses.instance.addToPurchased();
+                final dio = Dio();
+                final client = CourseVideoService(dio);
+                CreateOrderResponse response = await client.createOrder(
+                    prefs.getString('session_key').toString(),
+                    getPurchasedIndexes());
+                if (kDebugMode) {
+                  print(response.message);
+                }
               },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),

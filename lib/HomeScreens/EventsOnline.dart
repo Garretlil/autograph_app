@@ -104,56 +104,61 @@ class _EventsOnline extends State<EventsOnline> {
                           (webinar) => webinar.containsKey('description'),
                       orElse: () => {'description': 'No description available'},
                     )['description'] ?? 'No description available';
+
                     return GestureDetector(
                       onTap: () {
                         Navigator.pushNamed(
                           context,
                           '/DetailsScreenForSection',
-                          arguments: {
-                            'section': courseName,
-                          },
+                          arguments: {'section': courseName},
                         );
                       },
-                      child:Center(
-                        child: Card(
-                          color: Colors.black.withOpacity(0.2),
-                          margin: EdgeInsets.only(
-                            top: cardMarginFactor*0.25,
-                            right: cardPaddingFactor,
-                            bottom: cardMarginFactor*0.2,
-                            left: cardPaddingFactor
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(cardPaddingFactor*0.5),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  courseName,
-                                  style: TextStyle(
-                                    fontSize: subtitleSizeFactor,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontFamily: 'Inria Serif',
+                      child: Center(
+                        child: SizedBox(
+                          width: screenWidth * 1.5,
+                          height: screenHeight * 0.25,
+                          child: Card(
+                            color: Colors.black.withOpacity(0.2),
+                            margin: EdgeInsets.only(
+                              top: cardMarginFactor * 0.25,
+                              right: cardPaddingFactor,
+                              bottom: cardMarginFactor * 0.2,
+                              left: cardPaddingFactor,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(cardPaddingFactor * 0.5),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                // mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    courseName,
+                                    style: TextStyle(
+                                      fontSize: subtitleSizeFactor,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontFamily: 'Inria Serif',
+                                    ),
+                                    //maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                SizedBox(
-                                  height: screenHeight * 0.005,
-                                ),
-                                Text(
-                                  courseDescription,
-                                  style: TextStyle(
-                                    fontSize: descriptionSizeFactor*0.8,
-                                    color: Colors.white70,
-                                    fontFamily: 'Inria Serif',
+                                  SizedBox(height: screenHeight * 0.005),
+                                  Text(
+                                    courseDescription,
+                                    style: TextStyle(
+                                      fontSize: descriptionSizeFactor * 0.8,
+                                      color: Colors.white70,
+                                      fontFamily: 'Inria Serif',
+                                    ),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      )
-
+                      ),
                     );
                   },
                 ),
@@ -163,5 +168,4 @@ class _EventsOnline extends State<EventsOnline> {
         ),
     );
   }
-
 }

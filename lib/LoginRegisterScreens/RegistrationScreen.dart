@@ -83,20 +83,6 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
       final client = AuthService(dio);
       RegisterResponse response = await client.registerUser(registrationData);
       print(response.message);
-      // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      //   content:  Center(
-      //       child: Text(prefs?.getBool('LangParams') == true
-      //           ? 'Registration successful'
-      //           : 'Регистрация успешна',
-      //           style: TextStyle(fontSize:14,fontFamily:
-      //           prefs?.getBool('LangParams') == true
-      //               ? 'Inria Serif'
-      //               : 'Inria Serif',)
-      //       ),),
-      //   duration: const Duration(milliseconds: 2000),
-      //   backgroundColor: Colors.white.withOpacity(0.4),
-      // ));
-
       _fadeController.forward();
       _fadeController.addStatusListener((status) {
         if (status == AnimationStatus.completed) {

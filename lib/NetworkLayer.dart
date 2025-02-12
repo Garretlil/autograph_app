@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'NetworkLayer.g.dart';
 
-@RestApi(baseUrl: baseUrlTest2)
+@RestApi(baseUrl: baseUrlFinal)
 abstract class AuthService {
   factory AuthService(Dio dio, {String baseUrl}) = _AuthService;
 
@@ -22,8 +22,7 @@ abstract class AuthService {
 
 }
 
-
-@RestApi(baseUrl: baseUrlTest2)
+@RestApi(baseUrl: baseUrlFinal)
 abstract class CourseVideoService {
   factory CourseVideoService(Dio dio, {String baseUrl}) = _CourseVideoService;
 
@@ -33,6 +32,22 @@ abstract class CourseVideoService {
   @GET("/purchasedCourses")
   Future<List<Course>> getPurchasedCourses();
 
+  @POST("/orders")
+  Future<CreateOrderResponse> createOrder(
+      @Header('x-session-key') String session_key,
+      @Body() List<int> body,
+  );
+
+}
+@JsonSerializable()
+class CreateOrderResponse {
+  final String message;
+  CreateOrderResponse({required this.message});
+
+  factory CreateOrderResponse.fromJson(Map<String, dynamic> json) =>
+      _$CreateOrderResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CreateOrderResponseToJson(this);
 }
 @JsonSerializable()
 class MeResponse {

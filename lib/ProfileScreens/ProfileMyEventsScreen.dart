@@ -63,8 +63,8 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                     },
                     child:  Icon(
                       Icons.arrow_back_ios_new,
-                      color: Colors.white,
-                      size: spacingFactor*0.6,
+                      color: Colors.deepOrange,
+                      size: spacingFactor*0.5,
                     ),
                   ),
                   Column(
@@ -79,29 +79,31 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                           color: Colors.white,
                         ),
                       ),
-                      const Icon(
+                      SizedBox(height: spacingFactor*0.2,),
+                       Icon(
                         Icons.person,
-                        color: Colors.orange,
+                        color: Colors.white,
+                        size: spacingFactor*0.6,
                       ),
                     ],
                   ),
                    SizedBox(width: spacingFactorW),
                 ],
               ),
-              SizedBox(height: spacingFactor*0.3),
-              Center(
-                child: Text(
-                  prefs?.getBool('LangParams') == true
-                      ? 'MY EVENTS'
-                      : 'События',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: titleSizeFactor*1.2 ,
-                      fontFamily: prefs?.getBool('LangParams') == true
-                          ? 'Inria Serif'
-                          : 'ChUR'),
-                ),
-              ),
+              //SizedBox(height: spacingFactor*0.3),
+              // Center(
+              //   child: Text(
+              //     prefs?.getBool('LangParams') == true
+              //         ? 'MY EVENTS'
+              //         : 'События',
+              //     style: TextStyle(
+              //         color: Colors.white,
+              //         fontSize: titleSizeFactor*1.2 ,
+              //         fontFamily: prefs?.getBool('LangParams') == true
+              //             ? 'Inria Serif'
+              //             : 'ChUR'),
+              //   ),
+              // ),
               SizedBox(height:spacingFactor*0.5),
               Text(
                 prefs?.getBool('LangParams') == true
@@ -123,8 +125,8 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                       padding: EdgeInsets.fromLTRB(
                        paddingFactor*0.7,
                           paddingFactor*0.1,
-                          paddingFactor*0.5,
-                          paddingFactor*0.2
+                          paddingFactor,
+                          paddingFactor*0.5
                       ),
                       child: GestureDetector(
                         onTap: () {
