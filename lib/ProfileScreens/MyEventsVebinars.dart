@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:autograph_app/Consts.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import '../PurchasedСourses.dart';
 
@@ -14,7 +15,7 @@ class MyEventsVebinarsScreens extends StatefulWidget {
 }
 
 class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
-
+  final String code='2453';
   final Map<String, List<Map<String, dynamic>>> videos = PurchasedCourses.instance.getPurchasedWebinars();
   @override
   void initState() {
@@ -72,7 +73,7 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                   const SizedBox(width: 40),
                 ],
               ),
-              const SizedBox(height: 20),
+              //const SizedBox(height: 20),
               Expanded(
                 child: ListView.builder(
                   itemCount: videos[widget.courseName]?.length,
@@ -85,9 +86,11 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                            Text(item![index]['word'],style: TextStyle(
                                color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
                            SizedBox(height: spacingFactor*0.2,),
+
                            VideoPlayerView(
-                              url: '$baseUrl/video/'+item[index]['id'],
-                              thumbnailUrl: 'assets/preview.png',
+                              url: '$baseUrlFinal/video/'+item[index]['id'],
+                              thumbnailUrl: item[index]['preview_url']=='ttt'?
+                              'assets/preview.png' : item[index]['preview_url'],
                               dataSourceType: DataSourceType.network,
                             ),
                          ]
@@ -104,82 +107,6 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
   }
 }
 
-class VideoListItem extends StatefulWidget {
-  final String title;
-  final String url;
-
-  const VideoListItem({super.key, required this.title, required this.url});
-
-  @override
-  State<VideoListItem> createState() => _VideoListItemState();
-}
-
-class _VideoListItemState extends State<VideoListItem> {
-  late VideoPlayerController _videoPlayerController;
-  ChewieController? _chewieController;
-
-  @override
-  void initState() {
-    super.initState();
-    _videoPlayerController = VideoPlayerController.network(widget.url);
-    _videoPlayerController.initialize().then((_) {
-      setState(() {});
-      _chewieController = ChewieController(
-        videoPlayerController: _videoPlayerController,
-        aspectRatio: 16 / 9,
-        autoPlay: true,
-        looping: false,
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(15.0),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Container(
-                color: Colors.white70,
-                child: _chewieController != null && _videoPlayerController.value.isInitialized
-                    ? Chewie(controller: _chewieController!)
-                    : const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white70,
-                    strokeWidth: 3,
-
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Center(
-            child: Text(
-              widget.title,
-              style:  const TextStyle(fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  color: Colors.white,fontFamily: 'Inria Serif'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController?.dispose();
-    super.dispose();
-  }
-}
 class VideoPlayerView extends StatefulWidget{
   const VideoPlayerView ({
     super.key,
@@ -200,10 +127,16 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   late ChewieController _chewieController;
   bool _isVideoPlaying = false;
   late Duration videoDuration;
+  SharedPreferences? prefs;
+  Future<void> setPref() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
+    setPref();
     _initializeVideoPlayer();
     videoDuration = _videoPlayerController.value.duration;
   }
@@ -214,7 +147,10 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         _videoPlayerController = VideoPlayerController.asset(widget.url);
         break;
       case DataSourceType.network:
-        _videoPlayerController = VideoPlayerController.network(widget.url);
+        print(prefs?.getString('session_key'));
+        _videoPlayerController = VideoPlayerController.network(widget.url,
+            httpHeaders: { 'x-session-key': prefs?.getString('session_key')?? 'a55b540d-d85f-473d-9a03-5ff7ea46d30e'});
+        print(widget.url);
         break;
       case DataSourceType.file:
         _videoPlayerController = VideoPlayerController.file(File(widget.url));
@@ -222,15 +158,12 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
       case DataSourceType.contentUrl:
         _videoPlayerController = VideoPlayerController.contentUri(Uri.parse(widget.url));
         break;
-
     }
-
-
 
     _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
 
-    // Инициализация Chewie
+    // инициализация Chewie
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       aspectRatio: 16 / 9,
@@ -240,7 +173,6 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         backgroundColor: Colors.white24,
         bufferedColor: Colors.grey.shade300,
       ),
-
     );
 
     _videoPlayerController.addListener(() {

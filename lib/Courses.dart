@@ -63,6 +63,12 @@ class CourseWebinars {
             if (webinar.price != null) {
               webinarMap['cost'] =int.tryParse(webinar.price.toString()) ?? 0;
             }
+            if(webinar.preview_url!=null){
+              webinarMap['preview_url']=webinar.preview_url;
+            }
+            else{
+              webinarMap['preview_url']='ttt';
+            }
             webinarsList.add(webinarMap);
           }
         }

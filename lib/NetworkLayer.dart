@@ -37,7 +37,22 @@ abstract class CourseVideoService {
       @Header('x-session-key') String session_key,
       @Body() List<int> body,
   );
+  @GET('/orders/{order_id}/pay')
+  Future<PayOrderResponse> payOrder(
+      @Header('x-session-key') String session_key,
+      @Path('order_id') String id
+  );
 
+}
+@JsonSerializable()
+class PayOrderResponse {
+  final String message;
+  PayOrderResponse({required this.message});
+
+  factory PayOrderResponse.fromJson(Map<String, dynamic> json) =>
+      _$PayOrderResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PayOrderResponseToJson(this);
 }
 @JsonSerializable()
 class CreateOrderResponse {

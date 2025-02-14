@@ -327,9 +327,12 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                 CreateOrderResponse response = await client.createOrder(
                     prefs.getString('session_key').toString(),
                     getPurchasedIndexes());
-                if (kDebugMode) {
-                  print(response.message);
-                }
+
+                // PayOrderResponse payResponse = await client.payOrder(
+                //   prefs.getString('session_key').toString(),
+                //     response.message
+                // );
+
               },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),

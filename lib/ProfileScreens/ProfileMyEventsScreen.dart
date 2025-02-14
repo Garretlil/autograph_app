@@ -27,15 +27,9 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double paddingFactor = screenWidth * 0.06;
-    double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW=screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-    double cardMarginFactor = screenHeight * 0.06;
-    double cardPaddingFactor = screenWidth * 0.06;
-    //final cartItems = LocalCart.instance.getCart();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -90,20 +84,6 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                    SizedBox(width: spacingFactorW),
                 ],
               ),
-              //SizedBox(height: spacingFactor*0.3),
-              // Center(
-              //   child: Text(
-              //     prefs?.getBool('LangParams') == true
-              //         ? 'MY EVENTS'
-              //         : 'События',
-              //     style: TextStyle(
-              //         color: Colors.white,
-              //         fontSize: titleSizeFactor*1.2 ,
-              //         fontFamily: prefs?.getBool('LangParams') == true
-              //             ? 'Inria Serif'
-              //             : 'ChUR'),
-              //   ),
-              // ),
               SizedBox(height:spacingFactor*0.5),
               Text(
                 prefs?.getBool('LangParams') == true
