@@ -1,6 +1,7 @@
 import 'package:autograph_app/LoginRegisterScreens/CheckCode.dart';
 import 'package:autograph_app/LoginRegisterScreens/RegistrationScreen.dart';
 import 'package:autograph_app/ProfileScreens/MyEventsVebinars.dart';
+import 'package:autograph_app/ShopScreens/ProductScreen.dart';
 import 'package:autograph_app/Theme/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
@@ -19,6 +20,8 @@ import 'ProfileScreens/ProfilePage.dart';
 import 'ProfileScreens/ProfileSettings.dart';
 import 'dart:io'; // Импортируем AnimatedMeshGradient
 import 'package:provider/provider.dart';
+
+import 'ShopScreens/CatalogScreen.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});
@@ -128,8 +131,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
             switch (settings.name) {
               case '/':
                 return customPageRoute( RegistrationScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
-              // case '/RegistrationScreen':
-              //   return customPageRoute( RegistrationScreen());
               case '/CheckCodeScreen':
                 return customPageRoute(CheckCodeScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/HomePage':
@@ -138,6 +139,24 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                 return customPageRoute( const HomePage());
               case '/EventsOnlineOffline':
                 return customPageRoute(const EventsOnlineOffline());
+              case '/Catalog':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute( CatalogViewScreen(
+                  screenHeight:args['screenHeight'],
+                  screenWidth: args['screenWidth'],
+                  autoRotate: args['autoRotate'],
+                  disableZoom: args['disableZoom'],
+                  src: args['src'],
+                ));
+              case '/Product':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute( ProductViewScreen(
+                  screenHeight:args['screenHeight'],
+                  screenWidth: args['screenWidth'],
+                  autoRotate: args['autoRotate'],
+                  disableZoom: args['disableZoom'],
+                  src: args['src'],
+                ));
               case '/EventsOnline':
                 return customPageRoute(const EventsOnline());
               case '/DetailsScreenForSection':
@@ -211,11 +230,11 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
           children: [
             Positioned.fill(
               child: AnimatedMeshGradient(
-                colors: const [
-                  backOrange2,
-                  back3,
-                  back3,
-                  backOrange,
+                colors:  [
+                  Colors.black,
+                  Colors.grey.shade800,
+                  Colors.blueGrey,
+                  Colors.black,
                 ],
                 options: AnimatedMeshGradientOptions(
                   speed: 2,

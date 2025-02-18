@@ -42,8 +42,61 @@ abstract class CourseVideoService {
       @Header('x-session-key') String session_key,
       @Path('order_id') String id
   );
-
 }
+@RestApi(baseUrl: baseUrlFinal)
+abstract class ProductService {
+  factory ProductService(Dio dio, {String baseUrl}) = _ProductService;
+
+  @GET("/products")
+  Future<Catalog> getProducts();
+
+  @GET("/purchasedProducts")
+  Future<List<Course>> getPurchasedProducts();
+
+  @POST("/product_orders")
+  Future<CreateOrderResponse> createOrder(
+      @Header('x-session-key') String session_key,
+      @Body() List<int> body,
+      );
+  @GET('/product_orders/{order_id}/pay')
+  Future<PayOrderResponse> payOrder(
+      @Header('x-session-key') String session_key,
+      @Path('order_id') String id
+      );
+}
+@JsonSerializable()
+class Catalog {
+  final List<listProducts>? products;
+  Catalog({
+    required this.products,
+  });
+
+  factory Catalog.fromJson(Map<String, dynamic> json) => _$CatalogFromJson(json);
+  Map<String, dynamic> toJson() => _$CatalogToJson(this);
+}
+@JsonSerializable()
+class listProducts {
+  final String? title;
+  final String? description;
+  final String? photo_url;
+  final String? price;
+  final String? model_url;
+  final int? id;
+
+  listProducts({
+    required this.title,
+    required this.description,
+    required this.photo_url,
+    required this.price,
+    required this.model_url,
+    required this.id,
+  });
+
+  factory listProducts.fromJson(Map<String, dynamic> json) => _$listProductsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$listProductsToJson(this);
+}
+
 @JsonSerializable()
 class PayOrderResponse {
   final String message;

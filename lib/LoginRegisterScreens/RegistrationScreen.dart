@@ -132,7 +132,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
     double spacingFactor = screenHeight * 0.06;
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Прозрачный фон
+      backgroundColor: Colors.transparent,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(
@@ -385,46 +385,4 @@ class BorderPainter extends CustomPainter {
     return oldDelegate.animationValue != animationValue;
   }
 }
-// @override
-// Widget build(BuildContext context) {
-//   double screenWidth = MediaQuery.of(context).size.width;
-//   double screenHeight = MediaQuery.of(context).size.height;
-//
-//   double titleSizeFactor = screenWidth * 0.06;
-//   double spacingFactor = screenHeight * 0.06;
-//   int t=5;
-//   return GestureDetector(child:
-//   Center(
-//     child: Container(
-//       decoration: BoxDecoration(
-//         borderRadius: BorderRadius.circular(20),
-//         boxShadow: [
-//           BoxShadow(
-//             color: Colors.white.withOpacity(0.5),
-//             blurRadius: 10,
-//             spreadRadius: 5,
-//           ),
-//         ],
-//       ),
-//       child: ElevatedButton(
-//         onPressed: () {const CheckCodeScreen();},
-//         style: ElevatedButton.styleFrom(
-//           backgroundColor: Colors.white.withOpacity(0.5),
-//           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-//           shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(20),
-//           ),
-//         ),
-//         child: const Text(
-//           "Продолжить",
-//           style: TextStyle(
-//               fontSize: 22,
-//               color: Colors.white,
-//               fontFamily: 'Inria Serif'
-//           ),
-//         ),
-//       ),
-//     ),
-//   )
-//   );
-// }
+

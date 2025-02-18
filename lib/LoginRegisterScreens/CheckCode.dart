@@ -170,7 +170,7 @@ class _OtpInputFieldsState extends State<OtpInputFields> {
           child: child,
         );
       },
-      transitionDuration: const Duration(milliseconds: 900),
+      transitionDuration: const Duration(milliseconds: 500),
     );
 
   }

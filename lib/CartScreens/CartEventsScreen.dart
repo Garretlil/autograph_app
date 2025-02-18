@@ -309,7 +309,6 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     double subtitleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW = screenWidth*0.06;
-
     return GestureDetector(
       onTap: () {
       },
