@@ -11,7 +11,6 @@ class PurchasedCourses {
 
   final Map<String, List<Map<String, dynamic>>> _purchasedWebinarsByCourse = {};
 
-  /// добавления вебинаров в список купленных
   void addToPurchased() {
     final cart = LocalCart.instance.getCart();
 
@@ -29,12 +28,10 @@ class PurchasedCourses {
     //LocalCart.instance.clearCart();
   }
 
-  /// Метод для получения всех купленных вебинаров
   Map<String, List<Map<String, dynamic>>> getPurchasedWebinars() {
     return Map.unmodifiable(_purchasedWebinarsByCourse);
   }
 
-  /// Проверка, куплен ли вебинар
   bool isWebinarPurchased(String courseName, String webinarName) {
     return _purchasedWebinarsByCourse[courseName]?.any((
         webinar) => webinar['word'] == webinarName) ?? false;

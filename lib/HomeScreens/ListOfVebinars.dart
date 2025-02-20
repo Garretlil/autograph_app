@@ -28,7 +28,6 @@ class _ListOfVebinars extends State<ListOfVebinars> {
     setPref();
   }
 
-  /// Синхронизация выбранных вебинаров с данными в корзине
   void _syncWebinarsWithCart() {
     vebinarChooseList = CourseWebinars.instance.getWebinars(widget.section)
         .where((webinar) => webinar.containsKey('word'))

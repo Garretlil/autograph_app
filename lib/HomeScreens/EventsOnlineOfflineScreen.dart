@@ -27,16 +27,12 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     double paddingFactor = screenWidth * 0.06;
-    double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
-    double cardMarginFactor = screenHeight * 0.06;
-    double cardPaddingFactor = screenWidth * 0.06;
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Прозрачный фон
+      backgroundColor: Colors.transparent,
       body: Stack(
         children: [
           Container(

@@ -25,7 +25,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {});
-    prefs?.setBool('LangParams', true);
+    //prefs?.setBool('LangParams', true);
   }
   @override
   void initState() {

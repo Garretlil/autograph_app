@@ -21,7 +21,7 @@ class _EventsOnline extends State<EventsOnline> {
   void initState() {
     super.initState();
     setPref();
-    print(CourseWebinars.instance.webinarsByCourse);
+    //print(CourseWebinars.instance.webinarsByCourse);
   }
 
   @override
@@ -93,7 +93,6 @@ class _EventsOnline extends State<EventsOnline> {
                 ],
                ),
               ),
-
               Expanded(
                 child: ListView.builder(
                   itemCount: CourseWebinars.instance.webinarsByCourse.length,

@@ -27,7 +27,6 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // Коэффициенты адаптации
     double paddingFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
@@ -86,7 +85,6 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                            Text(item![index]['word'],style: TextStyle(
                                color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
                            SizedBox(height: spacingFactor*0.2,),
-
                            VideoPlayerView(
                               url: '$baseUrlFinal/video/'+item[index]['id'],
                               thumbnailUrl: item[index]['preview_url']=='ttt'?
@@ -163,7 +161,6 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
     _videoPlayerController.initialize();
     _videoPlayerController.setLooping(true);
 
-    // инициализация Chewie
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       aspectRatio: 16 / 9,
@@ -182,7 +179,6 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         }
       });
     });
-
     setState(() {});
   }
 

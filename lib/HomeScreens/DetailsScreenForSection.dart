@@ -28,8 +28,6 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
-    // Коэффициенты адаптации
     double paddingFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
@@ -62,7 +60,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                       Navigator.pop(context);
                     },
                     child: Padding(
-                      padding: EdgeInsets.only(top: screenHeight * 0.001),  // Сдвиг вниз
+                      padding: EdgeInsets.only(top: screenHeight * 0.001),
                       child: Icon(
                         Icons.arrow_back_ios_new,
                         size: iconSizeFactor,

@@ -156,7 +156,7 @@ class _CenterCutPath extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     if (size.width == 0 || size.height == 0) {
-      return Path(); // Избегаем ошибки, если размеры 0
+      return Path();
     }
 
     Path path = Path()
@@ -185,7 +185,6 @@ class GradientBorderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(padding: EdgeInsets.fromLTRB(10, 0, 10, 0),child: Container(
-       // Ширина обводки
       decoration: BoxDecoration(
         border: const GradientBoxBorder(
           gradient: LinearGradient(colors: [Colors.orange, Colors.pink]),
@@ -208,8 +207,8 @@ class GradientBorderCard extends StatelessWidget {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.1), // Цвет фона внутри карточки
-          borderRadius: BorderRadius.circular(16), // Радиус скругления углов
+          color: Colors.black.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: const Padding(
           padding: EdgeInsets.all(20.0),
@@ -221,7 +220,7 @@ class GradientBorderCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // Цвет текста
+                  color: Colors.white,
                 ),
               ),
               SizedBox(height: 10),

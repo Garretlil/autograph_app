@@ -12,25 +12,25 @@ class LocalCart {
       return Map.unmodifiable(_selectedWebinarsByCourse);
    }
 
-   /// Получение выбранных вебинаров для указанного курса
+   /// получение выбранных вебинаров для указанного курса
    List<Map<String, dynamic>> getSelectedWebinars(String courseName) {
       return List.unmodifiable(_selectedWebinarsByCourse[courseName] ?? []);
    }
 
-   /// Получение итоговой цены для указанного курса
+   /// получение итоговой цены для указанного курса
    int getCourseTotalPrice(String courseName) {
       final webinars = _selectedWebinarsByCourse[courseName] ?? [];
       return webinars.fold(0, (sum, webinar) => sum + (webinar['cost'] as int));
    }
 
-   /// Получение общей суммы всех курсов
+   /// получение общей суммы всех курсов
    int getTotalPrice() {
       return _selectedWebinarsByCourse.keys.fold(0, (total, courseName) {
          return total + getCourseTotalPrice(courseName);
       });
    }
 
-   /// Добавление вебинара к курсу
+   /// добавление вебинара к курсу
    void addWebinarToCourse(String courseName, Map<String, dynamic> webinar) {
       _selectedWebinarsByCourse.putIfAbsent(courseName, () => []);
 
@@ -41,7 +41,7 @@ class LocalCart {
       }
    }
 
-   /// Удаление вебинара из курса
+   /// удаление вебинара из курса
    bool removeWebinarFromCourse(String courseName, Map<String, dynamic> webinar) {
       final webinars = _selectedWebinarsByCourse[courseName];
       if (webinars != null) {
@@ -63,7 +63,6 @@ class LocalCart {
       }
       return false;
    }
-   /// Очистка корзины
    void clearCart() {
       _selectedWebinarsByCourse.clear();
    }

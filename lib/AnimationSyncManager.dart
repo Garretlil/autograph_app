@@ -9,21 +9,13 @@ class AnimationSyncManager with ChangeNotifier {
   double get progress => _progress;
   AnimatedMeshGradientController get controller => _controller;
   AnimationSyncManager() {
-    //_startAnimation();
     _controller=AnimatedMeshGradientController();
     _controller.start();
   }
-  // void _startAnimation() {
-  //   _timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
-  //     _progress += 0.01;
-  //     notifyListeners();
-  //   });
-  // }
   @override
   void dispose() {
     super.dispose();
     _timer.cancel();
   }
 }
-
 final animationSyncManager = AnimationSyncManager();
