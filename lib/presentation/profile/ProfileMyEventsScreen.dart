@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../LocalCart.dart';
+import '../../core/services/local_cart.dart';
+
 
 class ProfileMyEventsScreen extends StatefulWidget {
   const ProfileMyEventsScreen({super.key});

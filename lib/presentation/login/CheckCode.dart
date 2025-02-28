@@ -1,10 +1,12 @@
-import 'package:autograph_app/HomeScreens/HomePage.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../NetworkLayer.dart';
 import 'package:dio/dio.dart';
+
+import '../../../core/network/network_layer.dart';
+import '../home/HomePage.dart';
 
 class CheckCodeScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;

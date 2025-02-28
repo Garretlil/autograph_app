@@ -6,11 +6,11 @@ import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../LocalCart.dart';
-import '../NetworkLayer.dart';
-import '../PurchasedСourses.dart';
-import '../Theme/Colors.dart';
+
 import 'OrderStatus.dart';
+import '../../../core/network/network_layer.dart';
+import '../../../core/services/local_cart.dart';
+import '../../../data/models/purchased_course.dart';
 
 class CartEvents extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;

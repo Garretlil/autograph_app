@@ -1,19 +1,23 @@
-import 'package:autograph_app/a.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'AnimationSyncManager.dart';
-import 'Courses.dart';
-import 'HomeScreens/EventsOnlineOfflineScreen.dart';
-import 'HomeScreens/HomePage.dart';
 import 'ScreensWithNavigationBar.dart';
+import 'core/animation_manager.dart';
+import 'data/models/course.dart';
 
 Future<void> main() async {
   CourseWebinars();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AnimationSyncManager(),
-      child: const MyApp(),
-    ),
+    // ChangeNotifierProvider(
+    //   create: (_) => AnimationSyncManager(),
+    //   lazy: false,
+    //   child: const MyApp(),
+    // ), 
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_)=> AnimationSyncManager())
+        ],
+        child: const MyApp(),
+      )
   );
 }
 

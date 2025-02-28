@@ -1,13 +1,14 @@
-import 'package:autograph_app/HomeScreens/HomePage.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
-import '../AnimationSyncManager.dart';
-import '../NetworkLayer.dart';
-import '../Theme/Colors.dart';
+
 import 'CheckCode.dart';
+import '../../../core/animation_manager.dart';
+import '../../../core/network/network_layer.dart';
+
 
 class RegistrationScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../Courses.dart';
-import '../LocalCart.dart';
+import '../../../core/services/local_cart.dart';
+import '../../../data/models/course.dart';
 
 class ListOfVebinars extends StatefulWidget {
   final String section;

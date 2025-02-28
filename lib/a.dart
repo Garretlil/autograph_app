@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
-import '../AnimationSyncManager.dart';
-import '../NetworkLayer.dart';
-import '../Theme/Colors.dart';
+
+import 'core/animation_manager.dart';
+
 
 class AScreen extends StatefulWidget {
   const AScreen({super.key});

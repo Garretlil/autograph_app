@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../AnimationSyncManager.dart';
+
+import '../../../core/animation_manager.dart';
 
 class HomePage extends StatefulWidget {
   //final void Function(bool) toggleBottomNavigationBar;

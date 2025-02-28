@@ -1,27 +1,27 @@
-import 'package:autograph_app/LoginRegisterScreens/CheckCode.dart';
-import 'package:autograph_app/LoginRegisterScreens/RegistrationScreen.dart';
-import 'package:autograph_app/ProfileScreens/MyEventsVebinars.dart';
-import 'package:autograph_app/ShopScreens/ProductScreen.dart';
-import 'package:autograph_app/Theme/Colors.dart';
+import 'package:autograph_app/presentation/cart/CartChoose.dart';
+import 'package:autograph_app/presentation/cart/CartEvents.dart';
+import 'package:autograph_app/presentation/home/DetailsScreenForSection.dart';
+import 'package:autograph_app/presentation/home/EventsOnline.dart';
+import 'package:autograph_app/presentation/home/EventsOnlineOfflineScreen.dart';
+import 'package:autograph_app/presentation/home/HomePage.dart';
+import 'package:autograph_app/presentation/home/ListOfVebinars.dart';
+import 'package:autograph_app/presentation/login/CheckCode.dart';
+import 'package:autograph_app/presentation/login/RegistrationScreen.dart';
+import 'package:autograph_app/presentation/profile/MyEventsVebinars.dart';
+import 'package:autograph_app/presentation/profile/ProfilePage.dart';
+import 'package:autograph_app/presentation/shop/ProductScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
-import 'AnimationSyncManager.dart';
-import 'CartScreens/CartChooseScreen.dart';
-import 'CartScreens/CartEventsScreen.dart';
-import 'HomeScreens/DetailsScreenForSection.dart';
-import 'HomeScreens/EventsOnline.dart';
-import 'HomeScreens/EventsOnlineOfflineScreen.dart';
-import 'HomeScreens/HomePage.dart';
-import 'HomeScreens/ListOfVebinars.dart';
-import 'ProfileScreens/ProfileMyEventsScreen.dart';
-import 'ProfileScreens/ProfileOrders.dart';
-import 'ProfileScreens/ProfilePage.dart';
-import 'ProfileScreens/ProfileSettings.dart';
-import 'dart:io'; // Импортируем AnimatedMeshGradient
+
+import 'presentation/profile/ProfileMyEventsScreen.dart';
+import 'presentation/profile/ProfileOrders.dart';
+import 'presentation/profile/ProfileSettings.dart';
+import 'dart:io';
 import 'package:provider/provider.dart';
 
 import 'ShopScreens/CatalogScreen.dart';
+import 'core/animation_manager.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});
@@ -32,14 +32,13 @@ class ScreensWithNavigationBar extends StatefulWidget {
 }
 
 class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> with SingleTickerProviderStateMixin{
-
   int _selectedIndex = 0;
   int cartItemCount = 0;
   bool isBottomNavVisible = false;
   bool isCircleVisible =false;
 
-  late AnimationController _animationController;
-  late Animation<double> _iconAnimation;
+  //late AnimationController _animationController;
+  //late Animation<double> _iconAnimation;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
@@ -80,9 +79,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
     _fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
       CurvedAnimation(parent: _fadeController, curve: Curves.easeOut),
     );
-
   }
-
   Widget _buildCartIcon() {
     return Stack(
       clipBehavior: Clip.none,
@@ -324,3 +321,4 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
     );
   }
 }
+

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../UserData.dart';
+import '../../core/services/user_service.dart';
 
 
 class ProfileSettingsScreen extends StatefulWidget {

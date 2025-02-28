@@ -1,10 +1,11 @@
 import 'dart:io';
-import 'package:autograph_app/Consts.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-import '../PurchasedСourses.dart';
+
+import '../../core/constants.dart';
+import '../../data/models/purchased_course.dart';
 
 class MyEventsVebinarsScreens extends StatefulWidget {
   final String courseName;
