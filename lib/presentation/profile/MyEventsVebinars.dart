@@ -4,7 +4,7 @@ import 'package:chewie/chewie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
-import '../../core/constants.dart';
+import '../../core/Constants.dart';
 import '../../data/models/purchased_course.dart';
 
 class MyEventsVebinarsScreens extends StatefulWidget {

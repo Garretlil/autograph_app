@@ -20,8 +20,8 @@ import 'presentation/profile/ProfileSettings.dart';
 import 'dart:io';
 import 'package:provider/provider.dart';
 
-import 'ShopScreens/CatalogScreen.dart';
-import 'core/animation_manager.dart';
+import 'presentation/shop/CatalogScreen.dart';
+import 'core/Animation_manager.dart';
 
 class ScreensWithNavigationBar extends StatefulWidget {
   const ScreensWithNavigationBar({super.key});

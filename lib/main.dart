@@ -1,7 +1,9 @@
+import 'package:autograph_app/core/network/network_layer.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'ScreensWithNavigationBar.dart';
-import 'core/animation_manager.dart';
+import 'core/Animation_manager.dart';
 import 'data/models/course.dart';
 
 Future<void> main() async {
@@ -14,6 +16,9 @@ Future<void> main() async {
     // ), 
       MultiProvider(
         providers: [
+          Provider(create: (_)=> AuthService(Dio())),
+          Provider(create: (_) => CourseVideoService(Dio())),
+          Provider(create: (_) => ProductService(Dio())),
           ChangeNotifierProvider(create: (_)=> AnimationSyncManager())
         ],
         child: const MyApp(),

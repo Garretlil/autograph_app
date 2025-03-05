@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:mesh_gradient/mesh_gradient.dart';
 
-import 'core/animation_manager.dart';
+import 'core/Animation_manager.dart';
 
 
 class AScreen extends StatefulWidget {
