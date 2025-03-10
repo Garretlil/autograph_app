@@ -1,4 +1,6 @@
 import 'package:autograph_app/core/network/network_layer.dart';
+import 'package:autograph_app/data/models/product.dart';
+import 'package:autograph_app/presentation/shop/CatalogScreen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,17 +10,16 @@ import 'data/models/course.dart';
 
 Future<void> main() async {
   CourseWebinars();
+  WidgetsFlutterBinding.ensureInitialized();
+  final products = Products();
+  await products.initialize();
   runApp(
-    // ChangeNotifierProvider(
-    //   create: (_) => AnimationSyncManager(),
-    //   lazy: false,
-    //   child: const MyApp(),
-    // ), 
       MultiProvider(
         providers: [
           Provider(create: (_)=> AuthService(Dio())),
           Provider(create: (_) => CourseVideoService(Dio())),
           Provider(create: (_) => ProductService(Dio())),
+          ChangeNotifierProvider(create: (_) => products),
           ChangeNotifierProvider(create: (_)=> AnimationSyncManager())
         ],
         child: const MyApp(),
@@ -34,7 +35,8 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: '/screenNavigationBar',
-      home: ScreensWithNavigationBar(),
+      home: CatalogViewScreen(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
     );
   }
 }
+

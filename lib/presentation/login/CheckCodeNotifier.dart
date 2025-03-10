@@ -48,6 +48,7 @@ class CheckCodeNotifier extends ChangeNotifier{
     }
     notifyListeners();
   }
+
   Future<void> onChanged(int index, String value,bool mounted) async {
     if (value.isNotEmpty && index < 3) {
       focusNodes[index + 1].requestFocus();
@@ -63,15 +64,18 @@ class CheckCodeNotifier extends ChangeNotifier{
           'email': 'ed763135@gmail.com',
           'code': code,
         };
+        print(3);
         ConfirmationResponse response =
         await client.verifyEmail(confirmationData);
 
         prefs?.setString('session_key', response.session_key);
         // MeResponse aboutMe = await client.getMe(response.session_key);
+        print(4);
         navigateToNextScreen(mounted);
         for (var controller in controllers) {
           controller.clear();
         }
+        print(5);
 
       } catch (error) {
         navigateToNextScreen(mounted);
@@ -81,6 +85,7 @@ class CheckCodeNotifier extends ChangeNotifier{
           width: double.infinity,
           height: double.infinity,
         );
+        print(6);
       }
       notifyListeners();
     }
