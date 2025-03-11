@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/network/DataConverter.dart';
 import 'OrderStatus.dart';
 import '../../../core/network/network_layer.dart';
-import '../../../core/services/local_cart.dart';
+import '../../../core/services/local_cart_video.dart';
 import '../../../data/models/purchased_course.dart';
 
 class CartEvents extends StatefulWidget {
@@ -95,7 +95,7 @@ class _CartEvents extends State<CartEvents> {
               ),
                //SizedBox(height: spacingFactor*0.3),
               Expanded(
-                child: LocalCart.instance.getCart().isEmpty
+                child: LocalCartVideo.instance.getCart().isEmpty
                     ? Center(
                   child: Text(prefs?.getBool('LangParams') == true
                       ? 'Your cart is empty :('
@@ -112,10 +112,10 @@ class _CartEvents extends State<CartEvents> {
                       ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
-                        itemCount: LocalCart.instance.getSelectedCourses().length,
+                        itemCount: LocalCartVideo.instance.getSelectedCourses().length,
                         itemBuilder: (context, index) {
-                          final courseName = LocalCart.instance.getSelectedCourses()[index];
-                          final webinars = LocalCart.instance.getSelectedWebinars(courseName);
+                          final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
+                          final webinars = LocalCartVideo.instance.getSelectedWebinars(courseName);
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +149,7 @@ class _CartEvents extends State<CartEvents> {
                                             GestureDetector(
                                               onTap: () {
                                                 setState(() {
-                                                  if (LocalCart.instance.removeWebinarFromCourse(courseName, webinar)){
+                                                  if (LocalCartVideo.instance.removeWebinarFromCourse(courseName, webinar)){
                                                     widget.toggleCircleCart(false);
                                                   }
                                                 });
@@ -207,7 +207,7 @@ class _CartEvents extends State<CartEvents> {
                           : 'ChUR',)
                   ),
                   Text(
-                    '${LocalCart.instance.getTotalPrice()} \$',
+                    '${LocalCartVideo.instance.getTotalPrice()} \$',
                     style:  TextStyle(
                       fontSize: subtitleSizeFactor,
                       color: Colors.white,

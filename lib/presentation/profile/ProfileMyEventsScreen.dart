@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/services/local_cart.dart';
+import '../../core/services/local_cart_video.dart';
 
 
 class ProfileMyEventsScreen extends StatefulWidget {
@@ -99,9 +99,9 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: LocalCart.instance.getSelectedCourses().length,
+                  itemCount: LocalCartVideo.instance.getSelectedCourses().length,
                   itemBuilder: (context, index) {
-                    final courseName = LocalCart.instance.getSelectedCourses()[index];
+                    final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
                     return Padding(
                       padding: EdgeInsets.fromLTRB(
                        paddingFactor*0.7,

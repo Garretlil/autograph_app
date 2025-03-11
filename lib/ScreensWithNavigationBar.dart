@@ -152,7 +152,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                   screenWidth: args['screenWidth'],
                   autoRotate: args['autoRotate'],
                   disableZoom: args['disableZoom'],
-                  src: args['src'],
+                  productId: args['productId'],
                 ));
               case '/EventsOnline':
                 return customPageRoute(const EventsOnline());

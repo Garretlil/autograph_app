@@ -85,7 +85,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                     paddingFactor * 1,
                     paddingFactor * 2.4,
                     paddingFactor,
-                    paddingFactor * 0.5,
+                    paddingFactor * 0.05,
                   ),
                   child: Row(
                     //mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,15 +159,20 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                     itemCount: filteredProducts?.length ?? 0,
                     itemBuilder: (context, index) {
                       final product = filteredProducts?[index];
-                      final productTitle = product?.title ?? 'Без названия';
-                      final productDescription = product?.description ?? 'Нет описания';
-
+                      final productTitle = product?.title ?? 'Название будет попозже(';
+                      final productDescription = product?.description ?? 'Описание будет попозже(';
                       return GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(
                             context,
-                            '/DetailsScreenForSection',
-                            arguments: {'section': product},
+                            '/Product',
+                            arguments: {
+                              'screenHeight':screenHeight,
+                              'screenWidth':screenWidth,
+                              'autoRotate':false,
+                              'disableZoom':true,
+                              'productId':product?.id
+                            },
                           );
                         },
                         child: Card(
@@ -180,7 +185,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-
                                   height: screenHeight * 0.18,
                                   width: screenWidth * 0.5,
                                   decoration: const BoxDecoration(
@@ -197,13 +201,13 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                                     backgroundColor: Colors.grey.withOpacity(
                                         0.5),
                                     src: 'assets/teeth.glb',
-                                    alt: 'A 3D model of an astronaut',
+                                    alt: '',
                                     ar: false,
                                     autoRotate: widget.autoRotate,
                                     disableZoom: widget.disableZoom,
                                   ),
                                 ),
-                                Text('${product?.price}' + ' ' + '\$',
+                                Text('${product?.price}' ' ' '\$',
                                   style: TextStyle(color: Colors.orange,
                                       fontFamily: 'Inria Serif',
                                       fontSize: titleSizeFactor * 0.8),),
@@ -211,10 +215,10 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                                   productTitle,
                                   style: TextStyle(
                                     fontSize: descriptionSizeFactor * 0.7,
-                                    color: Colors.white,
+                                    color: Colors.lightGreen,
                                     fontFamily: 'Inria Serif',
                                   ),
-                                  maxLines: 4,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
@@ -224,36 +228,10 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                                     color: Colors.white,
                                     fontFamily: 'Inria Serif',
                                   ),
-                                  maxLines: 4,
+                                  maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                GestureDetector(
-                                    onTap: toggleCartStatus,
-                                    child: Center(child: Container(
-                                      width: paddingFactor * 7,
-                                      height: screenHeight * 0.049,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 12),
-                                      decoration: BoxDecoration(
-                                        color: isAddedToCart
-                                            ? Colors.red
-                                            : Colors.blue,
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          isAddedToCart
-                                              ? 'Удалить из корзины'
-                                              : 'Добавить в корзину',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: titleSizeFactor * 0.6,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    )
-                                )
+                                const CardCatalog()
                               ],
                             ),
                           ),
@@ -261,12 +239,68 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                       );
                     },
                   ),
-                )
+                ),
+                const SizedBox(height: 30,)
               ],
             ),
           ),
         );
       }
+    );
+  }
+}
+
+class CardCatalog extends StatefulWidget{
+  const CardCatalog({super.key});
+
+  @override
+  State<CardCatalog> createState() => _CardCatalog();
+}
+
+class _CardCatalog extends State<CardCatalog> {
+  void toggleCartStatus() {
+    setState(() {
+      isAddedToCart = !isAddedToCart;
+    });
+  }
+
+  bool isAddedToCart = false;
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    double paddingFactor = screenWidth * 0.06;
+    double titleSizeFactor = screenWidth * 0.06;
+    return GestureDetector(
+        onTap: toggleCartStatus,
+        child: Center(
+          child: Container(
+            width: paddingFactor * 7,
+            height: screenHeight * 0.049,
+            padding: const EdgeInsets.symmetric(
+                vertical: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  colors: isAddedToCart ? [Colors.red, Colors.red] :[Colors.blue, Colors.blue] ),
+              // color: isAddedToCart
+              //     ? Colors.red
+              //     : Colors.blue,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                isAddedToCart
+                    ? 'Удалить из корзины'
+                    : 'Добавить в корзину',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: titleSizeFactor * 0.6,
+                ),
+              ),
+            ),
+          ),
+        )
     );
   }
 }

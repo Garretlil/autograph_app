@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: '/screenNavigationBar',
-      home: CatalogViewScreen(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
+      home: ScreensWithNavigationBar()
     );
   }
 }

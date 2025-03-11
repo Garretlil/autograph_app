@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/services/local_cart.dart';
+import '../../../core/services/local_cart_video.dart';
 import '../../../data/models/course.dart';
 
 class ListOfVebinars extends StatefulWidget {
@@ -135,12 +135,12 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                             item['isOn'] = value;
                             if (value) {
                               setState(() {
-                                LocalCart.instance.isProductsInCart = true;
+                                LocalCartVideo.instance.isProductsInCart = true;
                                 widget.toggleCircleCart(true);
                               });
-                              LocalCart.instance.addWebinarToCourse(widget.section, item);
+                              LocalCartVideo.instance.addWebinarToCourse(widget.section, item);
                             } else {
-                              if (LocalCart.instance.removeWebinarFromCourse(widget.section, item)) {
+                              if (LocalCartVideo.instance.removeWebinarFromCourse(widget.section, item)) {
                                 widget.toggleCircleCart(false);
                               }
                             }
@@ -161,8 +161,8 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                   ),
                   child:
                   Text(prefs?.getBool('LangParams') == true
-                      ? 'TOTAL:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ '
-                      : 'Сумма:   ${LocalCart.instance.getCourseTotalPrice(widget.section)}\$ ',
+                      ? 'TOTAL:   ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)}\$ '
+                      : 'Сумма:   ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)}\$ ',
                       style: TextStyle(fontSize:titleSizeFactor*1.05,color:Colors.white,fontFamily:
                       prefs?.getBool('LangParams') == true
                           ? 'Inria Serif'
