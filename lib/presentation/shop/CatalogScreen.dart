@@ -1,3 +1,4 @@
+import 'package:autograph_app/core/services/local_cart_products.dart';
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
@@ -58,8 +59,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
     double paddingFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double cardMarginFactor = screenHeight * 0.06;
     double cardPaddingFactor = screenWidth * 0.06;
     double descriptionSizeFactor = screenWidth * 0.06;
 
@@ -258,49 +257,60 @@ class CardCatalog extends StatefulWidget{
 }
 
 class _CardCatalog extends State<CardCatalog> {
-  void toggleCartStatus() {
+  bool isAddedToCart = false;
+
+  void toggleCartStatus(BuildContext context,int productIndex) {
+    if (isAddedToCart){
+      LocalCartProducts.instance.addProductToCart(productIndex);
+    }
+    else {
+      LocalCartProducts.instance.removeProductFromCart(productIndex);
+    }
     setState(() {
       isAddedToCart = !isAddedToCart;
     });
   }
-
-  bool isAddedToCart = false;
-
+  //перенести сюда всю карточку
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double paddingFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    return GestureDetector(
-        onTap: toggleCartStatus,
-        child: Center(
-          child: Container(
-            width: paddingFactor * 7,
-            height: screenHeight * 0.049,
-            padding: const EdgeInsets.symmetric(
-                vertical: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: isAddedToCart ? [Colors.red, Colors.red] :[Colors.blue, Colors.blue] ),
-              // color: isAddedToCart
-              //     ? Colors.red
-              //     : Colors.blue,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(
-                isAddedToCart
-                    ? 'Удалить из корзины'
-                    : 'Добавить в корзину',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: titleSizeFactor * 0.6,
+    return Consumer<Products>(
+        builder: (context, products, child)
+    {
+      return GestureDetector(
+          onTap: ()=> toggleCartStatus(context,products.products.products),
+          child: Center(
+            child: Container(
+              width: paddingFactor * 7,
+              height: screenHeight * 0.049,
+              padding: const EdgeInsets.symmetric(
+                  vertical: 12),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    colors: isAddedToCart ? [Colors.red, Colors.red] : [
+                      Colors.blue,
+                      Colors.blue
+                    ]),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Center(
+                child: Text(
+                  isAddedToCart
+                      ? 'Удалить из корзины'
+                      : 'Добавить в корзину',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: titleSizeFactor * 0.6,
+                  ),
                 ),
               ),
             ),
-          ),
-        )
+          )
+      );
+     }
     );
   }
 }

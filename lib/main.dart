@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'ScreensWithNavigationBar.dart';
 import 'core/Animation_manager.dart';
+import 'core/services/local_cart_video.dart';
 import 'data/models/course.dart';
 
 Future<void> main() async {

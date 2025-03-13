@@ -1,4 +1,4 @@
-import '../../data/models/course.dart';
+import 'package:autograph_app/data/models/product.dart';
 
 class LocalCartProducts {
   LocalCartProducts._privateConstructor();
@@ -6,61 +6,50 @@ class LocalCartProducts {
 
   static final LocalCartProducts instance = LocalCartProducts._privateConstructor();
 
-  final Map<String, List<Map<String, dynamic>>> _selectedProducts = {};
+  final Map<int,int> _selectedProducts = {};
 
-  Map<String, List<Map<String, dynamic>>> getCart() {
-    return Map.unmodifiable(_selectedProducts);
+  Map<int,int> getCart() {
+    return _selectedProducts;
   }
 
-  List<Map<String, dynamic>> getSelectedProducts(String courseName) {
-    return List.unmodifiable(_selectedProducts[courseName] ?? []);
+  int conv(String? price){
+    if (price!=null) {
+      int? num=int.tryParse(price);
+      if (num!=null){
+        return num.toInt();
+      }
+    }
+    return 0;
   }
-
   int getProductsTotalPrice(String courseName) {
-    final webinars = _selectedProducts[courseName] ?? [];
-    return webinars.fold(0, (sum, webinar) => sum + (webinar['cost'] as int));
+     int totalPrice=0;
+     for (var key in _selectedProducts.keys){
+       totalPrice+=conv(Products.instance.products.products?[key].price!)*_selectedProducts[key]!;
+     }
+     return totalPrice;
   }
 
-  void addProductToCart(String courseName, Map<String, dynamic> webinar) {
-    _selectedProducts.putIfAbsent(courseName, () => []);
+  void addProductToCart(int productIndex) {
+    int key = productIndex;
 
-    final webinars = _selectedProducts[courseName]!;
-
-    if (!webinars.any((item) => item['word'] == webinar['word'])) {
-      webinars.add(webinar);
+    if (_selectedProducts.containsKey(key)) {
+      _selectedProducts[key] = _selectedProducts[key]! + 1;
+    } else {
+      _selectedProducts[key] = 1;
     }
   }
 
-  bool removeProductFromCart(String courseName, Map<String, dynamic> webinar) {
-    final webinars = _selectedProducts[courseName];
-    if (webinars != null) {
-      webinars.removeWhere((item) => item['word'] == webinar['word']);
-      var webinarToUpdate = CourseWebinars.instance.webinarsByCourse[courseName]?.firstWhere(
-            (item) => item['word'] == webinar['word'],
-      );
-      if (webinarToUpdate != null) {
-        webinarToUpdate['isOn'] = false;
-      }
-
-      if (webinars.isEmpty) {
-        _selectedProducts.remove(courseName);
-        if (getSelectedProductsFromCart().isEmpty){
-          isProductsInCart=false;
-          return true;
-        }
-      }
+  void removeProductFromCart(int productIndex) {
+    int key = productIndex;
+    if (_selectedProducts[key]!>1) {
+      _selectedProducts[key]!=_selectedProducts[key]!-1;
+    } else {
+      _selectedProducts.remove(key);
     }
-    return false;
+
   }
   void clearCart() {
     _selectedProducts.clear();
-  }
-  List<String> getSelectedProductsFromCart() {
-    return _selectedProducts.keys.toList();
-  }
-
-  Map<String, List<Map<String, dynamic>>> getProductsFromRemote(){
-    return _selectedProducts;
   }
 
 }

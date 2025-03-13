@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../data/models/product.dart';
+
 class ProductViewScreen extends StatefulWidget {
   const ProductViewScreen({
     super.key,
