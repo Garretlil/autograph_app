@@ -2,8 +2,6 @@ import 'package:autograph_app/data/models/product.dart';
 
 class LocalCartProducts {
   LocalCartProducts._privateConstructor();
-  bool isProductsInCart=false;
-
   static final LocalCartProducts instance = LocalCartProducts._privateConstructor();
 
   final Map<int,int> _selectedProducts = {};
@@ -37,15 +35,27 @@ class LocalCartProducts {
     } else {
       _selectedProducts[key] = 1;
     }
+    print(_selectedProducts);
+  }
+  int countProductInCart(int productIndex){
+    return _selectedProducts[productIndex]!;
   }
 
   void removeProductFromCart(int productIndex) {
     int key = productIndex;
     if (_selectedProducts[key]!>1) {
-      _selectedProducts[key]!=_selectedProducts[key]!-1;
+      _selectedProducts[key]=_selectedProducts[key]!-1;
     } else {
-      _selectedProducts.remove(key);
+      _selectedProducts[key]=1;
     }
+    print(_selectedProducts);
+  }
+  bool isProductInCart(int productIndex){
+    if(_selectedProducts[productIndex]==1){
+      _selectedProducts[productIndex]=0;
+      return false;
+    }
+    return true;
 
   }
   void clearCart() {

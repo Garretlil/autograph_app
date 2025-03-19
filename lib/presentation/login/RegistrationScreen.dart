@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../cart/CartProducts.dart';
 import '../loginNotifiers/RegistrationNotifier.dart';
 import '../shop/CatalogScreen.dart';
 import 'CheckCode.dart';
@@ -97,7 +98,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                                 Navigator.pushReplacement(
                                                   context,
                                                   PageRouteBuilder(
-                                                    pageBuilder: (context, animation, secondaryAnimation) => const CatalogViewScreen(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
+                                                    pageBuilder: (context, animation, secondaryAnimation) => const CartProductsScreen(),//(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
                                                     transitionDuration: const Duration(milliseconds: 400),
                                                     transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                                       var begin = const Offset(1.0, 0.0);

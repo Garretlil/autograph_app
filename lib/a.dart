@@ -1,148 +1,106 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:gradient_borders/box_borders/gradient_box_border.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:dio/dio.dart';
-import 'package:mesh_gradient/mesh_gradient.dart';
 
-import 'core/Animation_manager.dart';
-
-
-class AScreen extends StatefulWidget {
-  const AScreen({super.key});
+class AnimatedGradientBorder extends StatefulWidget {
+  const AnimatedGradientBorder({super.key});
 
   @override
-  State<AScreen> createState() => _AScreen();
+  State<AnimatedGradientBorder> createState() => _AnimatedGradientBorderState();
 }
 
-class _AScreen extends State<AScreen> with SingleTickerProviderStateMixin {
-  SharedPreferences? prefs;
+class _AnimatedGradientBorderState extends State<AnimatedGradientBorder> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Alignment> _tlAlignAnim;
+  late Animation<Alignment> _brAlignAnim;
 
   @override
   void initState() {
     super.initState();
-
-  }
-  Future<void> _registerUser() async {
-
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: constraints.maxHeight,
-              ),
-              child: IntrinsicHeight(
-                child: AnimatedBuilder(
-                  animation: context.read<AnimationSyncManager>(),
-                  builder: (context, child) {
-                    return const Stack(
-                      children: [
-                        // Positioned.fill(
-                        //   child: AnimatedMeshGradient(
-                        //     colors: const [
-                        //       backOrange2,
-                        //       back3,
-                        //       back3,
-                        //       backOrange,
-                        //     ],
-                        //     options: AnimatedMeshGradientOptions(
-                        //       speed: 2,
-                        //       grain: 0,
-                        //       amplitude: 40,
-                        //       frequency: 5,
-                        //     ),
-                        //     controller: context.watch<AnimationSyncManager>().controller,
-                        //   ),
-                        // ),
-                       Center(child:StaticGradientBorder(child: Center(child: Text('hello'),),) ,)
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
-          );
-        },
-      ),
+    _controller = AnimationController(
+      duration: const Duration(seconds:5),
+      vsync: this,
     );
+    final linearAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.linear,
+    );
+
+    _tlAlignAnim = TweenSequence<Alignment>([
+      TweenSequenceItem(tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft), weight: 1),
+    ]).animate(linearAnimation);
+    _brAlignAnim = TweenSequence<Alignment>([
+      TweenSequenceItem(tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight), weight: 1),
+    ]).animate(linearAnimation);
+
+    _controller.repeat();
   }
-}
-
-class StaticGradientBorder extends StatelessWidget {
-  final double radius;
-  final double blurRadius;
-  final double spreadRadius;
-  final Color topColor;
-  final Color bottomColor;
-  final double glowOpacity;
-  final double thickness;
-  final Widget? child;
-
-  const StaticGradientBorder({
-    super.key,
-    this.radius = 30,
-    this.blurRadius = 30,
-    this.spreadRadius = 1,
-    this.topColor = Colors.orange,
-    this.bottomColor = Colors.red,
-    this.glowOpacity = 0.3,
-    this.thickness = 3,
-    this.child,
-  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 320,
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(radius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withOpacity(0.2),
-            blurRadius: blurRadius,
-            spreadRadius: spreadRadius,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return ClipPath(
+          clipper: _CenterCutPath(),
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              return Stack(
+                children: [
+                  Container(
+                    width: constraints.maxWidth,
+                    height: constraints.maxHeight,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(30)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.red.withOpacity(0.4),
+                          offset: const Offset(0, 0),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Align(
+                    alignment: _brAlignAnim.value,
+                    child: Container(
+                      width: constraints.maxWidth * 0.95,
+                      height: constraints.maxHeight * 0.95,
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: const BorderRadius.all(Radius.circular(30)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.withOpacity(0.4),
+                            offset: const Offset(0, 0),
+                            blurRadius: 20,
+                            spreadRadius: 5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(30)),
+                      gradient: LinearGradient(
+                        begin: _tlAlignAnim.value,
+                        end: _brAlignAnim.value,
+                        colors: const [Colors.red, Colors.blue],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          BoxShadow(
-            color: Colors.white.withOpacity(0.2),
-            blurRadius: blurRadius / 2,
-            spreadRadius: spreadRadius / 2,
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          if (child != null)
-            ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(radius)),
-              child: child!,
-            ),
-          ClipPath(
-            clipper: _CenterCutPath(radius: radius, thickness: thickness),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(radius),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [topColor, bottomColor],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -151,24 +109,20 @@ class _CenterCutPath extends CustomClipper<Path> {
   final double radius;
   final double thickness;
 
-  _CenterCutPath({this.radius = 0, this.thickness = 1});
+  _CenterCutPath({this.radius = 30, this.thickness = 2});
 
   @override
   Path getClip(Size size) {
-    if (size.width == 0 || size.height == 0) {
-      return Path();
-    }
+    final double safeRadius = (radius - thickness).clamp(0.0, radius);
+    final double width = size.width - thickness * 2;
+    final double height = size.height - thickness * 2;
 
-    Path path = Path()
+    final rect = Rect.fromLTWH(thickness, thickness, width, height);
+
+    final path = Path()
       ..fillType = PathFillType.evenOdd
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Radius.circular(radius),
-      ))
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(thickness, thickness, size.width - 2 * thickness, size.height - 2 * thickness),
-        Radius.circular(radius - thickness),
-      ));
+      ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(safeRadius)))
+      ..addRect(Rect.fromLTWH(-size.width, -size.height, size.width * 3, size.height * 3));
 
     return path;
   }
@@ -178,67 +132,3 @@ class _CenterCutPath extends CustomClipper<Path> {
     return oldClipper.radius != radius || oldClipper.thickness != thickness;
   }
 }
-
-
-
-class GradientBorderCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(padding: EdgeInsets.fromLTRB(10, 0, 10, 0),child: Container(
-      decoration: BoxDecoration(
-        border: const GradientBoxBorder(
-          gradient: LinearGradient(colors: [Colors.orange, Colors.pink]),
-          width: 3,
-        ),
-        borderRadius: BorderRadius.circular(25),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withOpacity(0.5),
-            offset: const Offset(-1, -1),
-            spreadRadius: 1,
-            blurRadius: 10,
-          ),
-          BoxShadow(
-            color: Colors.pink.withOpacity(0.5),
-            offset: const Offset(1, 1),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Заголовок карточки',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Здесь может быть описание...',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-    );
-  }
-}
-
-
-

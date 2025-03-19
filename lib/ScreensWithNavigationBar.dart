@@ -1,5 +1,6 @@
 import 'package:autograph_app/presentation/cart/CartChoose.dart';
 import 'package:autograph_app/presentation/cart/CartEvents.dart';
+import 'package:autograph_app/presentation/cart/CartProducts.dart';
 import 'package:autograph_app/presentation/home/DetailsScreenForSection.dart';
 import 'package:autograph_app/presentation/home/EventsOnline.dart';
 import 'package:autograph_app/presentation/home/EventsOnlineOfflineScreen.dart';
@@ -178,6 +179,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
               case '/CartEvents':
                 return customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
                   toggleCircleCart: _toggleCircleCart,));
+              case '/CartProducts':
+                return customPageRoute(const CartProductsScreen());
               case '/Cart2':
                 return  customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
                   toggleCircleCart: _toggleCircleCart,));

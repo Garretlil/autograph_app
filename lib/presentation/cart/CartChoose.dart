@@ -100,7 +100,11 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                     ),
                     SizedBox(
                         height: spacingFactor*3.5),
-                    Text(prefs?.getBool('LangParams') == true
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/CartProducts');
+                      },
+                    child: Text(prefs?.getBool('LangParams') == true
                         ? 'Products'
                         : 'Продукция',
                         style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
@@ -108,6 +112,7 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                             ? 'Inria Serif'
                             : 'ChUR',)
                     ),
+                    )
                   ],
                 ),
               ),
