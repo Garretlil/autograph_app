@@ -128,7 +128,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
           case 0:
             switch (settings.name) {
               case '/':
-                return customPageRoute( RegistrationScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
+                return customPageRoute(const CatalogViewScreen());//customPageRoute( RegistrationScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/CheckCodeScreen':
                 return customPageRoute(CheckCodeScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/HomePage':

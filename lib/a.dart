@@ -26,14 +26,14 @@ class _AnimatedGradientBorderState extends State<AnimatedGradientBorder> with Si
 
     _tlAlignAnim = TweenSequence<Alignment>([
       TweenSequenceItem(tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight), weight: 5),
-      TweenSequenceItem(tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft), weight: 1),
       TweenSequenceItem(tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft), weight: 1),
     ]).animate(linearAnimation);
     _brAlignAnim = TweenSequence<Alignment>([
       TweenSequenceItem(tween: Tween(begin: Alignment.bottomRight, end: Alignment.bottomLeft), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft), weight: 5),
-      TweenSequenceItem(tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight), weight: 5),
+      TweenSequenceItem(tween: Tween(begin: Alignment.bottomLeft, end: Alignment.topLeft), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: Alignment.topLeft, end: Alignment.topRight), weight: 1),
       TweenSequenceItem(tween: Tween(begin: Alignment.topRight, end: Alignment.bottomRight), weight: 1),
     ]).animate(linearAnimation);
 
@@ -58,9 +58,9 @@ class _AnimatedGradientBorderState extends State<AnimatedGradientBorder> with Si
                       borderRadius: const BorderRadius.all(Radius.circular(30)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.red.withOpacity(0.4),
+                          color: Colors.blue.withOpacity(0.4),
                           offset: const Offset(0, 0),
-                          blurRadius: 20,
+                          blurRadius: 15,
                           spreadRadius: 5,
                         ),
                       ],
@@ -76,10 +76,10 @@ class _AnimatedGradientBorderState extends State<AnimatedGradientBorder> with Si
                         borderRadius: const BorderRadius.all(Radius.circular(30)),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.withOpacity(0.4),
+                            color: Colors.orange.withOpacity(0.4),
                             offset: const Offset(0, 0),
-                            blurRadius: 20,
-                            spreadRadius: 5,
+                            blurRadius: 10,
+                            spreadRadius: 2,
                           ),
                         ],
                       ),
@@ -91,7 +91,7 @@ class _AnimatedGradientBorderState extends State<AnimatedGradientBorder> with Si
                       gradient: LinearGradient(
                         begin: _tlAlignAnim.value,
                         end: _brAlignAnim.value,
-                        colors: const [Colors.red, Colors.blue],
+                        colors: const [Colors.blue, Colors.purpleAccent],
                       ),
                     ),
                   ),

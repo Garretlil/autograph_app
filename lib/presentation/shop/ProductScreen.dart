@@ -22,11 +22,19 @@ class ProductViewScreen extends StatefulWidget {
   final int productId;
 
   @override
-  State<ProductViewScreen> createState() => _ProductViewScreen();
+  State<ProductViewScreen> createState() => _ProductViewScreenState();
 }
 
-class _ProductViewScreen extends State<ProductViewScreen> {
+class _ProductViewScreenState extends State<ProductViewScreen> {
   SharedPreferences? prefs;
+  bool isAddedToCart = false;
+
+  @override
+  void initState() {
+    super.initState();
+    setPref();
+    isAddedToCart = LocalCartProducts.instance.initIsProductInCart(widget.productId);
+  }
 
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
@@ -34,25 +42,14 @@ class _ProductViewScreen extends State<ProductViewScreen> {
     prefs?.setBool('LangParams', true);
   }
 
-  @override
-  void initState() {
-    super.initState();
-    setPref();
-  }
-  bool isAddedToCart = false;
-
-  void toggleCartStatus(BuildContext context) {
-
-    final productId = widget.productId;
-
-    if (!isAddedToCart) {
-      LocalCartProducts.instance.addProductToCart(productId);
-    } else {
-      LocalCartProducts.instance.removeProductFromCart(productId);
-    }
-
+  void toggleCartStatus() {
     setState(() {
-      isAddedToCart = !isAddedToCart;
+      if (!isAddedToCart) {
+        LocalCartProducts.instance.addProductToCart(widget.productId);
+      } else {
+        LocalCartProducts.instance.removeProductFromCart(widget.productId);
+      }
+      isAddedToCart = LocalCartProducts.instance.isProductInCart(widget.productId);
     });
   }
 
@@ -66,6 +63,18 @@ class _ProductViewScreen extends State<ProductViewScreen> {
 
     return Consumer<Products>(builder: (context, products, child) {
       final currentProduct = products.products.products?[widget.productId];
+
+      if (currentProduct == null) {
+        return Scaffold(
+          body: Center(
+            child: Text(
+              "Продукт не найден",
+              style: TextStyle(color: Colors.white, fontSize: titleSizeFactor),
+            ),
+          ),
+        );
+      }
+
       return Scaffold(
         body: Stack(
           children: [
@@ -97,7 +106,7 @@ class _ProductViewScreen extends State<ProductViewScreen> {
                     clipBehavior: Clip.hardEdge,
                     child: ModelViewer(
                       backgroundColor: Colors.grey.withOpacity(0.5),
-                      src: currentProduct!.model_url!,
+                      src: currentProduct.model_url ?? '',
                       alt: '',
                       ar: false,
                       autoRotate: widget.autoRotate,
@@ -105,7 +114,7 @@ class _ProductViewScreen extends State<ProductViewScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: spacingFactor*0.1),
+                SizedBox(height: spacingFactor * 0.1),
                 _buildInfoCard(
                   icon: Icons.label,
                   title: 'Название',
@@ -132,29 +141,27 @@ class _ProductViewScreen extends State<ProductViewScreen> {
                   content: currentProduct.description ?? 'Неизвестно',
                   titleSizeFactor: titleSizeFactor,
                 ),
-                SizedBox(height: spacingFactor,),
-                GestureDetector(
-                  onTap: () => toggleCartStatus(context),
+                SizedBox(height: spacingFactor),
+                isAddedToCart
+                    ? _buildCartControls(paddingFactor, screenHeight)
+                    : GestureDetector(
+                  onTap: toggleCartStatus,
                   child: Container(
-                    width: paddingFactor * 10,
-                    height: screenHeight *0.08,
+                    width: paddingFactor * 7,
+                    height: screenHeight * 0.049,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isAddedToCart
-                            ? [Colors.red, Colors.red]
-                            : [Colors.teal, Colors.blue],
+                      gradient: const LinearGradient(
+                        colors: [Colors.teal, Colors.blue],
                       ),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
                       child: Text(
-                        isAddedToCart
-                            ? 'Удалить из корзины'
-                            : 'Добавить в корзину',
+                        'Добавить в корзину',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: titleSizeFactor *0.75,
+                          fontSize: titleSizeFactor * 0.6,
                         ),
                       ),
                     ),
@@ -166,6 +173,44 @@ class _ProductViewScreen extends State<ProductViewScreen> {
         ),
       );
     });
+  }
+
+  Widget _buildCartControls(double paddingFactor, double screenHeight) {
+    return GestureDetector(
+      child: Container(
+        width: paddingFactor * 7,
+        height: screenHeight * 0.049,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Colors.red, Colors.red]),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            GestureDetector(
+              child: const Icon(Icons.remove, color: Colors.white),
+              onTap: () => setState(() {
+                if (LocalCartProducts.instance.isProductInCart(widget.productId)) {
+                  LocalCartProducts.instance.removeProductFromCart(widget.productId);
+                }
+                else {isAddedToCart=false;}
+              }),
+            ),
+            Text(
+              '${LocalCartProducts.instance.countProductInCart(widget.productId)}',
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            GestureDetector(
+              child: const Icon(Icons.add, color: Colors.white),
+              onTap: () => setState(() {
+                LocalCartProducts.instance.addProductToCart(widget.productId);
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildInfoCard({

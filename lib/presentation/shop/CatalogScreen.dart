@@ -11,9 +11,9 @@ class CatalogViewScreen extends StatefulWidget {
     super.key,
     this.autoRotate=false,
     this.disableZoom=false,
-    required this.src,
-    required this.screenWidth,
-    required this.screenHeight
+    this.src='',
+    this.screenWidth=5,
+    this.screenHeight=5
   });
   final String src;
   final bool autoRotate;

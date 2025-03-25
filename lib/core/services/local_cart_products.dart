@@ -46,7 +46,7 @@ class LocalCartProducts {
     if (_selectedProducts[key]!>1) {
       _selectedProducts[key]=_selectedProducts[key]!-1;
     } else {
-      _selectedProducts[key]=1;
+      _selectedProducts[key]=0;
     }
     print(_selectedProducts);
   }
@@ -56,8 +56,14 @@ class LocalCartProducts {
       return false;
     }
     return true;
-
   }
+  bool initIsProductInCart(int productIndex){
+    if(_selectedProducts[productIndex]!>=0){
+      return true;
+    }
+    return false;
+  }
+
   void clearCart() {
     _selectedProducts.clear();
   }

@@ -1,6 +1,7 @@
 import 'package:autograph_app/a.dart';
 import 'package:autograph_app/core/network/network_layer.dart';
 import 'package:autograph_app/data/models/product.dart';
+import 'package:autograph_app/presentation/shop/CatalogScreen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,10 +33,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       //initialRoute: '/screenNavigationBar',
-      home: Container( decoration:const BoxDecoration(color: Colors.transparent),width:300,height:300,child: Padding(padding:EdgeInsets.all(800 * 0.1),child: AnimatedGradientBorder()))
+      home: ScreensWithNavigationBar()//CatalogViewScreen()//Container( decoration:const BoxDecoration(color: Colors.transparent),child: const Padding(padding:EdgeInsets.all(800 * 0.1),child: AnimatedGradientBorder()))
     );
   }
 }
