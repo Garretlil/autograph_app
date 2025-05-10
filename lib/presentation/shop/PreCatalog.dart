@@ -3,14 +3,14 @@ import 'dart:ui'; // Required for ImageFilter
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class EventsOnlineOffline extends StatefulWidget {
-  const EventsOnlineOffline({super.key});
+class PreCatalogScreen extends StatefulWidget {
+  const PreCatalogScreen({super.key});
 
   @override
-  State<EventsOnlineOffline> createState() => _EventsOnlineOfflineState();
+  State<PreCatalogScreen> createState() => _PreCatalogState();
 }
 
-class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
+class _PreCatalogState extends State<PreCatalogScreen> {
   SharedPreferences? prefs;
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
@@ -70,8 +70,8 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                   ),
                   Text(
                     prefs?.getBool('LangParams') == true
-                        ? 'EVENTS'
-                        : 'Мероприятия',
+                        ? 'Phantoms'
+                        : 'Фантомы',
                     style: TextStyle(
                       fontSize: titleSizeFactor * 0.85, // Adjusted size
                       color: Colors.white,
@@ -114,12 +114,21 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/EventsOnline');
+                          Navigator.pushNamed(context, '/Catalog',
+                            arguments: {
+                              'screenHeight': screenHeight,
+                              'screenWidth': screenWidth,
+                              'src': 'assets/teeth.glb',
+                              'autoRotate': false,
+                              'disableZoom': true,
+                              'section':'Posterior'
+                            },
+                          );
                         },
                         child: Text(
                           prefs?.getBool('LangParams') == true
-                              ? 'ONLINE'
-                              : 'Онлайн',
+                              ? 'Posterior'
+                              : 'Posterior',
                           style: TextStyle(
                             fontSize: titleSizeFactor * 1.2, // Increased size for prominence
                             color: Colors.white,
@@ -133,12 +142,21 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       SizedBox(height: spacingFactor * 3.0), // Adjusted spacing
                       GestureDetector( // Added GestureDetector for consistency, if needed
                         onTap: () {
-                          // TODO: Implement navigation for Offline events if necessary
+                          Navigator.pushNamed(context, '/Catalog',
+                            arguments: {
+                              'screenHeight': screenHeight,
+                              'screenWidth': screenWidth,
+                              'src': 'assets/teeth.glb',
+                              'autoRotate': false,
+                              'disableZoom': true,
+                              'section':'Asterior'
+                            },
+                          );
                         },
                         child: Text(
                           prefs?.getBool('LangParams') == true
-                              ? 'OFFLINE'
-                              : 'Оффлайн',
+                              ? 'Asterior'
+                              : 'Asterior',
                           style: TextStyle(
                             fontSize: titleSizeFactor * 1.2, // Increased size for prominence
                             color: Colors.white,

@@ -59,7 +59,7 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                     },
                     child: const Icon(
                       Icons.arrow_back_ios_new,
-                      color: Colors.deepOrange,
+                      color: Colors.white,
                     ),
                   ),
                   Text(
@@ -87,7 +87,7 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                                color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
                            SizedBox(height: spacingFactor*0.2,),
                            VideoPlayerView(
-                              url: '$baseUrlFinal/video/'+item[index]['id'],
+                              url: '$baseUrlFinal/video/${item[index]['id']}',
                               thumbnailUrl: item[index]['preview_url']=='ttt'?
                               'assets/preview.png' : item[index]['preview_url'],
                               dataSourceType: DataSourceType.network,
@@ -148,7 +148,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
       case DataSourceType.network:
         print(prefs?.getString('session_key'));
         _videoPlayerController = VideoPlayerController.network(widget.url,
-            httpHeaders: { 'x-session-key': prefs?.getString('session_key')?? 'a55b540d-d85f-473d-9a03-5ff7ea46d30e'});
+            httpHeaders: { 'x-session-key': prefs?.getString('session_key')?? 'fake_key'});
         print(widget.url);
         break;
       case DataSourceType.file:
@@ -222,8 +222,8 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                       ),
                       alignment: Alignment.center,
                       child: const Icon(
-                        Icons.play_arrow,
-                        color: Colors.deepOrange,
+                        Icons.play_circle_outline,
+                        color: Colors.white,
                         size: 45.0,
                       ),
                     ),

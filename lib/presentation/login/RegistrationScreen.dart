@@ -98,7 +98,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                                 Navigator.pushReplacement(
                                                   context,
                                                   PageRouteBuilder(
-                                                    pageBuilder: (context, animation, secondaryAnimation) => const CartProductsScreen(),//(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
+                                                    pageBuilder: (context, animation, secondaryAnimation) => CheckCodeScreen(toggleBottomNavigationBar: widget.toggleBottomNavigationBar),//(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
                                                     transitionDuration: const Duration(milliseconds: 400),
                                                     transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                                       var begin = const Offset(1.0, 0.0);

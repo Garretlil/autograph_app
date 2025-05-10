@@ -19,6 +19,12 @@ class listProducts {
   final String? photo_url;
   final String? price;
   final String? model_url;
+  final double height;
+  final double width;
+  final double length;
+  final double weight;
+  final String section;
+  final String subSection;
   final int? id;
 
   listProducts({
@@ -27,10 +33,30 @@ class listProducts {
     required this.photo_url,
     required this.price,
     required this.model_url,
+    required this.weight,
+    required this.width,
+    required this.length,
+    required this.height,
+    required this.section,
+    required this.subSection,
     required this.id,
   });
 
-  factory listProducts.fromJson(Map<String, dynamic> json) => _$listProductsFromJson(json);
+  factory listProducts.fromJson(Map<String, dynamic> json) => listProducts(
+    title: json['name'],
+    description: json['description'],
+    photo_url: json['photo_url'],
+    price: json['price'],
+    model_url: json['model_url'],
+    height: json['height'].toDouble(),
+    width: json['width'].toDouble(),
+    length: json['length'].toDouble(),
+    weight: json['weight'].toDouble(),
+    section: json['section'],
+    subSection: json['subSection'],
+    id: json['id'],
+  );
+
 
   Map<String, dynamic> toJson() => _$listProductsToJson(this);
 }

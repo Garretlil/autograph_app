@@ -28,12 +28,16 @@ dependencies:
   json_annotation: ^4.9.0
   mesh_gradient: ^1.3.8
   flame: ^1.25.0
-
-
-
   dio: any
   google_nav_bar: any
   gradient_borders: ^1.0.1
+  http: ^1.3.0
+  yandex_mapkit: ^3.2.0
+  geolocator: ^13.0.2
+  uuid: ^4.4.2
+  cached_network_image: ^3.4.1
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

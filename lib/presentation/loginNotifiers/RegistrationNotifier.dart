@@ -1,8 +1,9 @@
-import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/network/network_layer.dart';
+import '../../core/services/user_service.dart';
+import '../../data/repositories/UserRepository.dart';
 
 class RegistrationNotifier extends ChangeNotifier {
   final SharedPreferences? prefs;
@@ -27,9 +28,10 @@ class RegistrationNotifier extends ChangeNotifier {
   }
 
   Future<void> registerUser(Function() onSuccess) async {
-    nameController.text='t';
-    surnameController.text='t';
-    emailController.text='t';
+    nameController.text='Houston';
+    surnameController.text='Cooper';
+    emailController.text='ed763135@gmail.com';
+    prefs?.setString('email', emailController.text);
     if (nameController.text.isEmpty || surnameController.text.isEmpty || emailController.text.isEmpty) {
       _snackBarMessage = prefs?.getBool('LangParams') == true ? 'Please fill all fields' : 'Заполните все поля';
       notifyListeners();
@@ -46,13 +48,29 @@ class RegistrationNotifier extends ChangeNotifier {
       fadeController.forward().then((_) {
         onSuccess();
       });
+      final userRepository = UserRepositoryImpl();
+      UserData.instance.name=registrationData['name'];
+      print(UserData.instance.name);
+      UserData.instance.surname=registrationData['surname'];
+      UserData.instance.email=registrationData['email'];
+      userRepository.saveUserData(UserData.instance);
 
     } catch (e) {
+      Map<String, dynamic> registrationData = {
+        'name': nameController.text,
+        'surname': surnameController.text,
+        'email': emailController.text,
+      };
       _snackBarMessage = prefs?.getBool('LangParams') == true ? 'Registration failed, try again' : 'Ошибка регистрации';
       fadeController.forward();
       fadeController.forward().then((_) {
         onSuccess();
       });
+      final userRepository = UserRepositoryImpl();
+      UserData.instance.name=registrationData['name'];
+      UserData.instance.surname=registrationData['surname'];
+      UserData.instance.email=registrationData['email'];
+      userRepository.saveUserData(UserData.instance);
       notifyListeners();
     }
   }

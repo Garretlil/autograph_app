@@ -64,18 +64,19 @@ class CheckCodeNotifier extends ChangeNotifier{
           'email': 'ed763135@gmail.com',
           'code': code,
         };
-        print(3);
-        ConfirmationResponse response =
-        await client.verifyEmail(confirmationData);
-
-        prefs?.setString('session_key', response.session_key);
-        // MeResponse aboutMe = await client.getMe(response.session_key);
-        print(4);
-        navigateToNextScreen(mounted);
-        for (var controller in controllers) {
-          controller.clear();
-        }
-        print(5);
+        throw Exception();
+        // print(3);
+        // ConfirmationResponse response =
+        // await client.verifyEmail(confirmationData);
+        //
+        // prefs?.setString('session_key', response.session_key);
+        // // MeResponse aboutMe = await client.getMe(response.session_key);
+        // print(4);
+        // navigateToNextScreen(mounted);
+        // for (var controller in controllers) {
+        //   controller.clear();
+        // }
+        // print(5);
 
       } catch (error) {
         navigateToNextScreen(mounted);
@@ -91,18 +92,23 @@ class CheckCodeNotifier extends ChangeNotifier{
     }
   }
   void navigateToNextScreen(bool mounted) async {
-    _isDark = true;
-    await Future.delayed(const Duration(milliseconds: 200));
-    if (mounted) {
-      Navigator.of(context).push(createRoute()).then((_) {
-        if (mounted) {
-            _isDark = true;
-        }
-      });
-    }
-    await Future.delayed(const Duration(milliseconds: 700));
-    //widget.toggleBottomNavigationBar(true);
-    notifyListeners();
+    // _isDark = true;
+    // await Future.delayed(const Duration(milliseconds: 200));
+    // if (mounted) {
+    //   Navigator.of(context).push(createRoute()).then((_) {
+    //     if (mounted) {
+    //         _isDark = true;
+    //     }
+    //   });
+    // }
+    // await Future.delayed(const Duration(milliseconds: 700));
+    // widget.toggleBottomNavigationBar(true);
+    // notifyListeners();
+    Navigator.pushNamed(
+      context,
+      '/HomePage',
+      // arguments: {'section': courseName},
+    );
   }
   Route createRoute() {
     return PageRouteBuilder(
@@ -119,8 +125,8 @@ class CheckCodeNotifier extends ChangeNotifier{
 
   bool _isDark = false;
 
-  Future<void> setNode() async {
-    await Future.delayed(const Duration(seconds: 1));
+  Future<void> setNode()  async {
+    await Future.delayed(const Duration(milliseconds: 500));
     focusNodes[0].requestFocus();
     notifyListeners();
   }

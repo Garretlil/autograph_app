@@ -29,7 +29,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     setPref().then((_) {
       setState(() {});
     });
-    UserData.instance.initUser();
   }
   @override
   Widget build(BuildContext context) {

@@ -1,8 +1,9 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:ui';
+
+import 'package:autograph_app/presentation/cdek_screen_integration/CDEKWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
@@ -39,102 +40,192 @@ class _CartProductsScreen extends State<CartProductsScreen>{
     return Consumer<Products>(
       builder: (context, products, child) {
         return Scaffold(
-          body: Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/image.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    paddingFactor,
-                    paddingFactor * 2.4,
-                    paddingFactor,
-                    paddingFactor * 0.05,
+          body: Stack(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/image.png'),
+                    fit: BoxFit.cover,
                   ),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(
-                          Icons.arrow_back_ios_new,
-                          size: iconSizeFactor,
-                          color: Colors.white,
-                        ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        paddingFactor,
+                        paddingFactor * 2.4,
+                        paddingFactor,
+                        paddingFactor * 0.05,
                       ),
-                      SizedBox(width: paddingFactor * 4),
-                      Column(
+                      child: Row(
                         children: [
-                          Text(
-                            'AUTOGRAPH',
-                            style: TextStyle(
-                              fontSize: titleSizeFactor * 0.8,
-                              fontWeight: FontWeight.w600,
-                              fontFamily: 'Inria Serif',
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(
+                              Icons.arrow_back_ios_new,
+                              size: iconSizeFactor,
                               color: Colors.white,
                             ),
                           ),
-                          Text(
-                            prefs?.getBool('LangParams') == true ? 'Phantoms' : 'Фантомы',
-                            style: TextStyle(
-                              fontSize: titleSizeFactor,
-                              color: Colors.white,
-                              fontFamily: prefs?.getBool('LangParams') == true
-                                  ? 'Inria Serif'
-                                  : 'ChUR',
-                            ),
+                          SizedBox(width: paddingFactor * 4),
+                          Column(
+                            children: [
+                              Text(
+                                'AUTOGRAPH',
+                                style: TextStyle(
+                                  fontSize: titleSizeFactor * 0.8,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Inria Serif',
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                prefs?.getBool('LangParams') == true ? 'Phantoms' : 'Фантомы',
+                                style: TextStyle(
+                                  fontSize: titleSizeFactor,
+                                  color: Colors.white,
+                                  fontFamily: prefs?.getBool('LangParams') == true
+                                      ? 'Inria Serif'
+                                      : 'ChUR',
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(bottomRight: Radius.circular(20),
-                        bottomLeft: Radius.circular(20)),
-                    child: GridView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: paddingFactor * 0.25),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 1,
-                        crossAxisSpacing: 3.0,
-                        mainAxisSpacing: 3.0,
-                        childAspectRatio: 6 / 4,
+                    ),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomRight: Radius.circular(20),
+                          bottomLeft: Radius.circular(20),
+                        ),
+                        child: Builder(
+                          builder: (_) {
+                            final allProducts = products.products.products ?? [];
+                            final cartIds = LocalCartProducts.instance.getCart().keys.toSet();
+                            final filteredProducts = allProducts
+                                .where((p) => p.id != null && cartIds.contains(p.id))
+                                .toList();
+                            return GridView.builder(
+                              padding: EdgeInsets.symmetric(horizontal: paddingFactor * 0.25),
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 1,
+                                crossAxisSpacing: 3.0,
+                                mainAxisSpacing: 3.0,
+                                childAspectRatio: 11 / 5,
+                              ),
+                              itemCount: filteredProducts.length,
+                              itemBuilder: (context, index) {
+                                final product = filteredProducts[index];
+                                return _CardCatalog(
+                                  product: product,
+                                  screenWidth: screenWidth,
+                                  screenHeight: screenHeight,
+                                  autoRotate: false,
+                                  disableZoom: true,
+                                  isEnglish: prefs?.getBool('LangParams') ?? false,
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
-                      itemCount: products.products.products?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        final product = products.products.products?[index];
-                        if (product == null) {
-                          return const SizedBox.shrink();
-                        }
-                        return _CardCatalog(
-                          product: product,
-                          screenWidth: screenWidth,
-                          screenHeight: screenHeight,
-                          autoRotate: false,
-                          disableZoom: true,
-                          isEnglish: prefs?.getBool('LangParams') ?? false,
-                        );
-                      },
+                    ),
+                    //const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 32,
+                right: 40,
+                width: 100,
+                height: 50,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(30),
+                          onTap: _showBottomSheet,
+                          child:  const Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('596 ₽', style: TextStyle(color: Colors.white, fontSize: 20)),
+                                //SizedBox(width: 10),
+                                //Icon(Icons.next_plan_outlined, color: Colors.white),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
-              ],
-            ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+  void _showBottomSheet() {
+    showModalBottomSheet(
+      enableDrag: false,
+      isScrollControlled: true,
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30),bottom: Radius.circular(30)),
+      ),
+      builder: (context) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30),bottom: Radius.circular(30)),
+          child: DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.9,
+            minChildSize: 0.5,
+            maxChildSize: 1.0,
+            builder: (context, scrollController) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Center(
+                      child: Container(
+                        height: 5,
+                        width: 70,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.grey[400],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Expanded(
+                    child: CDEKWindow(),
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
     );
   }
 }
+
 
 
 class _CardCatalog extends StatefulWidget {
@@ -166,7 +257,6 @@ class _CardCatalogState extends State<_CardCatalog> {
 
     final productId = widget.product.id;
     print(widget.product);
-
     if (!isAddedToCart) {
       LocalCartProducts.instance.addProductToCart(productId!);
     } else {
@@ -207,135 +297,126 @@ class _CardCatalogState extends State<_CardCatalog> {
           },
         );
       },
-      child: Card(
+      child:
+      Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
         color: Colors.black.withOpacity(0.2),
         child: Padding(
-          padding: EdgeInsets.all(paddingFactor * 0.1),
+          padding: EdgeInsets.all(paddingFactor * 0.2),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: screenHeight * 0.18,
-                width: screenWidth * 0.5,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
+                height: screenHeight * 0.15,
+                width: screenWidth * 0.4,
+                margin: EdgeInsets.only(right: paddingFactor * 0.2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
                     BoxShadow(color: Colors.black26, blurRadius: 5),
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                child: Image.asset(product.photo_url!,height: 500,),
+                child: Image.asset(
+                  product.photo_url!,
+                  fit: BoxFit.cover,
+                ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-              Text(
-                productTitle,
-                style: TextStyle(
-                  fontSize: descriptionSizeFactor * 0.7,
-                  color: Colors.lightGreen,
-                  fontFamily: 'Inria Serif',
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                productDescription,
-                style: TextStyle(
-                  fontSize: descriptionSizeFactor * 0.7,
-                  color: Colors.white,
-                  fontFamily: 'Inria Serif',
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              Text(
-                '$productPrice \$',
-                 style: TextStyle(
-                 color: Colors.orange,
-                 fontFamily: 'Inria Serif',
-                 fontSize: titleSizeFactor * 0.8,
-                ),
-              ),
-
-              const Spacer(),
-              !isAddedToCart? GestureDetector(
-                onTap: () => toggleCartStatus(context),
-                child: Container(
-                  width: paddingFactor * 7,
-                  height: screenHeight * 0.049,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: isAddedToCart
-                          ? [Colors.red, Colors.red]
-                          : [Colors.teal, Colors.blue],
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      isAddedToCart
-                          ? 'Удалить из корзины'
-                          : 'Добавить в корзину',
+                    Text(
+                      productTitle,
                       style: TextStyle(
+                        fontSize: descriptionSizeFactor * 0.7,
                         color: Colors.white,
-                        fontSize: titleSizeFactor * 0.6,
+                        fontFamily: 'Inria Serif',
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      productDescription,
+                      style: TextStyle(
+                        fontSize: descriptionSizeFactor * 0.6,
+                        color: Colors.white,
+                        fontFamily: 'Inria Serif',
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 6),
+                    Text(
+                      '$productPrice \$',
+                      style: TextStyle(
+                        color: Colors.orange,
+                        fontFamily: 'Inria Serif',
+                        fontSize: titleSizeFactor * 0.8,
                       ),
                     ),
-                  ),
-                ),
-              ) :
-              GestureDetector(
-                onTap:() => t(),
-                child: Container(
-                    width: paddingFactor * 7,
-                    height: screenHeight * 0.049,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isAddedToCart
-                            ? [Colors.red, Colors.red]
-                            : [Colors.teal, Colors.blue],
+                    const Spacer(),
+                    Padding(padding: EdgeInsets.only(left:screenWidth*0.07),child:
+                    Row(children:
+                        [
+                          GestureDetector(
+                            onTap:()=> t(),
+                            child: const Icon(Icons.delete_rounded,color: Colors.red,),
+                          ),
+                         SizedBox(width: screenWidth*0.02,),
+                         GestureDetector(
+                          onTap:() => t(),
+                          child: Container(
+                              width: paddingFactor * 6,
+                              height: screenHeight * 0.045,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: isAddedToCart
+                                      ? [Colors.red, Colors.red]
+                                      : [Colors.deepOrange, Colors.red],
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child:
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  GestureDetector(
+                                      child: const Icon(Icons.remove,color: Colors.white,size: 22,),
+                                      onTap: ()=>setState(() {
+                                        if (LocalCartProducts.instance.isProductInCart(product.id!)) {
+                                          LocalCartProducts.instance.removeProductFromCart(product.id!);
+                                        }
+                                        else {isAddedToCart=false;}
+                                      })
+                                  ),
+                                  Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
+                                    style: const TextStyle(fontSize: 13,color: Colors.white),
+                                  ),
+                                  GestureDetector(
+                                      child: const Icon(Icons.add,color: Colors.white,size: 22,),
+                                      onTap: ()=>setState(() {
+                                        LocalCartProducts.instance.addProductToCart(product.id!);
+                                      })
+                                  ),
+                                ],
+                              )
+                            ),
+                          ),
+                        ]
                       ),
-                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child:
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                            child: const Icon(Icons.remove,color: Colors.white,),
-                            onTap: ()=>setState(() {
-                              if (LocalCartProducts.instance.isProductInCart(product.id!)) {
-                                LocalCartProducts.instance.removeProductFromCart(product.id!);
-                              }
-                              else {isAddedToCart=false;}
-                            })
-                        ),
-                        Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
-                          style: const TextStyle(fontSize: 16,color: Colors.white),
-                        ),
-                        GestureDetector(
-                            child: const Icon(Icons.add,color: Colors.white,),
-                            onTap: ()=>setState(() {
-                              LocalCartProducts.instance.addProductToCart(product.id!);
-                            })
-                        ),
-                      ],
-                    )
+                  ],
                 ),
-               )
-              ]
-             )
+              ),
             ],
           ),
         ),
-      ),
+      )
     );
   }
 }

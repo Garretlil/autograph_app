@@ -1,3 +1,4 @@
+import 'package:autograph_app/core/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +54,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -60,20 +62,12 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     double titleSizeFactor = screenWidth * 0.06;
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.04;
+    double iconSizeFactor = screenWidth * 0.06;
 
     return Consumer<Products>(builder: (context, products, child) {
-      final currentProduct = products.products.products?[widget.productId];
-
-      if (currentProduct == null) {
-        return Scaffold(
-          body: Center(
-            child: Text(
-              "Продукт не найден",
-              style: TextStyle(color: Colors.white, fontSize: titleSizeFactor),
-            ),
-          ),
-        );
-      }
+      final currentProduct = products.products.products!
+          .firstWhere((product) => product.id == widget.productId);
+      print(baseUrlFinal+currentProduct.model_url!);
 
       return Scaffold(
         body: Stack(
@@ -106,7 +100,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     clipBehavior: Clip.hardEdge,
                     child: ModelViewer(
                       backgroundColor: Colors.grey.withOpacity(0.5),
-                      src: currentProduct.model_url ?? '',
+                      src: baseUrlFinal + currentProduct.model_url!,
                       alt: '',
                       ar: false,
                       autoRotate: widget.autoRotate,
@@ -169,6 +163,14 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                 ),
               ],
             ),
+            Positioned(
+              top: 62,
+              left: 15,
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new, color: Colors.white,size: iconSizeFactor,),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
           ],
         ),
       );
@@ -194,7 +196,9 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                 if (LocalCartProducts.instance.isProductInCart(widget.productId)) {
                   LocalCartProducts.instance.removeProductFromCart(widget.productId);
                 }
-                else {isAddedToCart=false;}
+                if (!LocalCartProducts.instance.isProductInCart(widget.productId)){
+                  isAddedToCart=!isAddedToCart;
+                }
               }),
             ),
             Text(

@@ -282,8 +282,10 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     setState(() {});
   }
   //bool isPaymentV=false;
-  List<int> getPurchasedIndexes(){
-    return PurchasedCourses.instance.getPurchasedIndexes();
+  Map<String, dynamic> getPurchasedIndexes() {
+    return {
+      'courseIds': PurchasedCourses.instance.getPurchasedIndexes(),
+    };
   }
   Future<void> _showPaymentWidget() async {
     setState(() {
