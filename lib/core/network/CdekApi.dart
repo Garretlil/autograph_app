@@ -1,3 +1,4 @@
+import 'package:dio/io.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../../presentation/cdek_screen_integration/SdekWindowNotifier.dart';
@@ -5,17 +6,29 @@ import 'CdekAuth.dart';
 import 'package:dio/dio.dart';
 
 class CdekApi {
+  Dio createInsecureDio() {
+    final dio = Dio();
+
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+
+    return dio;
+  }
 
   final CdekAuth auth;
-  final Dio _dio = Dio();
+  late final Dio _dio;
 
   CdekApi(this.auth){
     final prefs=SharedPreferences.getInstance();
+    _dio=createInsecureDio();
   }
 
   Future<List<DeliveryPoint>> fetchDeliveryPoints() async {
     final token= await auth.getToken();
-    final dio = Dio();
+    final dio = createInsecureDio();
     final response = await dio.get(
       'https://api.cdek.ru/v2/deliverypoints',
       queryParameters: {
@@ -43,7 +56,7 @@ class CdekApi {
         double weight,
       ) async {
     final token = await auth.getToken();
-    final dio = Dio();
+    final dio = createInsecureDio();
     final requestBody = {
       "currency": 1,
       "lang": "ru",
@@ -79,10 +92,9 @@ class CdekApi {
       return null;
     }
   }
-  Future<bool> sendOrderToServer({
+  Future<String> sendOrderToServer({
     required String userId,
     required String pointCode,
-    required String trackNumber,
     required List<Map<String, dynamic>> items,
     required double deliveryCost,
     required double totalCost,
@@ -93,17 +105,24 @@ class CdekApi {
         data: {
           'userId': userId,
           'pointCode': pointCode,
-          'trackingNumber': trackNumber,
           'items': items,
           'deliveryCost': deliveryCost,
           'totalCost': totalCost,
           'date': DateTime.now().toIso8601String(),
         },
-        options: Options(headers: {'x-session-key': 'a55b540d-d85f-473d-9a03-5ff7ea46d30e'}),
+        options: Options(
+          headers: {'x-session-key': 'a55b540d-d85f-473d-9a03-5ff7ea46d30e'},
+        ),
       );
-      return response.statusCode == 200;
+      final data = response.data;
+      if (data != null && data['trackingNumber'] != null) {
+        return data['trackingNumber'] as String;
+      } else {
+        return '';
+      }
     } catch (e) {
-      return false;
+      print('Ошибка при отправке заказа: $e');
+      return '';
     }
   }
   Future<bool> createCdekOrder({
@@ -118,7 +137,7 @@ class CdekApi {
     required double weight,
   }) async {
     final token = await auth.getToken();
-    final dio = Dio();
+    final dio = createInsecureDio();
     const uuid = Uuid();
     final orderUuid = uuid.v4();
 

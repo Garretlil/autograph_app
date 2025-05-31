@@ -3,7 +3,7 @@ part 'DataConverter.g.dart';
 
 @JsonSerializable()
 class Catalog {
-  final List<listProducts>? products;
+  final List<Product>? products;
   Catalog({
     required this.products,
   });
@@ -13,53 +13,44 @@ class Catalog {
 }
 
 @JsonSerializable()
-class listProducts {
+class Product {
   final String? title;
   final String? description;
   final String? photo_url;
   final String? price;
   final String? model_url;
-  final double height;
-  final double width;
-  final double length;
-  final double weight;
-  final String section;
-  final String subSection;
+  final double? height;
+  final double? width;
+  final double? length;
+  final double? weight;
+  final String? section;
+
+  @JsonKey(name: 'subsection')
+  final String? subSection;
+
   final int? id;
 
-  listProducts({
-    required this.title,
-    required this.description,
-    required this.photo_url,
-    required this.price,
-    required this.model_url,
-    required this.weight,
-    required this.width,
-    required this.length,
-    required this.height,
-    required this.section,
-    required this.subSection,
-    required this.id,
+  Product({
+    this.title,
+    this.description,
+    this.photo_url,
+    this.price,
+    this.model_url,
+    this.height,
+    this.width,
+    this.length,
+    this.weight,
+    this.section,
+    this.subSection,
+    this.id,
   });
 
-  factory listProducts.fromJson(Map<String, dynamic> json) => listProducts(
-    title: json['name'],
-    description: json['description'],
-    photo_url: json['photo_url'],
-    price: json['price'],
-    model_url: json['model_url'],
-    height: json['height'].toDouble(),
-    width: json['width'].toDouble(),
-    length: json['length'].toDouble(),
-    weight: json['weight'].toDouble(),
-    section: json['section'],
-    subSection: json['subSection'],
-    id: json['id'],
-  );
+  factory Product.fromJson(Map<String, dynamic> json) =>
+      _$ProductFromJson(json);
 
-
-  Map<String, dynamic> toJson() => _$listProductsToJson(this);
+  Map<String, dynamic> toJson() => _$ProductToJson(this);
 }
+
 
 @JsonSerializable()
 class PayOrderResponse {
@@ -171,6 +162,18 @@ class Webinar {
 
   Map<String, dynamic> toJson() => _$WebinarToJson(this);
 }
+@JsonSerializable()
+class CoursesResponse {
+  final List<Course> courses;
+
+  CoursesResponse({required this.courses});
+
+  factory CoursesResponse.fromJson(Map<String, dynamic> json) =>
+      _$CoursesResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CoursesResponseToJson(this);
+}
+
 
 @JsonSerializable()
 class Course {

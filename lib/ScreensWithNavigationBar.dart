@@ -152,7 +152,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                   screenWidth: args['screenWidth'],
                   autoRotate: args['autoRotate'],
                   disableZoom: args['disableZoom'],
-                  productId: args['productId'],
+                  product: args['product'],
                 ));
               case '/EventsOnline':
                 return customPageRoute(const EventsOnline());
@@ -180,7 +180,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                   toggleCircleCart: _toggleCircleCart,));
               case '/CartProducts':
                 _toggleBottomNavigationBar(false);
-                return customPageRoute(const CartProductsScreen());
+                return customPageRoute( CartProductsScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar));
               case '/Cart2':
                 return  customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
                   toggleCircleCart: _toggleCircleCart,));
@@ -229,21 +229,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
         body: Stack(
           children: [
             const Positioned.fill(
-              // child: AnimatedMeshGradient(
-              //   colors:  [
-              //     Colors.black,
-              //     Colors.grey.shade800,
-              //     Colors.blueGrey,
-              //     Colors.black,
-              //   ],
-              //   options: AnimatedMeshGradientOptions(
-              //     speed: 2,
-              //     grain: 0,
-              //     amplitude: 40,
-              //     frequency: 5,
-              //   ),
-              //   controller: context.watch<AnimationSyncManager>().controller,
-              // ),
               child: AnimatedGridPattern(squares: [[1,2],[3,4],[5,6],[5,1],[3,1]],)
             ),
             IndexedStack(
@@ -268,29 +253,22 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
+                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                       child: Container(
                         height: spacingFactor * 1.2,
                         width: spacingFactorW * 0.5,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withOpacity(0.01),
                           borderRadius: BorderRadius.circular(25),
-                          // boxShadow: [
-                          //   BoxShadow(
-                          //     color: Colors.white60.withOpacity(0.99),
-                          //     blurRadius: 5,
-                          //     offset: const Offset(0, 1),
-                          //   ),
-                          // ],
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(25),
                           child: GNav(
                             iconSize: spacingFactor * 0.5,
                             backgroundColor: Colors.grey.shade600.withOpacity(0.6),
-                            color: Colors.white,
+                            color: Colors.grey.shade400,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            activeColor: Colors.orange,
+                            activeColor: Colors.white,
                             tabBackgroundColor: Colors.transparent,
                             rippleColor: Colors.transparent,
                             gap: 2,
@@ -1166,7 +1144,6 @@ class EnhancedStarPainter extends CustomPainter {
         final spread = radius * particleSpread;
         final dx = math.cos(particle.angle) * spread;
         final dy = math.sin(particle.angle) * spread;
-
         final path = Path()
           ..moveTo(center.dx, center.dy)
           ..lineTo(center.dx + dx, center.dy + dy);

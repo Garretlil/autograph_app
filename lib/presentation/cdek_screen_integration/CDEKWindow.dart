@@ -186,26 +186,11 @@ class _CDEKWindowState extends State<CDEKWindow> {
     }
     return parts;
   }
-
-  Widget _buildButton(IconData icon, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
-        ),
-        child: Icon(icon, size: 30, color: Colors.black
-        ),
-      ),
-    );
-  }
 }
+
+
 class BottomSheetDemo extends StatefulWidget {
-  const BottomSheetDemo({Key? key}) : super(key: key);
+  const BottomSheetDemo({super.key});
 
   @override
   State<BottomSheetDemo> createState() => _BottomSheetDemoState();

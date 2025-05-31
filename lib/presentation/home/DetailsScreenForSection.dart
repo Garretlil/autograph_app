@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,6 +37,36 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
     double spacingFactor = screenHeight * 0.06;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(screenWidth, kToolbarHeight - 20),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                color: Colors.white,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text(
+                'AUTOGRAPH',
+                style: TextStyle(
+                  fontSize: titleSizeFactor * 0.85,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inria Serif',
+                  color: Colors.white,
+                ),
+              ),
+              centerTitle: true,
+            ),
+          ),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -44,7 +76,7 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            paddingFactor*1.5,
+            paddingFactor*1,
             paddingFactor * 2.4,
             paddingFactor,
             0,
@@ -52,47 +84,6 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(top: screenHeight * 0.001),
-                      child: Icon(
-                        Icons.arrow_back_ios_new,
-                        size: iconSizeFactor,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        'AUTOGRAPH ',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 0.8,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        widget.section,
-                        style: TextStyle(
-                          fontSize: subtitleSizeFactor,
-                          fontWeight: FontWeight.normal,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: screenWidth * 0.08),
-                ],
-              ),
               SizedBox(height: spacingFactor * 2.2),
               Center(child:
               Column(

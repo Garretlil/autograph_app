@@ -38,12 +38,13 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
       appBar: PreferredSize(
         preferredSize: Size(
           screenWidth,
-          kToolbarHeight,
+          kToolbarHeight-20,
         ),
         child: ClipRect(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
             child: AppBar(
+              forceMaterialTransparency: true,
               backgroundColor: Colors.black.withOpacity(0.3),
               elevation: 0,
               leading: IconButton(
@@ -66,18 +67,6 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                       fontWeight: FontWeight.w600,
                       fontFamily: 'Inria Serif',
                       color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    prefs?.getBool('LangParams') == true
-                        ? 'EVENTS'
-                        : 'Мероприятия',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85, // Adjusted size
-                      color: Colors.white,
-                      fontFamily: prefs?.getBool('LangParams') == true
-                          ? 'Inria Serif'
-                          : 'ChUR',
                     ),
                   ),
                 ],

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,98 +29,83 @@ class _CartChooseScreen extends State<CartChooseScreen> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     double paddingFactor = screenWidth * 0.06;
-    double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-    double cardMarginFactor = screenHeight * 0.06;
-    double cardPaddingFactor = screenWidth * 0.06;
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            paddingFactor*1.3,
-            paddingFactor * 2.4,
-            paddingFactor,
-            0,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'AUTOGRAPH ',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.8,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
-                    ),
-                  ),
-                  SizedBox(height: spacingFactor*0.2,),
-                   Icon(
-                    Icons.shopping_cart_outlined,
-                    color: Colors.white,
-                    size: spacingFactor*0.6,
-                  ),
-                  // Text(
-                  //   'CART',
-                  //   style: TextStyle(
-                  //     fontSize: subtitleSizeFactor * 2,
-                  //     fontWeight: FontWeight.normal,
-                  //     fontFamily: 'Inria Serif',
-                  //     color: Colors.white,
-                  //   ),
-                  // ),
-                ],
-              ),
-              SizedBox(height: spacingFactor * 2.2),
-              Center(
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/CartEvents');
-                      },
-                      child: Text(prefs?.getBool('LangParams') == true
-                          ? 'Events'
-                          : 'Мероприятия',
-                          style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                          prefs?.getBool('LangParams') == true
-                              ? 'Inria Serif'
-                              : 'ChUR',)
-                      ),
-                    ),
-                    SizedBox(
-                        height: spacingFactor*3.5),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/CartProducts');
-                      },
-                    child: Text(prefs?.getBool('LangParams') == true
-                        ? 'Products'
-                        : 'Продукция',
-                        style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                        prefs?.getBool('LangParams') == true
-                            ? 'Inria Serif'
-                            : 'ChUR',)
-                    ),
-                    )
-                  ],
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(screenWidth, kToolbarHeight - 20),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: const Text(''),
+              title: Text(
+                'AUTOGRAPH',
+                style: TextStyle(
+                  fontSize: titleSizeFactor * 0.85,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inria Serif',
+                  color: Colors.white,
                 ),
               ),
-            ],
+              centerTitle: true,
+            ),
           ),
         ),
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/image.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(
+            top: screenHeight*0.25
+          ),
+          child:
+          Center(
+            child: Column(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/CartEvents');
+                  },
+                  child: Text(prefs?.getBool('LangParams') == true
+                      ? 'Events'
+                      : 'Мероприятия',
+                      style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                      prefs?.getBool('LangParams') == true
+                          ? 'Inria Serif'
+                          : 'ChUR',)
+                  ),
+                ),
+                SizedBox(
+                    height: spacingFactor*3.5),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, '/CartProducts');
+                  },
+                child: Text(prefs?.getBool('LangParams') == true
+                    ? 'Products'
+                    : 'Продукция',
+                    style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                    prefs?.getBool('LangParams') == true
+                        ? 'Inria Serif'
+                        : 'ChUR',)
+                ),
+                )
+              ],
+            ),
+          ),
+          )
+        ],
       ),
     );
   }

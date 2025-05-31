@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,17 @@ class CheckCodeNotifier extends ChangeNotifier{
     }
     notifyListeners();
   }
+  Dio createInsecureDio() {
+    final dio = Dio();
+
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+
+    return dio;
+  }
 
   Future<void> onChanged(int index, String value,bool mounted) async {
     if (value.isNotEmpty && index < 3) {
@@ -58,27 +70,29 @@ class CheckCodeNotifier extends ChangeNotifier{
       code = controllers.map((controller) => controller.text).join();
 
       try {
-        final dio = Dio();
-        final client = AuthService(dio);
+        final dio = createInsecureDio();
+        final client= AuthService(dio);
         Map<String, dynamic> confirmationData = {
           'email': 'ed763135@gmail.com',
           'code': code,
         };
-        throw Exception();
-        // print(3);
-        // ConfirmationResponse response =
-        // await client.verifyEmail(confirmationData);
-        //
-        // prefs?.setString('session_key', response.session_key);
-        // // MeResponse aboutMe = await client.getMe(response.session_key);
-        // print(4);
-        // navigateToNextScreen(mounted);
-        // for (var controller in controllers) {
-        //   controller.clear();
-        // }
-        // print(5);
+        //throw Exception();
+        print(3);
+        ConfirmationResponse response =
+        await client.verifyEmail(confirmationData);
+
+        prefs?.setString('session_key', response.session_key);
+        print(prefs?.getString('session_key'));
+        // MeResponse aboutMe = await client.getMe(response.session_key);
+        print(4);
+        navigateToNextScreen(mounted);
+        for (var controller in controllers) {
+          controller.clear();
+        }
+        print(5);
 
       } catch (error) {
+        print(error);
         navigateToNextScreen(mounted);
         AnimatedContainer(
           duration: const Duration(milliseconds: 500),

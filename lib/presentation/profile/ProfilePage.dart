@@ -2,20 +2,26 @@ import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+  Shader createGradient(Rect bounds) {
+
+    if (bounds.isEmpty) {
+      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
+    }
+    return const LinearGradient(
+      colors: [Colors.orange, Colors.red],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(bounds);
+  }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double paddingFactor = screenWidth * 0.06;
-    double smallTextFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW=screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-    double cardMarginFactor = screenHeight * 0.06;
-    double cardPaddingFactor = screenWidth * 0.06;
     return Scaffold(
       body:
       Container(
@@ -45,11 +51,6 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: spacingFactor*0.2,),
-              Icon(
-                Icons.person,
-                color: Colors.white,
-                size: spacingFactor*0.6,
-              ),
               SizedBox(height: paddingFactor),
               Center(
                 child: Container(
@@ -60,13 +61,16 @@ class ProfileScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.4),
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child:  Text(
-                    'OLIVIA',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: titleSizeFactor*1.6,
-                      fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
+                  child:  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'OLIVIA',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor*1.6,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        fontFamily: 'Inria Serif',
+                      ),
                     ),
                   ),
                 ),

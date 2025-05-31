@@ -1,5 +1,6 @@
 import 'package:autograph_app/core/services/local_cart_products.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'dart:developer';
 import '../../core/network/DataConverter.dart';
@@ -25,7 +26,9 @@ class ConfirmationOrderScreen extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ConfirmationOrderNotifier(productsProvider),
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: Colors.white,
           title: _SectionTitle(
             text: 'Подтверждение заказа',
             color1: Colors.grey.shade800,
@@ -37,7 +40,10 @@ class ConfirmationOrderScreen extends StatelessWidget {
           builder: (context, notifier, child) {
             log('Screen: Rebuilding with Notifier State - isLoading: ${notifier.isLoading}, error: ${notifier.error}');
             if (notifier.isLoading && notifier.deliveryCost == null && notifier.error == null) {
-              return const Center(child: CircularProgressIndicator());
+              return  Center(child: Lottie.asset(
+                  width: 100,
+                  height: 100,
+                  'assets/loadAnim.json'),);
             }
             if (notifier.error != null && notifier.deliveryCost == null) {
               return Center(
@@ -67,12 +73,12 @@ class ConfirmationOrderScreen extends StatelessWidget {
               child: ListView(
                 children: [
                   const _SectionTitle(text: 'ДАННЫЕ ПОЛУЧАТЕЛЯ'),
-                  Text(userData.fullName.isEmpty ? 'Имя не указано' : userData.fullName, style: const TextStyle(fontSize: 16)),
-                  Text(userData.email.isEmpty ? 'Email не указан' : userData.email, style: const TextStyle(fontSize: 16)),
-                  Text(userData.phoneNumber.isEmpty ? 'Телефон не указан' : userData.phoneNumber, style: const TextStyle(fontSize: 16)),
+                  Text(userData.fullName.isEmpty ? 'Имя не указано' : userData.fullName, style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(userData.email.isEmpty ? 'Email не указан' : userData.email, style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(userData.phoneNumber.isEmpty ? 'Телефон не указан' : userData.phoneNumber, style: const TextStyle(fontSize: 16,color: Colors.black)),
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'ПУНКТ ВЫДАЧИ'),
-                  Text(userData.pointData.description.isEmpty ? 'Пункт выдачи не выбран' : userData.pointData.description, style: const TextStyle(fontSize: 16)),
+                  Text(userData.pointData.description.isEmpty ? 'Пункт выдачи не выбран' : userData.pointData.description, style: const TextStyle(fontSize: 16,color: Colors.black)),
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'КОРЗИНА'),
                   if (notifier.isLoading)
@@ -81,7 +87,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(height: 15, width: 15, child: CircularProgressIndicator(strokeWidth: 2)),
+                          SizedBox(height: 15, width: 15, child: CircularProgressIndicator(strokeWidth: 2,color: Colors.green,)),
                           SizedBox(width: 10),
                           Text("Обновление корзины...")
                         ],
@@ -115,7 +121,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
                   if (deliveryCost != null)
                     Text(
                       '→ Самовывоз из ПВЗ: ${deliveryCost.toStringAsFixed(0)} ₽',
-                      style: const TextStyle(fontSize: 16),
+                      style: const TextStyle(fontSize: 16,color: Colors.black),
                     ),
                   const SizedBox(height: 16),
                   const Divider(),
@@ -125,7 +131,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
                       const Text(
                         'ИТОГО:',
                         style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 18),
+                            fontWeight: FontWeight.bold, fontSize: 18,color: Colors.black),
                       ),
                       if (totalCost != null)
                         ShaderMask(
@@ -148,9 +154,20 @@ class ConfirmationOrderScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   Center(
                     child: GestureDetector(
-                      onTap: notifier.isLoading || totalCost == null
+                      onTap:
+                          notifier.isLoading || totalCost == null
                           ? null
-                          : () => notifier.placeOrder(),
+                          : () async {
+                             final success= await notifier.placeOrder();
+                             if (success && context.mounted){
+                               Navigator.pushReplacementNamed(context, '/CartEvents');
+                             }
+                             else {
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                 const SnackBar(content: Text('Ошибка при оформлении заказа')),
+                               );
+                             }
+                          },
                       child: Opacity(
                         opacity: notifier.isLoading || totalCost == null ? 0.5 : 1.0,
                         child: Container(
@@ -227,7 +244,7 @@ class _SectionTitle extends StatelessWidget {
 
 
 class _CardCatalog extends StatelessWidget {
-  final listProducts product;
+  final Product product;
   final double screenWidth;
   final double screenHeight;
 
@@ -255,7 +272,6 @@ class _CardCatalog extends StatelessWidget {
       context,
       '/Product',
       arguments: {
-
         'screenHeight': MediaQuery.of(context).size.height,
         'screenWidth': MediaQuery.of(context).size.width,
         'productId': product.id,
@@ -359,49 +375,48 @@ class _CardCatalog extends StatelessWidget {
             ),
 
             if (quantity > 0)
-              Column(
+              const Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Container(
-
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    width: paddingFactor * 7,
-                    height: screenHeight * 0.22,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.values[1],
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.remove, color: Colors.white, size: 22),
-                          onPressed: () => notifier.updateItemQuantity(product.id!, -1),
-                          padding: EdgeInsets.zero,
-                        ),
-                        const SizedBox(width: 1),
-                        Text(
-                          '$quantity',
-                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600,color: Colors.black),
-                        ),
-                        const SizedBox(width: 1),
-                        IconButton(
-                          icon: Icon(Icons.add, color: Colors.white, size: 22),
-                          onPressed: () => notifier.updateItemQuantity(product.id!, 1),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  IconButton(
-                    icon: const Icon(Icons.delete_rounded, color: Colors.red, size: 24),
-                    onPressed: () => notifier.removeItem(product.id!),
-                    tooltip: 'Удалить товар из корзины',
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //     color: Colors.orange,
+                  //     borderRadius: BorderRadius.circular(10),
+                  //   ),
+                  //   width: paddingFactor * 7,
+                  //   height: screenHeight * 0.22,
+                  //   child: Row(
+                  //     mainAxisSize: MainAxisSize.values[1],
+                  //     children: [
+                  //       IconButton(
+                  //         icon: Icon(Icons.remove, color: Colors.white, size: 22),
+                  //         onPressed: () => notifier.updateItemQuantity(product.id!, -1),
+                  //         padding: EdgeInsets.zero,
+                  //       ),
+                  //       const SizedBox(width: 1),
+                  //       Text(
+                  //         '$quantity',
+                  //         style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600,color: Colors.black),
+                  //       ),
+                  //       const SizedBox(width: 1),
+                  //       IconButton(
+                  //         icon: Icon(Icons.add, color: Colors.white, size: 22),
+                  //         onPressed: () => notifier.updateItemQuantity(product.id!, 1),
+                  //         padding: EdgeInsets.zero,
+                  //         constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 8),
+                  // IconButton(
+                  //   icon: const Icon(Icons.delete_rounded, color: Colors.red, size: 24),
+                  //   onPressed: () => notifier.removeItem(product.id!),
+                  //   tooltip: 'Удалить товар из корзины',
+                  //   padding: EdgeInsets.zero,
+                  //   constraints: const BoxConstraints(),
+                  // ),
                 ],
               )
             else

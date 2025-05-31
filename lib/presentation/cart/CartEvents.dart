@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:ui';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
+import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
@@ -21,97 +23,102 @@ class CartEvents extends StatefulWidget {
   State<CartEvents> createState() => _CartEvents();
 }
 
+
 class _CartEvents extends State<CartEvents> {
   SharedPreferences? prefs;
+
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {});
+    if (mounted) setState(() {});
   }
+
+  Dio createInsecureDio() {
+    final dio = Dio();
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+    return dio;
+  }
+
   @override
   void initState() {
     super.initState();
     setPref();
   }
+
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final titleSizeFactor = screenWidth * 0.06;
+    final subtitleSizeFactor = screenWidth * 0.06;
+    final spacingFactor = screenHeight * 0.06;
 
-    double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
-    double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(screenWidth, kToolbarHeight - 20),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                color: Colors.white,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text(
+                'AUTOGRAPH',
+                style: TextStyle(
+                  fontSize: titleSizeFactor * 0.85,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Inria Serif',
+                  color: Colors.white,
+                ),
+              ),
+              centerTitle: true,
+            ),
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            paddingFactor*1.2,
-            paddingFactor * 2.4,
-            paddingFactor,
-            0,
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/image.png',
+              fit: BoxFit.cover,
+            ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(
-                      Icons.arrow_back_ios_new,
-                      color: Colors.white,
-                      size: iconSizeFactor,
-                    ),
-                  ),
-                   Column(
-                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                       Text(
-                        'AUTOGRAPH',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 0.8,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: spacingFactor*0.2,),
-                      Icon(Icons.shopping_cart_outlined,color: Colors.white,
-                        size: spacingFactor*0.6,)
-                    ],
-                  ),
-                   SizedBox(width: spacingFactor*0.5),
-                ],
-              ),
-               //SizedBox(height: spacingFactor*0.3),
+              SizedBox(height: screenHeight * 0.13),
               Expanded(
                 child: LocalCartVideo.instance.getCart().isEmpty
                     ? Center(
-                  child: Text(prefs?.getBool('LangParams') == true
-                      ? 'Your cart is empty :('
-                      : 'Корзина пуста :(',
-                      style: TextStyle(fontSize:titleSizeFactor*1.05,color:Colors.white,fontFamily:
-                      prefs?.getBool('LangParams') == true
+                  child: Text(
+                    prefs?.getBool('LangParams') == true
+                        ? 'Your cart is empty :('
+                        : 'Корзина пуста :(',
+                    style: TextStyle(
+                      fontSize: titleSizeFactor * 1.05,
+                      color: Colors.white,
+                      fontFamily: prefs?.getBool('LangParams') == true
                           ? 'Inria Serif'
-                          : 'ChUR',)
+                          : 'ChUR',
+                    ),
                   ),
                 )
-                    : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
+                    : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        padding: EdgeInsets.only(bottom: spacingFactor * 6),
                         itemCount: LocalCartVideo.instance.getSelectedCourses().length,
                         itemBuilder: (context, index) {
                           final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
@@ -121,10 +128,13 @@ class _CartEvents extends State<CartEvents> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Padding(
-                                padding:  EdgeInsets.symmetric(vertical: spacingFactor*0.4),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: spacingFactor * 0.1,
+                                  horizontal: screenWidth * 0.05,
+                                ),
                                 child: Text(
                                   courseName,
-                                  style:  TextStyle(
+                                  style: TextStyle(
                                     fontSize: subtitleSizeFactor,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -132,15 +142,13 @@ class _CartEvents extends State<CartEvents> {
                                   ),
                                 ),
                               ),
-                              ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: webinars.length,
-                                itemBuilder: (context, webinarIndex) {
-                                  final webinar = webinars[webinarIndex];
-
+                              Column(
+                                children: webinars.map((webinar) {
                                   return Padding(
-                                    padding:  EdgeInsets.symmetric(vertical: spacingFactor*0.1),
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: spacingFactor * 0.1,
+                                      horizontal: screenWidth * 0.06,
+                                    ),
                                     child: Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -148,22 +156,21 @@ class _CartEvents extends State<CartEvents> {
                                           children: [
                                             GestureDetector(
                                               onTap: () {
-                                                setState(() {
-                                                  if (LocalCartVideo.instance.removeWebinarFromCourse(courseName, webinar)){
-                                                    widget.toggleCircleCart(false);
-                                                  }
-                                                });
+                                                if (LocalCartVideo.instance.removeWebinarFromCourse(courseName, webinar)) {
+                                                  widget.toggleCircleCart(false);
+                                                }
+                                                setState(() {});
                                               },
                                               child: const Icon(
-                                                Icons.dangerous_outlined,
-                                                color: Colors.black,
+                                                Icons.remove_circle_outlined,
+                                                color: Colors.red,
                                               ),
                                             ),
                                             const SizedBox(width: 10.0),
                                             Text(
-                                              webinar['word'],
-                                              style:  TextStyle(
-                                                fontSize: subtitleSizeFactor*0.7,
+                                              webinar['word'] ?? '',
+                                              style: TextStyle(
+                                                fontSize: subtitleSizeFactor * 0.7,
                                                 fontWeight: FontWeight.normal,
                                                 color: Colors.white,
                                                 fontFamily: 'Inria Serif',
@@ -172,9 +179,9 @@ class _CartEvents extends State<CartEvents> {
                                           ],
                                         ),
                                         Text(
-                                          webinar['cost'].toString(),
-                                          style:  TextStyle(
-                                            fontSize: subtitleSizeFactor*0.8,
+                                          '${webinar['cost'] ?? 0}\$',
+                                          style: TextStyle(
+                                            fontSize: subtitleSizeFactor * 0.8,
                                             color: Colors.white,
                                             fontFamily: 'Inria Serif',
                                           ),
@@ -182,47 +189,61 @@ class _CartEvents extends State<CartEvents> {
                                       ],
                                     ),
                                   );
-                                },
+                                }).toList(),
                               ),
                             ],
                           );
                         },
                       ),
-                       SizedBox(height: spacingFactor),
-                    ],
-                  ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacingFactor,
+                        vertical: spacingFactor * 0.5,
+                      ),
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                prefs?.getBool('LangParams') == true
+                                    ? 'TOTAL:    '
+                                    : 'Сумма:    ',
+                                style: TextStyle(
+                                  fontSize: subtitleSizeFactor * 0.9,
+                                  color: Colors.white,
+                                  fontFamily: prefs?.getBool('LangParams') == true
+                                      ? 'Inria Serif'
+                                      : 'ChUR',
+                                ),
+                              ),
+                              Text(
+                                '${LocalCartVideo.instance.getTotalPrice()}\$',
+                                style: TextStyle(
+                                  fontSize: subtitleSizeFactor*0.9,
+                                  color: Colors.white,
+                                  fontFamily: 'Inria Serif',
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: spacingFactor * 0.5),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: spacingFactor * 2),
+                            child: GradientAnimatedButton(
+                              toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-
-               SizedBox(height: spacingFactor),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(prefs?.getBool('LangParams') == true
-                      ? 'TOTAL:    '
-                      : 'Сумма:    ',
-                      style: TextStyle(fontSize:titleSizeFactor*1.05,color:Colors.white,fontFamily:
-                      prefs?.getBool('LangParams') == true
-                          ? 'Inria Serif'
-                          : 'ChUR',)
-                  ),
-                  Text(
-                    '${LocalCartVideo.instance.getTotalPrice()} \$',
-                    style:  TextStyle(
-                      fontSize: subtitleSizeFactor,
-                      color: Colors.white,
-                      fontFamily: 'Inria Serif',
-                    ),
-                  ),
-                ],
-              ),
-               SizedBox(height: spacingFactor*0.5),
-               Padding(padding: EdgeInsets.only(bottom: spacingFactor*2),
-                child:  Center(child: GradientAnimatedButton(toggleBottomNavigationBar: widget.toggleBottomNavigationBar)),
-              )
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -283,8 +304,11 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
   }
   //bool isPaymentV=false;
   Map<String, dynamic> getPurchasedIndexes() {
+    final webinarIds = PurchasedCourses.instance.getPurchasedIndexes();
     return {
-      'courseIds': PurchasedCourses.instance.getPurchasedIndexes(),
+      'webinar_items': webinarIds
+          .map((id) => {'webinar_id': id})
+          .toList(),
     };
   }
   Future<void> _showPaymentWidget() async {
@@ -302,6 +326,17 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     setState(() {
       widget.toggleBottomNavigationBar(true);
     });
+  }
+  Dio createInsecureDio() {
+    final dio = Dio();
+
+    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+        (client) {
+      client.badCertificateCallback = (cert, host, port) => true;
+      return client;
+    };
+
+    return dio;
   }
 
   @override
@@ -323,17 +358,20 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
               onTap: () async {
                 await _showPaymentWidget();
                 PurchasedCourses.instance.addToPurchased();
-                final dio = Dio();
+                final dio = createInsecureDio();
                 final client = CourseVideoService(dio);
+                print(prefs.getString('session_key').toString());
+                final body = getPurchasedIndexes();
+                print("Session Key: ${prefs.getString('session_key')}");
+                print("Body: ${jsonEncode(body)}");
+
                 CreateOrderResponse response = await client.createOrder(
                     prefs.getString('session_key').toString(),
                     getPurchasedIndexes());
-
                 // PayOrderResponse payResponse = await client.payOrder(
                 //   prefs.getString('session_key').toString(),
                 //     response.message
                 // );
-
               },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),
@@ -397,15 +435,10 @@ class _SbpHeaderModalSheet extends State<SbpHeaderModalSheet> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    // Коэффициенты адаптации
-    double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW = screenWidth*0.06;
-    double listTilePaddingFactor = screenWidth * 0.06;
-    double totalTextSizeFactor = screenWidth * 0.05;
+
     return Column(
       children: [
         const SizedBox(height: 10),
@@ -458,17 +491,7 @@ class _SbpModalBottomSheetEmptyListBankWidget extends State<SbpModalBottomSheetE
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
-    // Коэффициенты адаптации
-    double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
-    double spacingFactorW = screenWidth*0.06;
-    double listTilePaddingFactor = screenWidth * 0.06;
-    double totalTextSizeFactor = screenWidth * 0.05;
 
     return Container(
       decoration: const BoxDecoration(

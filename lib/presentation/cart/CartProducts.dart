@@ -8,14 +8,15 @@ import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
 
-class CartProductsScreen extends StatefulWidget{
-  const CartProductsScreen({super.key});
+class CartProductsScreen extends StatefulWidget {
+  const CartProductsScreen({super.key,required this.toggleBottomNavigationBar});
+  final void Function(bool) toggleBottomNavigationBar;
 
   @override
   State<CartProductsScreen> createState() => _CartProductsScreen();
 }
 
-class _CartProductsScreen extends State<CartProductsScreen>{
+class _CartProductsScreen extends State<CartProductsScreen> {
   SharedPreferences? prefs;
 
   Future<void> setPref() async {
@@ -34,110 +35,93 @@ class _CartProductsScreen extends State<CartProductsScreen>{
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
 
     return Consumer<Products>(
       builder: (context, products, child) {
         return Scaffold(
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
+          appBar: PreferredSize(
+            preferredSize: Size(screenWidth, kToolbarHeight - 20),
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                child: AppBar(
+                  forceMaterialTransparency: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                    color: Colors.white,
+                    onPressed: () => {
+                      widget.toggleBottomNavigationBar(true),
+                      Navigator.of(context).pop()
+                    },
+                  ),
+                  title: Text(
+                    'AUTOGRAPH',
+                    style: TextStyle(
+                      fontSize: titleSizeFactor * 0.85,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inria Serif',
+                      color: Colors.white,
+                    ),
+                  ),
+                  centerTitle: true,
+                ),
+              ),
+            ),
+          ),
           body: Stack(
             children: [
-              Container(
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/image.png'),
-                    fit: BoxFit.cover,
-                  ),
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/image.png',
+                  fit: BoxFit.cover,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        paddingFactor,
-                        paddingFactor * 2.4,
-                        paddingFactor,
-                        paddingFactor * 0.05,
-                      ),
-                      child: Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Icon(
-                              Icons.arrow_back_ios_new,
-                              size: iconSizeFactor,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SizedBox(width: paddingFactor * 4),
-                          Column(
-                            children: [
-                              Text(
-                                'AUTOGRAPH',
-                                style: TextStyle(
-                                  fontSize: titleSizeFactor * 0.8,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'Inria Serif',
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                prefs?.getBool('LangParams') == true ? 'Phantoms' : 'Фантомы',
-                                style: TextStyle(
-                                  fontSize: titleSizeFactor,
-                                  color: Colors.white,
-                                  fontFamily: prefs?.getBool('LangParams') == true
-                                      ? 'Inria Serif'
-                                      : 'ChUR',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomRight: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
+              ),
+              Positioned.fill(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                  ),
+                  child: Builder(
+                    builder: (_) {
+                      final allProducts = products.products.products ?? [];
+                      final cartIds = LocalCartProducts.instance
+                          .getCart()
+                          .keys
+                          .toSet();
+                      final filteredProducts = allProducts
+                          .where((p) => p.id != null && cartIds.contains(p.id))
+                          .toList();
+                      return GridView.builder(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: paddingFactor * 0.25),
+                        gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          crossAxisSpacing: 3.0,
+                          mainAxisSpacing: 3.0,
+                          childAspectRatio: 11 / 5,
                         ),
-                        child: Builder(
-                          builder: (_) {
-                            final allProducts = products.products.products ?? [];
-                            final cartIds = LocalCartProducts.instance.getCart().keys.toSet();
-                            final filteredProducts = allProducts
-                                .where((p) => p.id != null && cartIds.contains(p.id))
-                                .toList();
-                            return GridView.builder(
-                              padding: EdgeInsets.symmetric(horizontal: paddingFactor * 0.25),
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 1,
-                                crossAxisSpacing: 3.0,
-                                mainAxisSpacing: 3.0,
-                                childAspectRatio: 11 / 5,
-                              ),
-                              itemCount: filteredProducts.length,
-                              itemBuilder: (context, index) {
-                                final product = filteredProducts[index];
-                                return _CardCatalog(
-                                  product: product,
-                                  screenWidth: screenWidth,
-                                  screenHeight: screenHeight,
-                                  autoRotate: false,
-                                  disableZoom: true,
-                                  isEnglish: prefs?.getBool('LangParams') ?? false,
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    //const SizedBox(height: 30),
-                  ],
+                        itemCount: filteredProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = filteredProducts[index];
+                          return _CardCatalog(
+                            product: product,
+                            screenWidth: screenWidth,
+                            screenHeight: screenHeight,
+                            autoRotate: false,
+                            disableZoom: true,
+                            isEnglish: prefs?.getBool('LangParams') ?? false,
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
               Positioned(
@@ -151,7 +135,7 @@ class _CartProductsScreen extends State<CartProductsScreen>{
                     filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.8),
+                        color: Colors.orange,
                         borderRadius: BorderRadius.circular(30),
                       ),
                       child: Material(
@@ -159,13 +143,13 @@ class _CartProductsScreen extends State<CartProductsScreen>{
                         child: InkWell(
                           borderRadius: BorderRadius.circular(30),
                           onTap: _showBottomSheet,
-                          child:  const Center(
+                          child: const Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('596 ₽', style: TextStyle(color: Colors.white, fontSize: 20)),
-                                //SizedBox(width: 10),
-                                //Icon(Icons.next_plan_outlined, color: Colors.white),
+                                Text('596 ₽',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20)),
                               ],
                             ),
                           ),
@@ -181,17 +165,24 @@ class _CartProductsScreen extends State<CartProductsScreen>{
       },
     );
   }
+
   void _showBottomSheet() {
     showModalBottomSheet(
       enableDrag: false,
       isScrollControlled: true,
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30),bottom: Radius.circular(30)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(30),
+          bottom: Radius.circular(30),
+        ),
       ),
       builder: (context) {
         return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30),bottom: Radius.circular(30)),
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(30),
+            bottom: Radius.circular(30),
+          ),
           child: DraggableScrollableSheet(
             expand: false,
             initialChildSize: 0.9,
@@ -228,8 +219,9 @@ class _CartProductsScreen extends State<CartProductsScreen>{
 
 
 
+
 class _CardCatalog extends StatefulWidget {
-  final listProducts product;
+  final Product product;
   final double screenWidth;
   final double screenHeight;
   final bool autoRotate;

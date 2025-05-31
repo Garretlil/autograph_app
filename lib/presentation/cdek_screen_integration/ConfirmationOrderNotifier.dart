@@ -33,14 +33,14 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
   double? _totalCost;
   bool _isLoading = false;
   String? _error;
-  List<listProducts> _filteredProducts = [];
+  List<Product> _filteredProducts = [];
 
   double get cartCost => _boxCalculationResult['cost'] ?? 0.0;
   double? get deliveryCost => _deliveryCost;
   double? get totalCost => _totalCost;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  List<listProducts> get cartItems => _filteredProducts;
+  List<Product> get cartItems => _filteredProducts;
   Map<int, int> get cartQuantities => _localCart.getCart();
 
   ConfirmationOrderNotifier(this._productsProvider)
@@ -75,8 +75,8 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
         final itemWeight = item.weight;
         final itemPrice = double.tryParse(item.price ?? '0') ?? 0.0;
 
-        volume += itemHeight * itemLength * itemWidth * quantity;
-        weight += itemWeight * quantity;
+        volume += itemHeight! * itemLength! * itemWidth! * quantity;
+        weight += itemWeight! * quantity;
         currentCartCost += itemPrice * quantity;
       }
     }
@@ -190,11 +190,10 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     super.dispose();
   }
 
-  Future<void> placeOrder() async {
+  Future<bool> placeOrder( ) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
-
     try {
       final sizes = List<double>.from(_boxCalculationResult['sizes'] ?? []);
       if (sizes.length < 4 || _userData.pointData.code.isEmpty) {
@@ -211,39 +210,28 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
           'quantity': quantity,
         };
       }).toList();
-
-       final trackNumber ='0'; // await _cdekApi.createOrder(
-      //   point: _userData.pointData,
-      //   length: sizes[0],
-      //   width: sizes[1],
-      //   height: sizes[2],
-      //   weight: sizes[3],
-      //   cost: cartCost,
-      //   items: orderItems,
-      // );
-
-      if (trackNumber == null) {
-        throw Exception("Ошибка при оформлении доставки: не получен трек-номер");
-      }
-
       final backendResponse = await _cdekApi.sendOrderToServer(
         userId: _userData.id.toString(),
         pointCode: _userData.pointData.code,
-        trackNumber: trackNumber,
         items: orderItems,
         deliveryCost: _deliveryCost ?? 0,
         totalCost: _totalCost ?? 0,
       );
+      final trackingNumber =backendResponse;
 
-      if (!backendResponse) {
-        throw Exception("Ошибка при сохранении заказа на сервере");
+      if (trackingNumber == '') {
+        return true;
       }
 
       _localCart.clearCart();
       await recalculateCosts();
+      notifyListeners();
+      return true;
 
     } catch (e) {
       _error = e.toString();
+      notifyListeners();
+      return true;
     } finally {
       _isLoading = false;
       notifyListeners();

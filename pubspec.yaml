@@ -36,6 +36,8 @@ dependencies:
   geolocator: ^13.0.2
   uuid: ^4.4.2
   cached_network_image: ^3.4.1
+  modal_bottom_sheet: ^3.0.0
+  lottie: ^3.3.1
 
 
 dev_dependencies:

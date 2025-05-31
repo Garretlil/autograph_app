@@ -65,7 +65,7 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                   Text(
                     widget.courseName,
                     style: TextStyle(
-                      fontSize: subtitleSizeFactor,
+                      fontSize: subtitleSizeFactor*0.6,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -79,19 +79,19 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
                   itemCount: videos[widget.courseName]?.length,
                   itemBuilder: (context, index) {
                     final item = videos[widget.courseName];
+                    print('$baseUrlFinal/video/${item![index]['id']}');
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Column(
                          children: [
-                           Text(item![index]['word'],style: TextStyle(
+                           Text(item[index]['word'],style: TextStyle(
                                color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
                            SizedBox(height: spacingFactor*0.2,),
                            VideoPlayerView(
-                              url: '$baseUrlFinal/video/${item[index]['id']}',
-                              thumbnailUrl: item[index]['preview_url']=='ttt'?
-                              'assets/preview.png' : item[index]['preview_url'],
-                              dataSourceType: DataSourceType.network,
-                            ),
+                             url: '$baseUrlFinal/video/${item[index]['id']}',
+                             thumbnailUrl: 'assets/imageBottom.png',
+                             dataSourceType: DataSourceType.network, // ← фикс!
+                           ),
                          ]
                       )
                     );
@@ -129,6 +129,12 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
   SharedPreferences? prefs;
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
+    setState(() {});
+    _init();
+  }
+  Future<void> _init() async {
+    prefs = await SharedPreferences.getInstance();
+    await _initializeVideoPlayer();
     setState(() {});
   }
 

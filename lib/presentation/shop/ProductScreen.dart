@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
 
@@ -13,14 +14,14 @@ class ProductViewScreen extends StatefulWidget {
     this.disableZoom = false,
     required this.screenWidth,
     required this.screenHeight,
-    required this.productId,
+    required this.product,
   });
 
   final bool autoRotate;
   final bool disableZoom;
   final double screenWidth;
   final double screenHeight;
-  final int productId;
+  final Product product;
 
   @override
   State<ProductViewScreen> createState() => _ProductViewScreenState();
@@ -34,7 +35,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   void initState() {
     super.initState();
     setPref();
-    isAddedToCart = LocalCartProducts.instance.initIsProductInCart(widget.productId);
+    isAddedToCart = LocalCartProducts.instance.initIsProductInCart(widget.product.id!);
   }
 
   Future<void> setPref() async {
@@ -43,16 +44,23 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     prefs?.setBool('LangParams', true);
   }
 
-  void toggleCartStatus() {
+
+  void toggleCartStatus(BuildContext context) {
+
+    final productId = widget.product.id;
+    print(widget.product);
+
+    if (!isAddedToCart) {
+      LocalCartProducts.instance.addProductToCart(productId!);
+    } else {
+      LocalCartProducts.instance.removeProductFromCart(productId!);
+    }
+
     setState(() {
-      if (!isAddedToCart) {
-        LocalCartProducts.instance.addProductToCart(widget.productId);
-      } else {
-        LocalCartProducts.instance.removeProductFromCart(widget.productId);
-      }
-      isAddedToCart = LocalCartProducts.instance.isProductInCart(widget.productId);
+      isAddedToCart = !isAddedToCart;
     });
   }
+  void t(){}
 
 
   @override
@@ -66,7 +74,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
 
     return Consumer<Products>(builder: (context, products, child) {
       final currentProduct = products.products.products!
-          .firstWhere((product) => product.id == widget.productId);
+          .firstWhere((product) => product.id == widget.product.id);
       print(baseUrlFinal+currentProduct.model_url!);
 
       return Scaffold(
@@ -87,7 +95,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
-                  height: widget.screenHeight * 0.35,
+                  height: widget.screenHeight * 0.5,
                   child: Container(
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -100,59 +108,46 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     clipBehavior: Clip.hardEdge,
                     child: ModelViewer(
                       backgroundColor: Colors.grey.withOpacity(0.5),
-                      src: baseUrlFinal + currentProduct.model_url!,
+                      src: 'assets/prep16.glb',//baseUrlFinal + currentProduct.model_url!,
                       alt: '',
                       ar: false,
                       autoRotate: widget.autoRotate,
                       disableZoom: widget.disableZoom,
+                        scale: "0.5 0.5 0.5"
                     ),
                   ),
                 ),
                 SizedBox(height: spacingFactor * 0.1),
                 _buildInfoCard(
-                  icon: Icons.label,
-                  title: 'Название',
-                  content: currentProduct.title ?? 'Неизвестно',
-                  titleSizeFactor: titleSizeFactor,
-                ),
-                _buildInfoCard(
-                  icon: Icons.attach_money,
-                  title: 'Цена',
-                  content: '${currentProduct.price ?? 'Не указано'} ₽',
-                  titleSizeFactor: titleSizeFactor,
-                ),
-                _buildInfoCard(
-                  icon: Icons.description_outlined,
-                  title: 'Описание',
-                  content: prefs?.getBool('LangParams') == true
-                      ? currentProduct.description ?? 'Нет описания'
-                      : 'Описание продукта',
-                  titleSizeFactor: titleSizeFactor,
-                ),
-                _buildInfoCard(
-                  icon: Icons.category,
-                  title: 'Категория',
-                  content: currentProduct.description ?? 'Неизвестно',
+                  title: '1. Надпись autograph на app bar '
+                      'сделать наравне со стрелочкой «назад» '
+                      'на всех экранах (референт уровня стрелочки - '
+                      'главный экран home Убрать подписи и иконки под'
+                      ' AUTOGRAPH на app bar ',
                   titleSizeFactor: titleSizeFactor,
                 ),
                 SizedBox(height: spacingFactor),
-                isAddedToCart
-                    ? _buildCartControls(paddingFactor, screenHeight)
-                    : GestureDetector(
-                  onTap: toggleCartStatus,
+                !isAddedToCart? GestureDetector(
+                  onTap: () => toggleCartStatus(context),
                   child: Container(
                     width: paddingFactor * 7,
                     height: screenHeight * 0.049,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.teal, Colors.blue],
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: isAddedToCart
+                            ? [Colors.red, Colors.red]
+                            : [  buttonCard,  buttonCard],
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
                       child: Text(
-                        'Добавить в корзину',
+                        isAddedToCart
+                            ? 'Удалить из корзины'
+                            : 'Добавить в корзину',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: titleSizeFactor * 0.6,
@@ -160,7 +155,49 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                       ),
                     ),
                   ),
-                ),
+                ) :
+                GestureDetector(
+                  onTap:() => t(),
+                  child: Container(
+                      width: paddingFactor * 7,
+                      height: screenHeight * 0.049,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: isAddedToCart
+                              ? [Colors.white.withOpacity(0.45), Colors.white.withOpacity(0.45)]
+                              : [Colors.teal, Colors.blue],
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child:
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          GestureDetector(
+                            child: const Icon(Icons.remove, color: Colors.white),
+                            onTap: () => setState(() {
+                              if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
+                                LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
+                              }
+                              if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
+                                isAddedToCart=!isAddedToCart;
+                              }
+                            }),
+                          ),
+                          Text('${LocalCartProducts.instance.countProductInCart(widget.product.id!)}',
+                            style: const TextStyle(fontSize: 16,color: Colors.white),
+                          ),
+                          GestureDetector(
+                              child: const Icon(Icons.add,color: Colors.white,),
+                              onTap: ()=>setState(() {
+                                LocalCartProducts.instance.addProductToCart(widget.product.id!);
+                              })
+                          ),
+                        ],
+                      )
+                  ),
+                )
               ],
             ),
             Positioned(
@@ -177,54 +214,12 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     });
   }
 
-  Widget _buildCartControls(double paddingFactor, double screenHeight) {
-    return GestureDetector(
-      child: Container(
-        width: paddingFactor * 7,
-        height: screenHeight * 0.049,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [Colors.red, Colors.red]),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            GestureDetector(
-              child: const Icon(Icons.remove, color: Colors.white),
-              onTap: () => setState(() {
-                if (LocalCartProducts.instance.isProductInCart(widget.productId)) {
-                  LocalCartProducts.instance.removeProductFromCart(widget.productId);
-                }
-                if (!LocalCartProducts.instance.isProductInCart(widget.productId)){
-                  isAddedToCart=!isAddedToCart;
-                }
-              }),
-            ),
-            Text(
-              '${LocalCartProducts.instance.countProductInCart(widget.productId)}',
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            ),
-            GestureDetector(
-              child: const Icon(Icons.add, color: Colors.white),
-              onTap: () => setState(() {
-                LocalCartProducts.instance.addProductToCart(widget.productId);
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildInfoCard({
-    required IconData icon,
     required String title,
-    required String content,
     required double titleSizeFactor,
   }) {
     return Card(
-      color: Colors.grey.shade800,
+      color: Colors.grey.shade900,
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -232,8 +227,6 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            Icon(icon, color: Colors.deepOrange, size: titleSizeFactor * 0.8),
-            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -244,13 +237,6 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                       color: Colors.white70,
                       fontSize: titleSizeFactor * 0.7,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    content,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: titleSizeFactor * 0.9,
                     ),
                   ),
                 ],

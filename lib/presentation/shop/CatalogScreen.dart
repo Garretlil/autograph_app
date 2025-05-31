@@ -3,6 +3,7 @@ import 'package:autograph_app/core/services/local_cart_products.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../data/models/product.dart';
 
@@ -30,7 +31,7 @@ class CatalogViewScreen extends StatefulWidget {
 class _CatalogViewScreen extends State<CatalogViewScreen> {
   SharedPreferences? prefs;
   final TextEditingController _searchController = TextEditingController();
-  //String _searchQuery = '';
+  String selectedCategory='';
 
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
@@ -44,8 +45,8 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
     super.initState();
     setPref();
     _searchController.addListener(_onSearchChanged);
+    selectedCategory = widget.section=='POSTERIOR' ?'Одиночные' : 'Standart';
   }
-  String selectedCategory = 'Одиночные';
 
   @override
   void dispose() {
@@ -57,9 +58,33 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
   void _onSearchChanged() {
     if (mounted) {
       setState(() {
-       // _searchQuery = _searchController.text.toLowerCase();
+        // _searchQuery = _searchController.text.toLowerCase();
       });
     }
+  }
+  Widget buildChoiceChip(String category, bool isSelected) {
+    return ChipTheme(
+      data: ChipTheme.of(context).copyWith(
+        selectedColor: Colors.white.withOpacity(0.4),
+        secondarySelectedColor: Colors.white.withOpacity(0.4),
+        labelStyle: const TextStyle(color: Colors.white),
+        showCheckmark: false,
+      ),
+      child: ChoiceChip(
+        label: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected) ...[
+              const Icon(Icons.star_half, size: 18, color: Colors.white),
+              const SizedBox(width: 4),
+            ],
+            Text(category),
+          ],
+        ),
+        selected: isSelected,
+        onSelected: (_) => setState(() => selectedCategory = category),
+      ),
+    );
   }
 
   @override
@@ -74,29 +99,31 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
       builder: (context, productsData, child) {
         final filteredProducts = productsData.products.products
             ?.where((product) =>
-        product.section.contains(widget.section) &&
+        product.section!.contains(widget.section) &&
             product.subSection == selectedCategory
         ).toList() ?? [];
         List<Widget> listWidget=[];
         for (var item in filteredProducts){
-            listWidget.add(_CardCatalog(
-              product: item,
-              screenWidth: screenWidth,
-              screenHeight: screenHeight,
-              autoRotate: widget.autoRotate,
-              disableZoom: widget.disableZoom,
-              isEnglish: prefs?.getBool('LangParams') ?? false,
-            ));
+          listWidget.add(_CardCatalog(
+            product: item,
+            screenWidth: screenWidth,
+            screenHeight: screenHeight,
+            autoRotate: widget.autoRotate,
+            disableZoom: widget.disableZoom,
+            isEnglish: prefs?.getBool('LangParams') ?? false,
+          ));
         }
+        final categories = productsData.categories[widget.section]!;
 
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: PreferredSize(
-            preferredSize: Size(screenWidth, kToolbarHeight),
+            preferredSize: Size(screenWidth, kToolbarHeight-20),
             child: ClipRect(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
                 child: AppBar(
+                  forceMaterialTransparency:true,
                   backgroundColor: Colors.black.withOpacity(0.25),
                   elevation: 0,
                   leading: IconButton(
@@ -115,22 +142,10 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                       Text(
                         'AUTOGRAPH',
                         style: TextStyle(
-                          fontSize: titleSizeFactor * 0.75,
+                          fontSize: titleSizeFactor * 0.85,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'Inria Serif',
                           color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        prefs?.getBool('LangParams') == true
-                            ? 'Phantoms'
-                            : 'Фантомы',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor,
-                          color: Colors.white,
-                          fontFamily: prefs?.getBool('LangParams') == true
-                              ? 'Inria Serif'
-                              : 'ChUR',
                         ),
                       ),
                     ],
@@ -141,81 +156,50 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
             ),
           ),
           body: Container(
-            width: screenWidth,
-            height: screenHeight,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/image.png'),
-                fit: BoxFit.cover,
+              width: screenWidth,
+              height: screenHeight,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/image.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 120,),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.only(top: 8,bottom: 8),
-                  child: Row(
-                    children: productsData.categories[widget.section]!.map((category) {
-                      final isSelected = category == selectedCategory;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: ChipTheme(
-                          data: ChipTheme.of(context).copyWith(
-                            selectedColor: Colors.white.withOpacity(0.4),
-                            secondarySelectedColor: Colors.white.withOpacity(0.4),
-                            labelStyle: const TextStyle(color: Colors.white),
-                            showCheckmark: false,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 105,),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.only(top: 8,left: 8,right: 8,bottom: 4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: List.generate(3, (i) {
+                              final cat = categories[i];
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: buildChoiceChip(cat, selectedCategory == cat),
+                              );
+                            }),
                           ),
-                          child: ChoiceChip(
-                            label: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (isSelected) ...[
-                                  const Icon(Icons.star_half, size: 18, color: Colors.white),
-                                  const SizedBox(width: 4),
-                                ],
-                                Text(category),
-                              ],
-                            ),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() => selectedCategory = category),
+                          const SizedBox(height: 1),
+                          Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 4),
+                                child: buildChoiceChip(categories[3], selectedCategory == categories[3]),
+                              ),
+                            ],
                           ),
-                        )
-                      );
-                    }).toList(),
-                  ),
-                ),
-                // Expanded(
-                //   child: ClipRRect(
-                //     borderRadius: const BorderRadius.only(
-                //         bottomRight: Radius.circular(20),
-                //         bottomLeft: Radius.circular(20)),
-                //     child: AnimatedGrid(
-                //       crossAxisCount: 2,
-                //       spacing: 8.0,
-                //       staggerDuration: const Duration(milliseconds: 100),
-                //       animationDuration: const Duration(milliseconds: 500),
-                //       children: filteredProducts.map((product) {
-                //         return _CardCatalog(
-                //           product: product,
-                //           screenWidth: screenWidth,
-                //           screenHeight: screenHeight,
-                //           autoRotate: widget.autoRotate,
-                //           disableZoom: widget.disableZoom,
-                //           isEnglish: prefs?.getBool('LangParams') ?? false,
-                //         );
-                //       }).toList(),
-                //     ),
-                //   ),
-                // ),
-                Expanded(
-                  child: GridAnimatedDemo(children: listWidget),
-                ),
-                //GridAnimatedDemo(children: listWidget)
-              ]
-                )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: GridAnimatedDemo(children: listWidget),
+                    ),
+                  ]
+              )
           ),
         );
       },
@@ -225,7 +209,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
 
 
 class _CardCatalog extends StatefulWidget {
-  final listProducts product;
+  final Product product;
   final double screenWidth;
   final double screenHeight;
   final bool autoRotate;
@@ -266,6 +250,12 @@ class _CardCatalogState extends State<_CardCatalog> {
   void t(){}
 
   @override
+  void initState(){
+    super.initState();
+    isAddedToCart = LocalCartProducts.instance.initIsProductInCart(widget.product.id!);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = widget.screenWidth;
     final screenHeight = widget.screenHeight;
@@ -289,7 +279,7 @@ class _CardCatalogState extends State<_CardCatalog> {
             'screenWidth': screenWidth,
             'autoRotate': widget.autoRotate,
             'disableZoom': widget.disableZoom,
-            'productId': product.id,
+            'product': product,
           },
         );
       },
@@ -299,7 +289,12 @@ class _CardCatalogState extends State<_CardCatalog> {
         ),
         color: Colors.black.withOpacity(0.2),
         child: Padding(
-          padding: EdgeInsets.all(paddingFactor * 0.1),
+          padding: EdgeInsets.only(
+              left: paddingFactor * 0.17,
+              right: paddingFactor * 0.1,
+              top: paddingFactor * 0.1,
+              bottom:paddingFactor * 0.1
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -356,7 +351,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-
+              SizedBox(height: 2.5,),
               !isAddedToCart? GestureDetector(
                 onTap: () => toggleCartStatus(context),
                 child: Container(
@@ -369,9 +364,9 @@ class _CardCatalogState extends State<_CardCatalog> {
                       end: Alignment.bottomCenter,
                       colors: isAddedToCart
                           ? [Colors.red, Colors.red]
-                          : [Colors.orange, Colors.orange],
+                          : [  buttonCard,  buttonCard],
                     ),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(15),
                   ),
                   child: Center(
                     child: Text(
@@ -389,44 +384,44 @@ class _CardCatalogState extends State<_CardCatalog> {
               GestureDetector(
                 onTap:() => t(),
                 child: Container(
-                width: paddingFactor * 7,
-                height: screenHeight * 0.049,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: isAddedToCart
-                        ? [Colors.red, Colors.red]
-                        : [Colors.teal, Colors.blue],
-                  ),
-                  borderRadius: BorderRadius.circular(10),
+                    width: paddingFactor * 7,
+                    height: screenHeight * 0.049,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isAddedToCart
+                            ? [Colors.white.withOpacity(0.45), Colors.white.withOpacity(0.45)]
+                            : [Colors.teal, Colors.blue],
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          child: const Icon(Icons.remove, color: Colors.white),
+                          onTap: () => setState(() {
+                            if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
+                              LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
+                            }
+                            if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
+                              isAddedToCart=!isAddedToCart;
+                            }
+                          }),
+                        ),
+                        Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
+                          style: const TextStyle(fontSize: 16,color: Colors.white),
+                        ),
+                        GestureDetector(
+                            child: const Icon(Icons.add,color: Colors.white,),
+                            onTap: ()=>setState(() {
+                              LocalCartProducts.instance.addProductToCart(product.id!);
+                            })
+                        ),
+                      ],
+                    )
                 ),
-                child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      GestureDetector(
-                        child: const Icon(Icons.remove, color: Colors.white),
-                        onTap: () => setState(() {
-                          if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
-                            LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
-                          }
-                          if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
-                            isAddedToCart=!isAddedToCart;
-                          }
-                        }),
-                      ),
-                      Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
-                        style: const TextStyle(fontSize: 16,color: Colors.white),
-                      ),
-                      GestureDetector(
-                        child: const Icon(Icons.add,color: Colors.white,),
-                        onTap: ()=>setState(() {
-                          LocalCartProducts.instance.addProductToCart(product.id!);
-                        })
-                      ),
-                    ],
-                  )
-              ),
               )
             ],
           ),
@@ -444,22 +439,21 @@ class AnimatedGrid extends StatefulWidget {
   final Duration animationDuration;
 
   const AnimatedGrid({
-    Key? key,
+    super.key,
     required this.children,
     this.crossAxisCount = 2,
     this.spacing = 16.0,
     this.staggerDuration = const Duration(milliseconds: 100),
-    this.animationDuration = const Duration(milliseconds: 500),
-  }) : super(key: key);
+    this.animationDuration = const Duration(milliseconds: 700),
+  });
 
   @override
-  _AnimatedGridState createState() => _AnimatedGridState();
+  State<AnimatedGrid> createState() => _AnimatedGridState();
 }
 
 class _AnimatedGridState extends State<AnimatedGrid> {
   bool _isReadyToAnimate = false;
   final ScrollController _scrollController = ScrollController();
-
 
   @override
   void initState() {
@@ -472,12 +466,6 @@ class _AnimatedGridState extends State<AnimatedGrid> {
       }
     });
     _scrollController.addListener(() {
-      // if (_scrollController.hasClients) {
-        // print('Scroll Position: ${_scrollController.position.pixels}');
-        // print('Max Scroll Extent: ${_scrollController.position.maxScrollExtent}');
-        // print('Viewport Dimension: ${_scrollController.position.viewportDimension}');
-        // print('Out of Range: ${_scrollController.position.outOfRange}');
-      //}
     });
   }
 
