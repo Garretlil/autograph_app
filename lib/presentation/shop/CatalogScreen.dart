@@ -75,7 +75,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected) ...[
-              const Icon(Icons.star_half, size: 18, color: Colors.white),
+              //const Icon(Icons.wb_auto, size: 18, color: Colors.orange),
               const SizedBox(width: 4),
             ],
             Text(category),
@@ -136,19 +136,17 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                       Navigator.pop(context);
                     },
                   ),
-                  title: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'AUTOGRAPH',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 0.85,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
+                  title: ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
                       ),
-                    ],
+                    ),
                   ),
                   centerTitle: true,
                 ),
@@ -309,18 +307,18 @@ class _CardCatalogState extends State<_CardCatalog> {
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                child: Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,),
-                // child: Image.network(
-                //   'https://picsum.photos/200',//baseUrlFinal+product.photo_url!,
-                //   fit: BoxFit.cover,
-                //   loadingBuilder: (context, child, loadingProgress) {
-                //     if (loadingProgress == null) return child;
-                //     return const Center(child: CircularProgressIndicator());
-                //   },
-                //   errorBuilder: (context, error, stackTrace) {
-                //     return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
-                //   },
-                // )
+                //child: Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,),
+                child: Image.network(
+                  '$baseUrlFinal/static${product.photo_url!}',
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
+                  },
+                )
               ),
               ),
               Text(
@@ -386,7 +384,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                 child: Container(
                     width: paddingFactor * 7,
                     height: screenHeight * 0.049,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 9),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: isAddedToCart
@@ -398,6 +396,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                     child:
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
                           child: const Icon(Icons.remove, color: Colors.white),

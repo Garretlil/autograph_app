@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,138 +25,103 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
     setPref();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double paddingFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
-    double spacingFactorW=screenWidth * 0.06;
-    double titleSizeFactor = screenWidth * 0.06;
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
+    @override
+    Widget build(BuildContext context) {
+      final screenSize = MediaQuery.of(context).size;
+      final screenWidth = screenSize.width;
+      final screenHeight = screenSize.height;
+      final paddingFactor = screenWidth * 0.06;
+      final spacingFactor = screenHeight * 0.06;
+      final titleSizeFactor = screenWidth * 0.06;
+
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: Size(screenWidth, kToolbarHeight - 20),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+              child: AppBar(
+                forceMaterialTransparency: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                  color: Colors.white,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                centerTitle: true,
+              ),
+            ),
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-              paddingFactor*1.2,
-              paddingFactor*2.4,
-              paddingFactor,
-              0
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset(
+                'assets/image.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
+              child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child:  Icon(
-                      Icons.arrow_back_ios_new,
-                      color: Colors.deepOrange,
-                      size: spacingFactor*0.5,
+                  SizedBox(height: screenHeight * 0.03),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: LocalCartVideo.instance.getSelectedCourses().length,
+                      itemBuilder: (context, index) {
+                        final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
+                        return Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            paddingFactor * 0.7,
+                            paddingFactor * 0.1,
+                            paddingFactor,
+                            paddingFactor * 0.5,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/MyEventsVebinars',
+                                arguments: {'courseName': courseName},
+                              );
+                            },
+                            child: Text(
+                              courseName,
+                              style: TextStyle(
+                                fontSize: titleSizeFactor * 0.9,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white,
+                                fontFamily: 'Inria Serif',
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'AUTOGRAPH ',
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 0.8,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Inria Serif',
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: spacingFactor*0.2,),
-                       Icon(
-                        Icons.person,
-                        color: Colors.white,
-                        size: spacingFactor*0.6,
-                      ),
-                    ],
-                  ),
-                   SizedBox(width: spacingFactorW),
                 ],
               ),
-              SizedBox(height:spacingFactor*0.5),
-              Text(
-                prefs?.getBool('LangParams') == true
-                    ? 'ONLINE:'
-                    : 'Онлайн:',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: titleSizeFactor*1.2 ,
-                    fontFamily: prefs?.getBool('LangParams') == true
-                        ? 'Inria Serif'
-                        : 'ChUR'),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: LocalCartVideo.instance.getSelectedCourses().length,
-                  itemBuilder: (context, index) {
-                    final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
-                    return Padding(
-                      padding: EdgeInsets.fromLTRB(
-                       paddingFactor*0.7,
-                          paddingFactor*0.1,
-                          paddingFactor,
-                          paddingFactor*0.5
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/MyEventsVebinars',
-                              arguments:{'courseName': courseName});
-                        },
-                        child:Text(
-                        courseName,
-                        style:  TextStyle(
-                          fontSize:titleSizeFactor*0.9,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white,
-                          fontFamily: 'Inria Serif',
-                        ),
-                      ),
-                      )
-                    );
-                  },
-                ),
-              ),
-              Text(
-                prefs?.getBool('LangParams') == true
-                    ? 'OFFLINE:'
-                    : 'Оффлайн:',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: titleSizeFactor*1.2 ,
-                    fontFamily: prefs?.getBool('LangParams') == true
-                        ? 'Inria Serif'
-                        : 'ChUR'),
-              ),
-              Padding(padding: EdgeInsets.only(left: 9.0 * MediaQuery.of(context).devicePixelRatio,bottom: spacingFactor*4),
-                  child: Text(
-                    '32 FEBRUARY 2026 '
-                        'MODELLING TECHNIQUES',
-                    style: TextStyle(
-                      fontSize: 9.0 * MediaQuery.of(context).devicePixelRatio,
-                      fontWeight: FontWeight.w400,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
-                    ),
-                  ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-    );
-  }
+      );
+    }
 }

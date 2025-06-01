@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../core/services/user_service.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
   Shader createGradient(Rect bounds) {
 
     if (bounds.isEmpty) {
@@ -22,6 +25,7 @@ class ProfileScreen extends StatelessWidget {
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW=screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
+    final UserData _userData = UserData.instance;
     return Scaffold(
       body:
       Container(
@@ -58,13 +62,13 @@ class ProfileScreen extends StatelessWidget {
                   width: spacingFactorW*10,
                   padding: EdgeInsets.symmetric( horizontal: spacingFactorW),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Colors.grey.shade600.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child:  ShaderMask(
                     shaderCallback: (bounds) => createGradient(bounds),
                     child: Text(
-                      'OLIVIA',
+                      _userData.name,
                       style: TextStyle(
                         fontSize: titleSizeFactor*1.6,
                         fontWeight: FontWeight.w500,

@@ -4,6 +4,7 @@ import 'package:autograph_app/presentation/cdek_screen_integration/CDEKWindow.da
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
@@ -81,6 +82,8 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                   fit: BoxFit.cover,
                 ),
               ),
+              Padding(padding: EdgeInsets.only(top: screenHeight*0.13),
+              child:
               Positioned.fill(
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
@@ -123,6 +126,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                     },
                   ),
                 ),
+              ),
               ),
               Positioned(
                 bottom: 32,
@@ -311,10 +315,21 @@ class _CardCatalogState extends State<_CardCatalog> {
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                child: Image.asset(
-                  product.photo_url!,
-                  fit: BoxFit.cover,
-                ),
+                // child: Image.asset(
+                //   product.photo_url!,
+                //   fit: BoxFit.cover,
+                // ),
+                  child: Image.network(
+                    '$baseUrlFinal/static${product.photo_url!}',
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
+                    },
+                  )
               ),
               Expanded(
                 child: Column(
@@ -331,16 +346,16 @@ class _CardCatalogState extends State<_CardCatalog> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      productDescription,
-                      style: TextStyle(
-                        fontSize: descriptionSizeFactor * 0.6,
-                        color: Colors.white,
-                        fontFamily: 'Inria Serif',
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    // Text(
+                    //   productDescription,
+                    //   style: TextStyle(
+                    //     fontSize: descriptionSizeFactor * 0.6,
+                    //     color: Colors.white,
+                    //     fontFamily: 'Inria Serif',
+                    //   ),
+                    //   maxLines: 2,
+                    //   overflow: TextOverflow.ellipsis,
+                    // ),
                     SizedBox(height: 6),
                     Text(
                       '$productPrice \$',
@@ -351,7 +366,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                       ),
                     ),
                     const Spacer(),
-                    Padding(padding: EdgeInsets.only(left:screenWidth*0.07),child:
+                    Padding(padding: EdgeInsets.only(left:screenWidth*0.05),child:
                     Row(children:
                         [
                           GestureDetector(

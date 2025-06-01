@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,79 +29,90 @@ class _MyEventsVebinarsScreens extends State<MyEventsVebinarsScreens> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    double paddingFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
-          ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(
+          screenWidth,
+          kToolbarHeight-20,
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            paddingFactor*1.5,
-            paddingFactor * 3,
-            paddingFactor,
-            0,),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                color: Colors.white,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(
-                      Icons.arrow_back_ios_new,
-                      color: Colors.white,
-                    ),
-                  ),
                   Text(
-                    widget.courseName,
+                    'AUTOGRAPH',
                     style: TextStyle(
-                      fontSize: subtitleSizeFactor*0.6,
+                      fontSize: titleSizeFactor * 0.85,
                       fontWeight: FontWeight.bold,
+                      fontFamily: 'Inria Serif',
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(width: 40),
                 ],
               ),
-              //const SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: videos[widget.courseName]?.length,
-                  itemBuilder: (context, index) {
-                    final item = videos[widget.courseName];
-                    print('$baseUrlFinal/video/${item![index]['id']}');
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20.0),
-                      child: Column(
-                         children: [
-                           Text(item[index]['word'],style: TextStyle(
-                               color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
-                           SizedBox(height: spacingFactor*0.2,),
-                           VideoPlayerView(
-                             url: '$baseUrlFinal/video/${item[index]['id']}',
-                             thumbnailUrl: 'assets/imageBottom.png',
-                             dataSourceType: DataSourceType.network, // ← фикс!
-                           ),
-                         ]
-                      )
-                    );
-                  },
-                ),
-              ),
-            ],
+              centerTitle: true,
+            ),
           ),
         ),
+      ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/image.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(padding: EdgeInsets.only(
+              left: screenWidth*0.07,
+              right: screenWidth*0.07
+          ),
+          child:
+          Column(children: [
+            SizedBox(height: screenHeight * 0.03),
+            Expanded(
+              child: ListView.builder(
+                itemCount: videos[widget.courseName]?.length,
+                itemBuilder: (context, index) {
+                  final item = videos[widget.courseName];
+                  print('$baseUrlFinal/video/${item![index]['id']}');
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: Column(
+                       children: [
+                         Text(item[index]['word'],style: TextStyle(
+                             color: Colors.white,fontFamily: 'Inria Serif',fontSize:spacingFactor*0.4 )),
+                         SizedBox(height: spacingFactor*0.2,),
+                         VideoPlayerView(
+                           url: '$baseUrlFinal/video/${item[index]['id']}',
+                           thumbnailUrl: 'assets/imageBottom.png',
+                           dataSourceType: DataSourceType.network,
+                         ),
+                       ]
+                    )
+                  );
+                },
+              ),
+             ),
+           ]
+          )
+          )
+        ],
       ),
     );
   }
@@ -225,11 +237,12 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                           image: AssetImage(widget.thumbnailUrl),
                           fit: BoxFit.cover,
                         ),
+                        borderRadius: BorderRadius.circular(20.0),
                       ),
                       alignment: Alignment.center,
                       child: const Icon(
                         Icons.play_circle_outline,
-                        color: Colors.white,
+                        color: Colors.orange,
                         size: 45.0,
                       ),
                     ),
