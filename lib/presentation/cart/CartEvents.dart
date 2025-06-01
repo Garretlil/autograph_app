@@ -364,14 +364,16 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                 final body = getPurchasedIndexes();
                 print("Session Key: ${prefs.getString('session_key')}");
                 print("Body: ${jsonEncode(body)}");
-
                 CreateOrderResponse response = await client.createOrder(
                     prefs.getString('session_key').toString(),
                     getPurchasedIndexes());
-                // PayOrderResponse payResponse = await client.payOrder(
-                //   prefs.getString('session_key').toString(),
-                //     response.message
-                // );
+                PayOrderResponse payResponse = await client.payOrder(
+                  prefs.getString('session_key').toString(),
+                    response.orderId.toString()
+                );
+                if(payResponse.message=='Product order payment processed successfully'){
+                  PurchasedCourses.instance.ids.add(response.orderId);
+                }
               },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),

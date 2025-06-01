@@ -1,6 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/services/user_service.dart';
 
 
@@ -42,67 +43,52 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     double iconSizeFactor = screenWidth * 0.06;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(screenWidth, kToolbarHeight - 20),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                color: Colors.white,
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'AUTOGRAPH',
+                    style: TextStyle(
+                      fontSize: titleSizeFactor * 0.85,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inria Serif',
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+              centerTitle: true,
+            ),
+          ),
+        ),
+      ),
       body: Stack(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/image.png'),
-                fit: BoxFit.cover,
-              ),
+          Positioned.fill(
+            child: Image.asset(
+              'assets/image.png',
+              fit: BoxFit.cover,
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(
-              paddingFactor * 1.4,
-              paddingFactor * 2.4,
-              paddingFactor,
-              0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.only(top: screenHeight * 0.03),
-                        child: Icon(
-                          Icons.arrow_back_ios_new,
-                          size: iconSizeFactor,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'AUTOGRAPH ',
-                          style: TextStyle(
-                            fontSize: titleSizeFactor * 0.8,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'Inria Serif',
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: spacingFactor*0.2,),
-                         Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: spacingFactor*0.6,
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: screenWidth * 0.08),
-                  ],
-                ),
-                SizedBox(height: spacingFactor ),
-                Column(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07,vertical: screenHeight*0.15),
+          child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildInfoSection("PERSONAL INFORMATION:", ""),
@@ -116,7 +102,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     _buildInfoSection("EMAIL:", UserData.instance.email),
                     SizedBox(height:spacingFactor*0.3),
                     _buildInfoSection("COUNTRY:", UserData.instance.country),
-                    SizedBox(height: spacingFactor*2),
+                    SizedBox(height: spacingFactor*0.5),
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -135,16 +121,39 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(width: spacingFactorW*0.5),
-                  ],
-                ),
-              ],
-            ),
+                    SizedBox(height: spacingFactorW),
+                    GestureDetector(
+                      onTap: openTelegram,
+                      child: const Row(
+                        children: [
+                          Text('Telegram'),
+                          SizedBox(width: 5,),
+                          Icon(Icons.telegram,color: Colors.blue,)
+                        ],
+                      ),
+                    ),
+              //SizedBox(width: spacingFactorW*0.5),
+            ],
           ),
+          )
         ],
-      ),
+      )
     );
   }
+
+  void openTelegram() async {
+    final tgUrl = Uri.parse('tg://resolve?domain=bobrovich_dent');
+    final webUrl = Uri.parse('https://t.me/bobrovich_dent');
+    if (await canLaunchUrl(tgUrl)) {
+      await launchUrl(tgUrl);
+    } else if (await canLaunchUrl(webUrl)) {
+      await launchUrl(webUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Не удалось открыть Telegram';
+    }
+  }
+
+
 
   Widget _buildInfoSection(String title, String value) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -209,62 +218,3 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     );
   }
 }
-
-// Column(
-// crossAxisAlignment: CrossAxisAlignment.start,
-// children: [
-// GestureDetector(
-// onTap: () => Navigator.pop(context),
-// child: const Icon(
-// Icons.arrow_back_ios_new,
-// color: Colors.white,
-// ),
-// ),
-// const Center(
-// child: Text(
-// "AUTOGRAPH\nSETTINGS",
-// textAlign: TextAlign.center,
-// style: TextStyle(
-// color: Colors.white,
-// fontFamily: 'Inria Serif',
-// fontSize: 32.0,
-// fontWeight: FontWeight.bold,
-// letterSpacing: 2.0,
-// ),
-// ),
-// ),
-// _buildInfoSection("PERSONAL INFORMATION:", ""),
-// SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-// _buildInfoSection("NAME:", UserData.instance.name),
-// SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-// _buildInfoSection("SURNAME:", UserData.instance.surname),
-// SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-// _buildInfoSection("PHONE NUMBER:", UserData.instance.phoneNumber),
-// SizedBox(height: 15.0 * MediaQuery.of(context).devicePixelRatio),
-// _buildInfoSection("EMAIL:", UserData.instance.email),
-// SizedBox(height: 5.0 * MediaQuery.of(context).devicePixelRatio),
-// _buildInfoSection("COUNTRY:", UserData.instance.country),
-// SizedBox(height: spacingFactor),
-// //rus-0,eng-1
-//
-// Center(
-// child: Row(
-// mainAxisAlignment: MainAxisAlignment.center,
-// children: [
-// _buildLanguageOption("RUS", !isEnglish),
-// const SizedBox(width: 10),
-// const Text(
-// "|",
-// style: TextStyle(
-// color: Colors.white,
-// fontSize: 20.0,
-// ),
-// ),
-// const SizedBox(width: 10),
-// _buildLanguageOption("ENG", isEnglish),
-// ],
-// ),
-// ),
-// const SizedBox(height: 30),
-// ],
-// ),

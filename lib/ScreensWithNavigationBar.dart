@@ -196,7 +196,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                 return customPageRoute(const ProfileMyEventsScreen());
               case '/MyEventsVebinars':
                 final args = settings.arguments as Map<String, dynamic>;
-                return customPageRoute( MyEventsVebinarsScreens(
+                return customPageRoute( MyEventsWebinarsScreens(
                   courseName: args['courseName'],
                 ),
                 );
@@ -283,7 +283,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                             },
                             tabs: const [
                               GButton(
-                                icon: Icons.account_balance_rounded,
+                                icon: Icons.home_max,
                                 text: 'Home',
                                 haptic: true,
                               ),
@@ -293,7 +293,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                                 haptic: true,
                               ),
                               GButton(
-                                icon: Icons.person,
+                                icon: Icons.account_circle_sharp,
                                 text: 'Profile',
                                 haptic: true,
                               ),
@@ -576,87 +576,86 @@ class _SparkleDemoState extends State<SparkleDemo> {
 }
 
 class MysticalWavesState extends State<MysticalWaves> with TickerProviderStateMixin {
-late AnimationController _waveController;
-late AnimationController _visibilityController;
-bool _isVisible = false;
+  late AnimationController _waveController;
+  late AnimationController _visibilityController;
+  late bool _isVisible;
+  @override
+  void initState() {
+    super.initState();
 
-@override
-void initState() {
-  super.initState();
+    _waveController = AnimationController(
+      vsync: this,
+      duration: widget.waveDuration,
+    )..repeat();
 
-  _waveController = AnimationController(
-    vsync: this,
-    duration: widget.waveDuration,
-  )..repeat();
+    _visibilityController = AnimationController(
+      vsync: this,
+      duration: widget.animationDuration,
+    );
+  }
 
-  _visibilityController = AnimationController(
-    vsync: this,
-    duration: widget.animationDuration,
-  );
-}
+  @override
+  void deactivate() {
 
-@override
-void deactivate() {
+    _waveController.stop();
+    _visibilityController.stop();
+    super.deactivate();
+  }
 
-  _waveController.stop();
-  _visibilityController.stop();
-  super.deactivate();
-}
+  @override
+  void dispose() {
+    _waveController.dispose();
+    _visibilityController.dispose();
+    super.dispose();
+  }
 
-@override
-void dispose() {
-  _waveController.dispose();
-  _visibilityController.dispose();
-  super.dispose();
-}
+  Future<void> startAnimation() async {
+    setState(() => _isVisible = true);
+    await _visibilityController.forward();
+  }
 
-Future<void> startAnimation() async {
-  setState(() => _isVisible = true);
-  await _visibilityController.forward();
-}
+  Future<void> stopAnimation() async {
+    await _visibilityController.reverse();
+    setState(() => _isVisible = false);
+  }
 
-Future<void> stopAnimation() async {
-  await _visibilityController.reverse();
-  setState(() => _isVisible = false);
-}
-
-@override
-Widget build(BuildContext context) {
-  return AnimatedBuilder(
-    animation: Listenable.merge([_waveController, _visibilityController]),
-    builder: (context, child) {
-      return ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 35 * _visibilityController.value,
-            sigmaY: 35 * _visibilityController.value,
-          ),
-          child: Container(
-            height: widget.height * _visibilityController.value,
-            width: MediaQuery.of(context).size.width,
-            child: Stack(
-              children: List.generate(
-                (widget.waveColors ?? []).length,
-                    (index) => CustomPaint(
-                  size: Size.infinite,
-                  painter: _WavePainter(
-                    waveColor: widget.waveColors![index],
-                    animation: _waveController,
-                    waveOffset: index * 0.4,
-                    amplitude: 25 - (index * 5),
-                    frequency: 1.5 + (index * 0.5),
-                    blur: 30 * _visibilityController.value,
-                    opacity: 0.5 * _visibilityController.value,
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([_waveController, _visibilityController]),
+      builder: (context, child) {
+        return ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 35 * _visibilityController.value,
+              sigmaY: 35 * _visibilityController.value,
+            ),
+            child: Container(
+              height: widget.height * _visibilityController.value,
+              width: MediaQuery.of(context).size.width,
+              child: Stack(
+                children: List.generate(
+                  (widget.waveColors ?? []).length,
+                      (index) => CustomPaint(
+                    size: Size.infinite,
+                    painter: _WavePainter(
+                      waveColor: widget.waveColors![index],
+                      animation: _waveController,
+                      waveOffset: index * 0.4,
+                      amplitude: 25 - (index * 5),
+                      frequency: 1.5 + (index * 0.5),
+                      blur: 30 * _visibilityController.value,
+                      opacity: 0.5 * _visibilityController.value,
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }
 
 class _WavePainter extends CustomPainter {

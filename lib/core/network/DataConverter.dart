@@ -65,13 +65,20 @@ class PayOrderResponse {
 @JsonSerializable()
 class CreateOrderResponse {
   final String message;
-  CreateOrderResponse({required this.message});
+  @JsonKey(name: 'order_id')
+  final int orderId;
+
+  CreateOrderResponse({
+    required this.message,
+    required this.orderId,
+  });
 
   factory CreateOrderResponse.fromJson(Map<String, dynamic> json) =>
       _$CreateOrderResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$CreateOrderResponseToJson(this);
 }
+
 @JsonSerializable()
 class MeResponse {
   final User user;
@@ -137,6 +144,43 @@ class RegisterResponse {
 
   Map<String, dynamic> toJson() => _$RegisterResponseToJson(this);
 }
+@JsonSerializable()
+class PurchasedWebinarsResponse {
+  final List<PurchasedWebinar> webinars;
+
+  PurchasedWebinarsResponse({required this.webinars});
+
+  factory PurchasedWebinarsResponse.fromJson(Map<String, dynamic> json) =>
+      _$PurchasedWebinarsResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PurchasedWebinarsResponseToJson(this);
+}
+@JsonSerializable()
+class PurchasedWebinar {
+  final String? title;
+  final String? description;
+  final String? preview_url;
+  final int? course_id;
+  final int? duration;
+  final String? price;
+  final int? id;
+  final String? video_url;
+
+  PurchasedWebinar({
+    required this.title,
+    required this.description,
+    required this.preview_url,
+    required this.course_id,
+    required this.duration,
+    required this.price,
+    required this.id,
+    required this.video_url,
+  });
+
+  factory PurchasedWebinar.fromJson(Map<String, dynamic> json) => _$PurchasedWebinarFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PurchasedWebinarToJson(this);
+}
 
 @JsonSerializable()
 class Webinar {
@@ -181,12 +225,14 @@ class Course {
   final String? description;
   final String? preview_url;
   final List<Webinar>? webinars;
+  final int? id;
 
   Course({
     required this.title,
     required this.description,
     required this.preview_url,
     required this.webinars,
+    required this.id
   });
 
   factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);

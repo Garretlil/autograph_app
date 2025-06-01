@@ -313,10 +313,10 @@ class _CardCatalogState extends State<_CardCatalog> {
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator(color: Colors.orange,));
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
+                    return Center(child: Text('Ошибка загрузки',style: TextStyle(color: Colors.white,fontSize: titleSizeFactor*0.6),));// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
                   },
                 )
               ),

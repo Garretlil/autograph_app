@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import '../../data/repositories/UserRepository.dart';
 
-import '../../core/services/user_service.dart';
-
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String name = '';
   Shader createGradient(Rect bounds) {
 
     if (bounds.isEmpty) {
@@ -16,6 +21,17 @@ class ProfileScreen extends StatelessWidget {
       end: Alignment.bottomRight,
     ).createShader(bounds);
   }
+  @override
+  void initState() {
+    super.initState();
+    _loadName();
+  }
+  Future<void> _loadName() async {
+    final userData = await UserRepositoryImpl().loadUserData();
+    setState(() {
+      name = userData.name;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +41,7 @@ class ProfileScreen extends StatelessWidget {
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW=screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    final UserData _userData = UserData.instance;
+
     return Scaffold(
       body:
       Container(
@@ -68,7 +84,7 @@ class ProfileScreen extends StatelessWidget {
                   child:  ShaderMask(
                     shaderCallback: (bounds) => createGradient(bounds),
                     child: Text(
-                      _userData.name,
+                      name,
                       style: TextStyle(
                         fontSize: titleSizeFactor*1.6,
                         fontWeight: FontWeight.w500,
@@ -146,6 +162,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
               const Spacer(),
               SizedBox(height: spacingFactor),
             ],
