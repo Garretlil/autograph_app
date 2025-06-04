@@ -12,6 +12,7 @@ import 'package:autograph_app/presentation/login/CheckCode.dart';
 import 'package:autograph_app/presentation/login/RegistrationScreen.dart';
 import 'package:autograph_app/presentation/profile/MyEventsVebinars.dart';
 import 'package:autograph_app/presentation/profile/ProfilePage.dart';
+import 'package:autograph_app/presentation/profile/SupportPage.dart';
 import 'package:autograph_app/presentation/shop/PreCatalog.dart';
 import 'package:autograph_app/presentation/shop/ProductScreen.dart';
 import 'package:flame/particles.dart';
@@ -206,6 +207,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                 return customPageRoute(const ProfileOrdersScreen());
               case '/ProfileSettings':
                 return customPageRoute(const ProfileSettingsScreen());
+              case '/Support':
+                return customPageRoute(const SupportPageScreen());
               default:
                 throw Exception('Unknown route: ${settings.name}');
             } {}
@@ -228,9 +231,9 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
       child: Scaffold(
         body: Stack(
           children: [
-            const Positioned.fill(
-              child: AnimatedGridPattern(squares: [[1,2],[3,4],[5,6],[5,1],[3,1]],)
-            ),
+            // const Positioned.fill(
+            //   child: AnimatedGridPattern(squares: [[1,2],[3,4],[5,6],[5,1],[3,1]],)
+            // ),
             IndexedStack(
               index: _selectedIndex,
               children: List.generate(

@@ -1,8 +1,7 @@
-import 'package:autograph_app/core/services/local_cart_products.dart';
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import 'dart:developer';
+import '../../core/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/user_service.dart';
 import '../../data/models/product.dart';
@@ -21,29 +20,57 @@ class ConfirmationOrderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final titleSizeFactor = screenWidth * 0.06;
+    final subtitleSizeFactor = screenWidth * 0.06;
+    final spacingFactor = screenHeight * 0.06;
     final productsProvider = Provider.of<Products>(context, listen: false);
     return ChangeNotifierProvider(
       create: (_) => ConfirmationOrderNotifier(productsProvider),
-      child: Scaffold(
+      child:  Scaffold(
+        extendBodyBehindAppBar: true,
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: _SectionTitle(
-            text: 'Подтверждение заказа',
-            color1: Colors.grey.shade800,
-            color2: Colors.grey.shade800,
+        appBar: PreferredSize(
+          preferredSize: Size(screenWidth, kToolbarHeight - 20),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: AppBar(
+                forceMaterialTransparency: true,
+                backgroundColor: Colors.white70,
+                elevation: 0,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                  color: Colors.grey.shade700,
+                  onPressed: () => {
+                    Navigator.of(context).pop()
+                  },
+                ),
+                title: Text(
+                  'Подтверждение заказа',
+                  style: TextStyle(
+                    fontSize: titleSizeFactor * 0.85,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inria Serif',
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+                centerTitle: true,
+              ),
+            ),
           ),
         ),
-
         body: Consumer<ConfirmationOrderNotifier>(
           builder: (context, notifier, child) {
-            log('Screen: Rebuilding with Notifier State - isLoading: ${notifier.isLoading}, error: ${notifier.error}');
             if (notifier.isLoading && notifier.deliveryCost == null && notifier.error == null) {
-              return  Center(child: Lottie.asset(
-                  width: 100,
-                  height: 100,
-                  'assets/loadAnim.json'),);
+              return Center(child:
+                  CircularProgressIndicator.adaptive(backgroundColor: Colors.grey.shade800,)
+                  // Lottie.asset(
+                    // width: 100,
+                    // height: 100,
+                    // 'assets/loadAnim.json'),
+              );
             }
             if (notifier.error != null && notifier.deliveryCost == null) {
               return Center(
@@ -67,7 +94,6 @@ class ConfirmationOrderScreen extends StatelessWidget {
             final totalCost = notifier.totalCost;
             final cartItems = notifier.cartItems;
             final userData = UserData.instance;
-
             return Padding(
               padding: const EdgeInsets.all(16),
               child: ListView(
@@ -82,14 +108,13 @@ class ConfirmationOrderScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'КОРЗИНА'),
                   if (notifier.isLoading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                     Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(height: 15, width: 15, child: CircularProgressIndicator(strokeWidth: 2,color: Colors.green,)),
-                          SizedBox(width: 10),
-                          Text("Обновление корзины...")
+                          SizedBox(height: 15, width: 15, child: CircularProgressIndicator.adaptive(backgroundColor: Colors.grey.shade800,)),
+                          const SizedBox(width: 10),
                         ],
                       ),
                     ),
@@ -119,9 +144,13 @@ class ConfirmationOrderScreen extends StatelessWidget {
                   if (!notifier.isLoading && notifier.error != null)
                     Text('Ошибка расчета: ${notifier.error}', style: const TextStyle(fontSize: 16, color: Colors.red)),
                   if (deliveryCost != null)
-                    Text(
-                      '→ Самовывоз из ПВЗ: ${deliveryCost.toStringAsFixed(0)} ₽',
-                      style: const TextStyle(fontSize: 16,color: Colors.black),
+                    Row(children: [
+                          Icon(Icons.directions_walk,color: Colors.grey.shade800,size: screenWidth*0.05,),
+                          Text(
+                            ' Самовывоз из ПВЗ: ${deliveryCost.toStringAsFixed(0)} ₽',
+                            style: const TextStyle(fontSize: 16,color: Colors.black),
+                          ),
+                        ]
                     ),
                   const SizedBox(height: 16),
                   const Divider(),
@@ -290,7 +319,7 @@ class _CardCatalog extends StatelessWidget {
     double descriptionSizeFactor = screenWidth * 0.035;
     double imageSize = screenWidth * 0.25;
 
-    final productTitle = product.title ?? 'Нет названия';
+    final productTitle = product.name ?? 'Нет названия';
     final productDescription = product.description ?? 'Нет описания';
     final productPrice = double.tryParse(product.price ?? '0') ?? 0.0;
     final photoUrl = product.photo_url ?? 'assets/placeholder.png';
@@ -319,14 +348,19 @@ class _CardCatalog extends StatelessWidget {
                     boxShadow: const [
                       BoxShadow(color: Colors.transparent, blurRadius: 4, offset: Offset(0, 2)),
                     ],
-                    image: DecorationImage(
-                      image: AssetImage(photoUrl),
-                      fit: BoxFit.cover,
-                      onError: (exception, stackTrace) {
-                      },
-                    )
                 ),
                 clipBehavior: Clip.hardEdge,
+                child:Image.network(
+                  '$baseUrlFinal/static${product.photo_url!}',
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const Center(child: CircularProgressIndicator.adaptive());
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Center(child: Text('Ошибка загрузки',style: TextStyle(color: Colors.white,fontSize: titleSizeFactor*0.6),));// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
+                  },
+                ),
               ),
             ),
 
@@ -373,7 +407,6 @@ class _CardCatalog extends StatelessWidget {
                 ),
               ),
             ),
-
             if (quantity > 0)
               const Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

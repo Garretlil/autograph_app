@@ -14,7 +14,7 @@ class Catalog {
 
 @JsonSerializable()
 class Product {
-  final String? title;
+  final String? name;
   final String? description;
   final String? photo_url;
   final String? price;
@@ -31,7 +31,7 @@ class Product {
   final int? id;
 
   Product({
-    this.title,
+    this.name,
     this.description,
     this.photo_url,
     this.price,
@@ -191,6 +191,7 @@ class Webinar {
   final int? duration;
   final String? price;
   final int? id;
+  final bool? bought;
 
   Webinar({
     required this.title,
@@ -200,6 +201,7 @@ class Webinar {
     required this.duration,
     required this.price,
     required this.id,
+    required this.bought
   });
 
   factory Webinar.fromJson(Map<String, dynamic> json) => _$WebinarFromJson(json);

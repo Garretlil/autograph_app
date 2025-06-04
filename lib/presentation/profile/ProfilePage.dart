@@ -148,7 +148,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Padding(padding:  EdgeInsets.only(top: paddingFactor*1.3),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, '/Orders');
+                    Navigator.pushNamed(context, '/Support');
                   },
                   child: Text(
                     'SUPPORT',

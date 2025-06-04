@@ -1,12 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../core/network/DataConverter.dart';
 import '../../core/network/network_layer.dart';
 import '../home/HomePage.dart';
@@ -24,7 +20,7 @@ class CheckCodeNotifier extends ChangeNotifier{
 
   CheckCodeNotifier({required this.context, required TickerProvider vsync, required this.prefs}) {
     fadeController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 300),
       vsync: vsync,
     );
     fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
@@ -73,23 +69,17 @@ class CheckCodeNotifier extends ChangeNotifier{
         final dio = createInsecureDio();
         final client= AuthService(dio);
         Map<String, dynamic> confirmationData = {
-          'email': 'ed763135@gmail.com',
+          'email': 'ed763136@gmail.com',
           'code': code,
         };
-        //throw Exception();
-        print(3);
         ConfirmationResponse response =
         await client.verifyEmail(confirmationData);
-
         prefs?.setString('session_key', response.session_key);
         print(prefs?.getString('session_key'));
-        // MeResponse aboutMe = await client.getMe(response.session_key);
-        print(4);
         navigateToNextScreen(mounted);
         for (var controller in controllers) {
           controller.clear();
         }
-        print(5);
 
       } catch (error) {
         print(error);
@@ -100,7 +90,6 @@ class CheckCodeNotifier extends ChangeNotifier{
           width: double.infinity,
           height: double.infinity,
         );
-        print(6);
       }
       notifyListeners();
     }
@@ -121,7 +110,6 @@ class CheckCodeNotifier extends ChangeNotifier{
     Navigator.pushNamed(
       context,
       '/HomePage',
-      // arguments: {'section': courseName},
     );
   }
   Route createRoute() {
@@ -137,7 +125,7 @@ class CheckCodeNotifier extends ChangeNotifier{
     );
   }
 
-  bool _isDark = false;
+  final bool _isDark = false;
 
   Future<void> setNode()  async {
     await Future.delayed(const Duration(milliseconds: 500));

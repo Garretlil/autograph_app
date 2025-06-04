@@ -94,6 +94,9 @@ class _EventsOnline extends State<EventsOnline> {
               ),
               child: Center(
                 child: Container(
+                  decoration:  const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
                   width: screenWidth *0.91,
                   height: screenHeight * 0.25,
                   margin: EdgeInsets.only(
@@ -101,9 +104,17 @@ class _EventsOnline extends State<EventsOnline> {
                     bottom: cardMarginFactor * 0.001,
                   ),
                   child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color:
+                             Colors.blue.withOpacity(0.3),
+                        width: 2,
+                      ),
+                    ),
                     color: Colors.grey.shade800,
                     child: Padding(
-                      padding: EdgeInsets.all(cardPaddingFactor * 0.4),
+                      padding: EdgeInsets.all(cardPaddingFactor * 0.5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

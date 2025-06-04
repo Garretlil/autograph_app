@@ -149,7 +149,6 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     notifyListeners();
     try {
       _calculateBoxSizeAndCartCost();
-
       if (_error == null) {
         await _fetchDeliveryCost();
       }
@@ -205,7 +204,7 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
         final quantity = cartMap[product.id] ?? 1;
         return {
           'id': product.id,
-          'name': product.title,
+          'name': product.name,
           'price': product.price,
           'quantity': quantity,
         };

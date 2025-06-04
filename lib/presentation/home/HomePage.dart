@@ -1,10 +1,7 @@
-import 'dart:ui'; // Required for ImageFilter
-
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../core/Animation_manager.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,8 +32,6 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double cardMarginFactor = screenHeight * 0.06;
-    double cardPaddingFactor = screenWidth * 0.06;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -190,7 +185,7 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
           child: Padding(
             padding: const EdgeInsets.all(8.0),
               child: SizedBox(
-                height: screenHeight * 0.342,
+                height: screenHeight * 0.345,
                 width: screenWidth*1.2,
               child:Card(
               elevation: widget.isDarkMode ? 8.0 : 8.0,

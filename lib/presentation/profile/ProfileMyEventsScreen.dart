@@ -1,9 +1,7 @@
 import 'dart:ui';
-
+import 'package:autograph_app/data/models/purchased_course.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../core/services/local_cart_video.dart';
 
 
 class ProfileMyEventsScreen extends StatefulWidget {
@@ -17,6 +15,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
   SharedPreferences? prefs;
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
+    await PurchasedCourses.instance.init();
     setState(() {});
   }
   @override
@@ -24,6 +23,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
     super.initState();
     setPref();
   }
+
 
     @override
     Widget build(BuildContext context) {
@@ -33,6 +33,7 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
       final paddingFactor = screenWidth * 0.06;
       final spacingFactor = screenHeight * 0.06;
       final titleSizeFactor = screenWidth * 0.06;
+      final nameEntries = PurchasedCourses.instance.namePurchasedCourses.entries.toList();
 
       return Scaffold(
         extendBodyBehindAppBar: true,
@@ -85,36 +86,35 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
                   SizedBox(height: screenHeight * 0.03),
                   Expanded(
                     child: ListView.builder(
-                      itemCount: LocalCartVideo.instance.getSelectedCourses().length,
+                      itemCount: nameEntries.length,
                       itemBuilder: (context, index) {
-                        final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
+                        final entry = nameEntries[index];
+                        final courseId = entry.key;
+                        final courseName = entry.value;
+
                         return Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            paddingFactor * 0.7,
+                          padding: EdgeInsets.fromLTRB(paddingFactor * 0.7,
                             paddingFactor * 0.1,
                             paddingFactor,
-                            paddingFactor * 0.5,
-                          ),
+                            paddingFactor * 0.5,),
                           child: GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(
                                 context,
                                 '/MyEventsVebinars',
-                                arguments: {'courseName': courseName},
+                                arguments: {'courseId': courseId, 'courseName': courseName},
                               );
                             },
                             child: Text(
                               courseName,
-                              style: TextStyle(
-                                fontSize: titleSizeFactor * 0.9,
+                              style: TextStyle(fontSize: titleSizeFactor * 0.9,
                                 fontWeight: FontWeight.normal,
                                 color: Colors.white,
-                                fontFamily: 'Inria Serif',
-                              ),
+                                fontFamily: 'Inria Serif',),
                             ),
                           ),
                         );
-                      },
+                      }
                     ),
                   ),
                 ],

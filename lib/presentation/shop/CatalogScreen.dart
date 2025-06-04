@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:autograph_app/core/services/local_cart_products.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/Constants.dart';
@@ -263,7 +264,7 @@ class _CardCatalogState extends State<_CardCatalog> {
     double titleSizeFactor = screenWidth * 0.06;
     double descriptionSizeFactor = screenWidth * 0.06;
 
-    final productTitle = product.title ?? 'Название будет попозже(';
+    final productTitle = product.name ?? 'Название будет попозже(';
     final productDescription = product.description ?? 'Описание будет попозже(';
     final productPrice = product.price ?? 0;
 
@@ -295,6 +296,7 @@ class _CardCatalogState extends State<_CardCatalog> {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Center(child:
               Container(
@@ -313,21 +315,13 @@ class _CardCatalogState extends State<_CardCatalog> {
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
-                    return const Center(child: CircularProgressIndicator(color: Colors.orange,));
+                    return const Center(child: CircularProgressIndicator.adaptive());
                   },
                   errorBuilder: (context, error, stackTrace) {
                     return Center(child: Text('Ошибка загрузки',style: TextStyle(color: Colors.white,fontSize: titleSizeFactor*0.6),));// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
                   },
                 )
               ),
-              ),
-              Text(
-                '$productPrice \$',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Inria Serif',
-                  fontSize: titleSizeFactor * 0.8,
-                ),
               ),
               Text(
                 productTitle,
@@ -340,18 +334,15 @@ class _CardCatalogState extends State<_CardCatalog> {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                productDescription,
+                '$productPrice \$',
                 style: TextStyle(
-                  fontSize: descriptionSizeFactor * 0.7,
                   color: Colors.white,
                   fontFamily: 'Inria Serif',
+                  fontSize: titleSizeFactor * 0.8,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-              SizedBox(height: 2.5,),
               !isAddedToCart? GestureDetector(
-                onTap: () => toggleCartStatus(context),
+                onTap: () => {toggleCartStatus(context),HapticFeedback.heavyImpact()},
                 child: Container(
                   width: paddingFactor * 7,
                   height: screenHeight * 0.049,
@@ -380,7 +371,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                 ),
               ) :
               GestureDetector(
-                onTap:() => t(),
+                onTap:() => HapticFeedback.heavyImpact(),
                 child: Container(
                     width: paddingFactor * 7,
                     height: screenHeight * 0.049,

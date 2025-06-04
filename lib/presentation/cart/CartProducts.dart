@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:autograph_app/presentation/cdek_screen_integration/CDEKWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +18,7 @@ class CartProductsScreen extends StatefulWidget {
 
 class _CartProductsScreen extends State<CartProductsScreen> {
   SharedPreferences? prefs;
+  int totalCost=0;
 
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
@@ -83,20 +83,16 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                 ),
               ),
               Padding(padding: EdgeInsets.only(top: screenHeight*0.13),
-              child:
-              Positioned.fill(
-                child: ClipRRect(
+              child: LocalCartProducts.instance.calcTotalCost()!=0 ? ClipRRect(
                   borderRadius: const BorderRadius.only(
                     bottomRight: Radius.circular(20),
                     bottomLeft: Radius.circular(20),
                   ),
                   child: Builder(
                     builder: (_) {
+                      totalCost=LocalCartProducts.instance.calcTotalCost().round();
                       final allProducts = products.products.products ?? [];
-                      final cartIds = LocalCartProducts.instance
-                          .getCart()
-                          .keys
-                          .toSet();
+                      final cartIds = LocalCartProducts.instance.getCart().keys.toSet();
                       final filteredProducts = allProducts
                           .where((p) => p.id != null && cartIds.contains(p.id))
                           .toList();
@@ -120,14 +116,33 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                             autoRotate: false,
                             disableZoom: true,
                             isEnglish: prefs?.getBool('LangParams') ?? false,
+                            onQuantityChanged: () {
+                              setState(() {
+                                totalCost = LocalCartProducts.instance.calcTotalCost().round();
+                              });
+                            },
                           );
                         },
                       );
                     },
                   ),
+                )
+                : Center(
+                child: Text(
+                  prefs?.getBool('LangParams') == true
+                      ? 'Your cart is empty :('
+                      : 'Корзина пуста :(',
+                  style: TextStyle(
+                    fontSize: titleSizeFactor * 1.05,
+                    color: Colors.white,
+                    fontFamily: prefs?.getBool('LangParams') == true
+                        ? 'Inria Serif'
+                        : 'ChUR',
+                  ),
                 ),
+              )
               ),
-              ),
+              totalCost!=0 ?
               Positioned(
                 bottom: 32,
                 right: 40,
@@ -147,13 +162,13 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(30),
                           onTap: _showBottomSheet,
-                          child: const Center(
+                          child:  Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text('596 ₽',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20)),
+                                Text('${totalCost==0 ? '0' : totalCost} ₽',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 19)),
                               ],
                             ),
                           ),
@@ -162,7 +177,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                     ),
                   ),
                 ),
-              ),
+              ) : const SizedBox()
             ],
           ),
         );
@@ -222,8 +237,6 @@ class _CartProductsScreen extends State<CartProductsScreen> {
 }
 
 
-
-
 class _CardCatalog extends StatefulWidget {
   final Product product;
   final double screenWidth;
@@ -231,6 +244,7 @@ class _CardCatalog extends StatefulWidget {
   final bool autoRotate;
   final bool disableZoom;
   final bool isEnglish;
+  final VoidCallback onQuantityChanged;
 
   const _CardCatalog({
     super.key,
@@ -240,6 +254,7 @@ class _CardCatalog extends StatefulWidget {
     required this.autoRotate,
     required this.disableZoom,
     required this.isEnglish,
+    required this.onQuantityChanged,
   });
 
   @override
@@ -248,6 +263,21 @@ class _CardCatalog extends StatefulWidget {
 
 class _CardCatalogState extends State<_CardCatalog> {
   bool isAddedToCart = false;
+  void _increment() {
+    LocalCartProducts.instance.addProductToCart(widget.product.id!);
+    widget.onQuantityChanged();
+    setState(() {});
+  }
+
+  void _decrement() {
+    if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
+      LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
+      widget.onQuantityChanged();
+    }
+    else {isAddedToCart=false;}
+    setState(() {});
+
+  }
 
   void toggleCartStatus(BuildContext context) {
 
@@ -275,7 +305,7 @@ class _CardCatalogState extends State<_CardCatalog> {
     double titleSizeFactor = screenWidth * 0.06;
     double descriptionSizeFactor = screenWidth * 0.06;
 
-    final productTitle = product.title ?? 'Название будет попозже(';
+    final productTitle = product.name ?? 'Название будет попозже(';
     final productDescription = product.description ?? 'Описание будет попозже(';
     final productPrice = product.price ?? 0;
 
@@ -346,19 +376,9 @@ class _CardCatalogState extends State<_CardCatalog> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    // Text(
-                    //   productDescription,
-                    //   style: TextStyle(
-                    //     fontSize: descriptionSizeFactor * 0.6,
-                    //     color: Colors.white,
-                    //     fontFamily: 'Inria Serif',
-                    //   ),
-                    //   maxLines: 2,
-                    //   overflow: TextOverflow.ellipsis,
-                    // ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
-                      '$productPrice \$',
+                      '$productPrice \₽',
                       style: TextStyle(
                         color: Colors.orange,
                         fontFamily: 'Inria Serif',
@@ -374,9 +394,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                             child: const Icon(Icons.delete_rounded,color: Colors.red,),
                           ),
                          SizedBox(width: screenWidth*0.02,),
-                         GestureDetector(
-                          onTap:() => t(),
-                          child: Container(
+                          Container(
                               width: paddingFactor * 6,
                               height: screenHeight * 0.045,
                               padding: const EdgeInsets.symmetric(vertical: 12),
@@ -393,27 +411,19 @@ class _CardCatalogState extends State<_CardCatalog> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   GestureDetector(
+                                      onTap: _decrement,
                                       child: const Icon(Icons.remove,color: Colors.white,size: 22,),
-                                      onTap: ()=>setState(() {
-                                        if (LocalCartProducts.instance.isProductInCart(product.id!)) {
-                                          LocalCartProducts.instance.removeProductFromCart(product.id!);
-                                        }
-                                        else {isAddedToCart=false;}
-                                      })
                                   ),
                                   Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
                                     style: const TextStyle(fontSize: 13,color: Colors.white),
                                   ),
                                   GestureDetector(
-                                      child: const Icon(Icons.add,color: Colors.white,size: 22,),
-                                      onTap: ()=>setState(() {
-                                        LocalCartProducts.instance.addProductToCart(product.id!);
-                                      })
+                                      onTap: _increment,
+                                      child: const Icon(Icons.add,color: Colors.white,size: 22,)
                                   ),
                                 ],
                               )
                             ),
-                          ),
                         ]
                       ),
                     ),

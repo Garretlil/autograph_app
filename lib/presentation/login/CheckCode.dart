@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/Constants.dart';
+
 class CheckCodeScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;
   const CheckCodeScreen({super.key,required this.toggleBottomNavigationBar});
@@ -35,7 +37,7 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
     double spacingFactor = screenHeight * 0.06;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: background,
       body: LayoutBuilder(
         builder: (context, constraints) {
           return SingleChildScrollView(

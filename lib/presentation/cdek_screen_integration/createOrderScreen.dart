@@ -125,6 +125,10 @@ class _CreateOrderState extends State<CreateOrderScreen> with SingleTickerProvid
   Widget _buildTextField(String label, TextEditingController controller, SharedPreferences prefs) {
     return TextField(
       controller: controller,
+      style: TextStyle(
+        color: Colors.black,
+        fontFamily: prefs.getBool('LangParams') == true ? 'Inria Serif' : 'Inria Serif',
+      ),
       //keyboardType: TextInputType.phone,
       decoration: InputDecoration(
         labelText: label,

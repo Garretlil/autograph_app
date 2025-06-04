@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
@@ -169,40 +170,41 @@ class VideoPlayerView extends StatefulWidget{
 }
 
 class _VideoPlayerViewState extends State<VideoPlayerView> {
-  late VideoPlayerController _videoPlayerController;
-  late ChewieController _chewieController;
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
   bool _isVideoPlaying = false;
-  late Duration videoDuration;
+  bool _isPlayerVisible = false;
   SharedPreferences? prefs;
-  Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {});
-    _init();
-  }
-  Future<void> _init() async {
-    prefs = await SharedPreferences.getInstance();
-    await _initializeVideoPlayer();
-    setState(() {});
-  }
 
   @override
   void initState() {
     super.initState();
-    setPref();
-    _initializeVideoPlayer();
-    videoDuration = _videoPlayerController.value.duration;
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
   }
 
   Future<void> _initializeVideoPlayer() async {
+    if (_videoPlayerController != null) {
+      await _videoPlayerController!.dispose();
+      _videoPlayerController = null;
+    }
+    if (_chewieController != null) {
+       _chewieController!.dispose();
+      _chewieController = null;
+    }
+
     switch (widget.dataSourceType) {
       case DataSourceType.assets:
         _videoPlayerController = VideoPlayerController.asset(widget.url);
         break;
       case DataSourceType.network:
-        print(prefs?.getString('session_key'));
-        _videoPlayerController = VideoPlayerController.network(widget.url,
-            httpHeaders: { 'x-session-key': prefs?.getString('session_key')?? 'fake_key'});
-        print(widget.url);
+        _videoPlayerController = VideoPlayerController.network(
+          widget.url,
+          httpHeaders: {'x-session-key': prefs?.getString('session_key') ?? ''},
+        );
         break;
       case DataSourceType.file:
         _videoPlayerController = VideoPlayerController.file(File(widget.url));
@@ -212,12 +214,16 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         break;
     }
 
-    _videoPlayerController.initialize();
-    _videoPlayerController.setLooping(true);
+    await _videoPlayerController!.initialize();
 
     _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
+      videoPlayerController: _videoPlayerController!,
+      autoPlay: true,
+      showControls: true,
       aspectRatio: 16 / 9,
+      allowMuting: false,
+      allowFullScreen: true,
+      allowPlaybackSpeedChanging: false,
       materialProgressColors: ChewieProgressColors(
         playedColor: Colors.white70,
         handleColor: Colors.white70,
@@ -226,79 +232,92 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
       ),
     );
 
-    _videoPlayerController.addListener(() {
-      setState(() {
-        if (_videoPlayerController.value.position == _videoPlayerController.value.duration) {
-          _isVideoPlaying = false;
-        }
-      });
-    });
-    setState(() {});
-    _chewieController.addListener(() {
-      if (!_chewieController.isFullScreen) {
-        _chewieController.pause();
-        _isVideoPlaying = false;
+    _chewieController!.addListener(() {
+      if (!_chewieController!.isFullScreen && _isVideoPlaying) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          //DeviceOrientation.portraitDown,
+        ]);
+        _cleanupPlayer();
       }
     });
+
+    setState(() {
+      _isVideoPlaying = true;
+      _isPlayerVisible = true;
+    });
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _chewieController?.enterFullScreen();
+    });
+  }
+
+  void _cleanupPlayer() async {
+    await _videoPlayerController?.pause();
+    await _chewieController?.pause();
+    await _videoPlayerController?.dispose();
+     _chewieController?.dispose();
+
+    _videoPlayerController = null;
+    _chewieController = null;
+
+    setState(() {
+      _isVideoPlaying = false;
+      _isPlayerVisible = false;
+    });
+  }
+
+  void _onPlayPressed() {
+    _initializeVideoPlayer();
   }
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController.dispose();
+    _cleanupPlayer();
     super.dispose();
   }
-
-  void _playVideo() {
-    setState(() {
-      _isVideoPlaying = true;
-    });
-    _videoPlayerController.play();
-    _chewieController.enterFullScreen();
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Chewie(controller: _chewieController),
-                if (!_isVideoPlaying)
-                  GestureDetector(
-                    onTap: _playVideo,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(widget.thumbnailUrl),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.center,
-                      child:  Icon(
-                        Icons.play_circle_outline,
-                        color: Colors.white.withOpacity(0.8),
-                        size: 35.0,
-                      ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+      ClipRRect(
+      borderRadius: BorderRadius.circular(10),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (_isPlayerVisible && _chewieController != null)
+              Chewie(controller: _chewieController!)
+            else
+              GestureDetector(
+                onTap: _onPlayPressed,
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(widget.thumbnailUrl),
+                      fit: BoxFit.cover,
                     ),
                   ),
-              ],
-            ),
-          ),
+                  alignment: Alignment.center,
+                  child: const Icon(
+                    Icons.play_circle_outline,
+                    size: 35,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+          ],
         ),
-      ],
-    );
+      ),
+    )
+   ]
+   );
   }
 }
+
 
 enum DataSourceType {
   assets,

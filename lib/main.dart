@@ -3,6 +3,7 @@ import 'package:autograph_app/data/models/product.dart';
 import 'package:autograph_app/presentation/cdek_screen_integration/ConfirmationOrderNotifier.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'ScreensWithNavigationBar.dart';
 import 'core/Animation_manager.dart';
@@ -10,9 +11,13 @@ import 'data/models/course.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  CourseWebinars();
+  await CourseWebinars.instance.init();
   final products = Products();
   await products.initialize();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   runApp(
       MultiProvider(

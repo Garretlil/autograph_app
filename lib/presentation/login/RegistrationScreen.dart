@@ -54,6 +54,12 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                         child: IntrinsicHeight(
                           child: Stack(
                                 children: [
+                                  Positioned.fill(
+                                    child: Image.asset(
+                                      'assets/image.png',
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                   Padding(
                                       padding: EdgeInsets.fromLTRB(
                                           paddingFactor * 1.2,

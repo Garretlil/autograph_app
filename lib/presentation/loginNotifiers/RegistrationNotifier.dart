@@ -22,7 +22,7 @@ class RegistrationNotifier extends ChangeNotifier {
 
   RegistrationNotifier({required this.context, required TickerProvider vsync, required this.prefs}) {
     fadeController = AnimationController(
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 300),
       vsync: vsync,
     );
     fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
@@ -42,7 +42,7 @@ class RegistrationNotifier extends ChangeNotifier {
   Future<void> registerUser(Function() onSuccess) async {
     nameController.text='Houston';
     surnameController.text='Cooper';
-    emailController.text='ed763135@gmail.com';
+    emailController.text='ed763136@gmail.com';
     prefs?.setString('email', emailController.text);
     if (nameController.text.isEmpty || surnameController.text.isEmpty || emailController.text.isEmpty) {
       _snackBarMessage = prefs?.getBool('LangParams') == true ? 'Please fill all fields' : 'Заполните все поля';
@@ -54,7 +54,7 @@ class RegistrationNotifier extends ChangeNotifier {
         'name': nameController.text,
         'surname': surnameController.text,
         'email': emailController.text,
-        'phone' : '89168273103'
+        'phone' : '89168273104'
       };
       // final apiService = Provider.of<AuthService>(context, listen: false);
       // RegisterResponse response = await apiService.registerUser(registrationData);
