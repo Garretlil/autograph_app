@@ -95,22 +95,19 @@ class CheckCodeNotifier extends ChangeNotifier{
     }
   }
   void navigateToNextScreen(bool mounted) async {
-    // _isDark = true;
-    // await Future.delayed(const Duration(milliseconds: 200));
-    // if (mounted) {
-    //   Navigator.of(context).push(createRoute()).then((_) {
-    //     if (mounted) {
-    //         _isDark = true;
-    //     }
-    //   });
-    // }
-    // await Future.delayed(const Duration(milliseconds: 700));
-    // widget.toggleBottomNavigationBar(true);
-    // notifyListeners();
-    Navigator.pushNamed(
-      context,
-      '/HomePage',
-    );
+    FocusScope.of(context).unfocus();
+
+    for (var node in focusNodes) {
+      node.unfocus();
+    }
+    await Future.delayed(const Duration(milliseconds: 700));
+
+    if (mounted) {
+      Navigator.pushNamed(
+        context,
+        '/HomePage',
+      );
+    }
   }
   Route createRoute() {
     return PageRouteBuilder(

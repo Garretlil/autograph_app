@@ -11,7 +11,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String name = '';
   Shader createGradient(Rect bounds) {
-
     if (bounds.isEmpty) {
       return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
     }

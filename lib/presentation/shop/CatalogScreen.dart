@@ -342,7 +342,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                 ),
               ),
               !isAddedToCart? GestureDetector(
-                onTap: () => {toggleCartStatus(context),HapticFeedback.heavyImpact()},
+                onTap: () => {toggleCartStatus(context),HapticFeedback.lightImpact()},
                 child: Container(
                   width: paddingFactor * 7,
                   height: screenHeight * 0.049,
@@ -371,7 +371,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                 ),
               ) :
               GestureDetector(
-                onTap:() => HapticFeedback.heavyImpact(),
+                onTap:() => HapticFeedback.lightImpact(),
                 child: Container(
                     width: paddingFactor * 7,
                     height: screenHeight * 0.049,
@@ -391,23 +391,23 @@ class _CardCatalogState extends State<_CardCatalog> {
                       children: [
                         GestureDetector(
                           child: const Icon(Icons.remove, color: Colors.white),
-                          onTap: () => setState(() {
+                          onTap: () => {setState(() {
                             if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
                               LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
                             }
                             if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
                               isAddedToCart=!isAddedToCart;
                             }
-                          }),
+                          }),HapticFeedback.lightImpact()},
                         ),
                         Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
                           style: const TextStyle(fontSize: 16,color: Colors.white),
                         ),
                         GestureDetector(
                             child: const Icon(Icons.add,color: Colors.white,),
-                            onTap: ()=>setState(() {
+                            onTap: ()=>{setState(() {
                               LocalCartProducts.instance.addProductToCart(product.id!);
-                            })
+                            }),HapticFeedback.lightImpact()}
                         ),
                       ],
                     )

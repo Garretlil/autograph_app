@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../cart/CartProducts.dart';
 import '../loginNotifiers/RegistrationNotifier.dart';
-import '../shop/CatalogScreen.dart';
 import 'CheckCode.dart';
-import '../../../core/Animation_manager.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;
@@ -101,21 +98,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                           Center(
                                             child: InfiniteGradientButton(
                                               onTap: () => registration.registerUser(() {
-                                                Navigator.pushReplacement(
-                                                  context,
-                                                  PageRouteBuilder(
-                                                    pageBuilder: (context, animation, secondaryAnimation) => CheckCodeScreen(toggleBottomNavigationBar: widget.toggleBottomNavigationBar),//(src: 'assets/teeth.glb', screenWidth: 500, screenHeight: 500),
-                                                    transitionDuration: const Duration(milliseconds: 400),
-                                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                                      var begin = const Offset(1.0, 0.0);
-                                                      var end = Offset.zero;
-                                                      var curve = Curves.ease;
-                                                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                                                      var offsetAnimation = animation.drive(tween);
-                                                      return SlideTransition(position: offsetAnimation, child: child);
-                                                    },
-                                                  ),
-                                                );
+                                                Navigator.pushNamed(context, '/CheckCodeScreen',);
                                               }),
                                             ),
                                           ),

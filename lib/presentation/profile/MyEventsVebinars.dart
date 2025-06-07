@@ -5,13 +5,13 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-
 import '../../core/Constants.dart';
 import '../../data/models/purchased_course.dart';
 
 class MyEventsWebinarsScreens extends StatefulWidget {
   final String courseName;
-  const MyEventsWebinarsScreens({super.key, required this.courseName});
+  final void Function(bool) toggleBottomNavigationBar;
+  const MyEventsWebinarsScreens({super.key, required this.courseName,required this.toggleBottomNavigationBar});
 
   @override
   State<MyEventsWebinarsScreens> createState() => _MyEventsWebinarsScreens();
@@ -21,6 +21,17 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
   final String code = '2453';
 
   Map<String, List<Map<String, dynamic>>> videos = {};
+
+  Shader createGradient(Rect bounds) {
+    if (bounds.isEmpty) {
+      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
+    }
+    return const LinearGradient(
+      colors: [Colors.orange, Colors.red],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(bounds);
+  }
 
   @override
   void initState() {
@@ -34,7 +45,6 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
       videos = fetchedVideos;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,13 +75,16 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'AUTOGRAPH',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
+                  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor*0.9,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        fontFamily: 'Inria Serif',
+                      ),
                     ),
                   ),
                 ],
@@ -114,9 +127,12 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                           children: [
                             Expanded(
                               child: VideoPlayerView(
+                                toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
                                 url: '$baseUrlFinal/video/${item[index]['id']}',
                                 thumbnailUrl: 'assets/fon2.png',
                                 dataSourceType: DataSourceType.network,
+                                duration: item[index]['duration'].toString(),
+                                id: int.parse(item[index]['id']),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -154,48 +170,215 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
   }
 }
 
-class VideoPlayerView extends StatefulWidget{
-  const VideoPlayerView ({
+
+enum DataSourceType {
+  assets,
+  network,
+  file,
+  contentUrl,
+}
+
+class VideoPlayerView extends StatefulWidget {
+  final String url;
+  final String thumbnailUrl;
+  final DataSourceType dataSourceType;
+  final void Function(bool) toggleBottomNavigationBar;
+  final String duration;
+  final int id;
+
+  const VideoPlayerView({
     super.key,
     required this.url,
     required this.thumbnailUrl,
     required this.dataSourceType,
+    required this.toggleBottomNavigationBar,
+    required this.duration,
+    required this.id,
   });
-  final String url;
-  final DataSourceType dataSourceType;
-  final String thumbnailUrl;
 
   @override
   State<VideoPlayerView> createState() => _VideoPlayerViewState();
 }
 
 class _VideoPlayerViewState extends State<VideoPlayerView> {
-  VideoPlayerController? _videoPlayerController;
+  SharedPreferences? prefs;
+  int watchMoment = 0;
+  int hours=0;
+  int minutes=0;
+  int seconds=0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadWatchMoment();
+
+  }
+
+  Future<void> _loadWatchMoment() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      watchMoment = prefs?.getInt('video${widget.id}') ?? 0;
+      print(watchMoment);
+    });
+  }
+
+
+  void _openFullScreenPlayer(BuildContext context) async {
+    widget.toggleBottomNavigationBar(false);
+
+    await Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: true,
+        maintainState: true,
+        transitionDuration: const Duration(milliseconds: 500),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (_, animation, __) => FullScreenVideoPlayer(
+          url: widget.url,
+          dataSourceType: widget.dataSourceType,
+          toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
+          videoId: widget.id,
+          initialPosition: Duration(seconds: watchMoment),
+        ),
+        transitionsBuilder: (_, animation, __, child) {
+          const begin = Offset(0.0, 1.0);
+          const end = Offset.zero;
+          const curve = Curves.easeOutCubic;
+
+          final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+          final offsetAnimation = animation.drive(tween);
+
+          return SlideTransition(
+            position: offsetAnimation,
+            child: child,
+          );
+        },
+      ),
+    );
+
+    await _loadWatchMoment();
+  }
+
+  String convertToTime(int time){
+    hours=time~/3600;
+    minutes=(time%3600)~/60;
+    seconds=((time%3600)%60)%60;
+    String str='';
+    if(hours>0){
+      str='$hours:';
+    }
+    str+='$minutes:';
+    str+='$seconds';
+    return str;
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double totalDuration = double.tryParse(widget.duration) ?? 0.0;
+    print(totalDuration);
+    return GestureDetector(
+      onTap: () => _openFullScreenPlayer(context),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: AspectRatio(
+          aspectRatio: 16 / 9,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                widget.thumbnailUrl,
+                fit: BoxFit.cover,
+              ),
+              Center(
+                child: Icon(
+                  Icons.play_circle_filled_sharp,
+                  size: 40,
+                  color: Colors.grey.withOpacity(0.88),
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                right: 10,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                  ),
+                  child: Center(child: Text(' ${convertToTime(totalDuration.toInt())} ')),
+                ),
+              ),
+              Positioned(
+                bottom: 1,
+                left: 0,
+                right: 0,
+                child: CustomPaint(
+                  painter: TimeLinePainter(
+                    watchMoment: 0,
+                    totalDuration: 1,
+                    colorType: Colors.grey,
+                    isFull: true,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 1,
+                left: 0,
+                right: 0,
+                child: CustomPaint(
+                  painter: TimeLinePainter(
+                    watchMoment: watchMoment,
+                    totalDuration: totalDuration,
+                    colorType: Colors.deepOrange,
+                    isFull: false,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class FullScreenVideoPlayer extends StatefulWidget {
+  final String url;
+  final DataSourceType dataSourceType;
+  final void Function(bool) toggleBottomNavigationBar;
+  final int videoId;
+  final Duration initialPosition;
+
+  const FullScreenVideoPlayer({
+    super.key,
+    required this.url,
+    required this.dataSourceType,
+    required this.toggleBottomNavigationBar,
+    required this.videoId,
+    required this.initialPosition,
+  });
+
+  @override
+  State<FullScreenVideoPlayer> createState() => _FullScreenVideoPlayerState();
+}
+
+class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
+  late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
-  bool _isVideoPlaying = false;
-  bool _isPlayerVisible = false;
+  bool _isInitialized = false;
   SharedPreferences? prefs;
 
   @override
   void initState() {
     super.initState();
-    _loadPrefs();
+    _initialize();
   }
 
-  Future<void> _loadPrefs() async {
+  Future<void> _initialize() async {
     prefs = await SharedPreferences.getInstance();
+    await _initializePlayer();
   }
 
-  Future<void> _initializeVideoPlayer() async {
-    if (_videoPlayerController != null) {
-      await _videoPlayerController!.dispose();
-      _videoPlayerController = null;
-    }
-    if (_chewieController != null) {
-       _chewieController!.dispose();
-      _chewieController = null;
-    }
-
+  Future<void> _initializePlayer() async {
     switch (widget.dataSourceType) {
       case DataSourceType.assets:
         _videoPlayerController = VideoPlayerController.asset(widget.url);
@@ -203,7 +386,7 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
       case DataSourceType.network:
         _videoPlayerController = VideoPlayerController.network(
           widget.url,
-          httpHeaders: {'x-session-key': prefs?.getString('session_key') ?? ''},
+          httpHeaders: {'x-session-key': '069648d4-835b-424d-a712-3cc0ba5d391e'},
         );
         break;
       case DataSourceType.file:
@@ -214,114 +397,115 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
         break;
     }
 
-    await _videoPlayerController!.initialize();
+    await _videoPlayerController.initialize();
 
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController!,
-      autoPlay: true,
-      showControls: true,
-      aspectRatio: 16 / 9,
-      allowMuting: false,
-      allowFullScreen: true,
-      allowPlaybackSpeedChanging: false,
-      materialProgressColors: ChewieProgressColors(
-        playedColor: Colors.white70,
-        handleColor: Colors.white70,
-        backgroundColor: Colors.white24,
-        bufferedColor: Colors.grey.shade300,
-      ),
-    );
+    await _videoPlayerController.seekTo(widget.initialPosition);
 
-    _chewieController!.addListener(() {
-      if (!_chewieController!.isFullScreen && _isVideoPlaying) {
-        SystemChrome.setPreferredOrientations([
-          DeviceOrientation.portraitUp,
-          //DeviceOrientation.portraitDown,
-        ]);
-        _cleanupPlayer();
+    int lastSavedSecond = -1;
+
+    _videoPlayerController.addListener(() {
+      if (_videoPlayerController.value.isInitialized &&
+          _videoPlayerController.value.isPlaying) {
+        final currentSecond = _videoPlayerController.value.position.inSeconds;
+        if (currentSecond != lastSavedSecond && currentSecond % 5 == 0) {
+          lastSavedSecond = currentSecond;
+          prefs?.setInt('video${widget.videoId}', currentSecond);
+        }
       }
     });
 
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController,
+      autoPlay: true,
+      looping: false,
+      showControls: true,
+      allowFullScreen: true,
+      allowMuting: true,
+      allowPlaybackSpeedChanging: true,
+      deviceOrientationsAfterFullScreen: [DeviceOrientation.portraitUp],
+    );
+
     setState(() {
-      _isVideoPlaying = true;
-      _isPlayerVisible = true;
+      _isInitialized = true;
     });
 
-    Future.delayed(const Duration(milliseconds: 100), () {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _chewieController?.enterFullScreen();
     });
   }
 
-  void _cleanupPlayer() async {
-    await _videoPlayerController?.pause();
-    await _chewieController?.pause();
-    await _videoPlayerController?.dispose();
-     _chewieController?.dispose();
-
-    _videoPlayerController = null;
-    _chewieController = null;
-
-    setState(() {
-      _isVideoPlaying = false;
-      _isPlayerVisible = false;
-    });
-  }
-
-  void _onPlayPressed() {
-    _initializeVideoPlayer();
-  }
-
   @override
   void dispose() {
-    _cleanupPlayer();
+    _chewieController?.dispose();
+    _videoPlayerController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-      ClipRRect(
-      borderRadius: BorderRadius.circular(10),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            if (_isPlayerVisible && _chewieController != null)
-              Chewie(controller: _chewieController!)
-            else
-              GestureDetector(
-                onTap: _onPlayPressed,
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(widget.thumbnailUrl),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.play_circle_outline,
-                    size: 35,
-                    color: Colors.white70,
-                  ),
-                ),
-              ),
-          ],
+    double screenWidth = MediaQuery.of(context).size.width;
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+            widget.toggleBottomNavigationBar(true);
+          },
+          child: Icon(Icons.close_sharp, size: screenWidth * 0.08, color: Colors.white70),
         ),
       ),
-    )
-   ]
-   );
+      body: Center(
+        child: _isInitialized && _chewieController != null
+            ? Chewie(controller: _chewieController!)
+            : const CircularProgressIndicator.adaptive(backgroundColor: Colors.white),
+      ),
+    );
   }
 }
 
+class TimeLinePainter extends CustomPainter {
+  final int watchMoment;
+  final double totalDuration;
+  final Color colorType;
+  final bool isFull;
 
-enum DataSourceType {
-  assets,
-  network,
-  file,
-  contentUrl
+  TimeLinePainter({
+    required this.watchMoment,
+    required this.totalDuration,
+    required this.colorType,
+    required this.isFull,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = colorType
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+
+    if (totalDuration <= 0) {
+      canvas.drawLine(const Offset(0, 0), Offset(isFull ? size.width : 0, 0), paint);
+      return;
+    }
+
+    double progressRatio = watchMoment / totalDuration;
+
+    progressRatio = progressRatio.clamp(0.0, 1.0);
+
+    final double progressWidth = isFull ? size.width : size.width * progressRatio;
+
+    canvas.drawLine(
+      const Offset(0, 0),
+      Offset(progressWidth, 0),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant TimeLinePainter oldDelegate) {
+    return watchMoment != oldDelegate.watchMoment || totalDuration != oldDelegate.totalDuration;
+  }
 }
+

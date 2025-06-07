@@ -163,7 +163,6 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
   }
 
   Future<void> updateItemQuantity(int productId, int change) async {
-    log('Notifier: Updating quantity for product $productId by $change');
     final currentQuantity = _localCart.countProductInCart(productId);
     final newQuantity = currentQuantity! + change;
 

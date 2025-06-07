@@ -126,11 +126,10 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
               case '/':
                 return customPageRoute(RegistrationScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar));//customPageRoute( RegistrationScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/CheckCodeScreen':
-                _sparkleKey.currentState?.stopAnimations();
+                // _sparkleKey.currentState?.stopAnimations();
                 return customPageRoute(CheckCodeScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/HomePage':
                 _toggleBottomNavigationBar(true);
-                // isBottomNavVisible=true;
                 return customPageRoute( const HomePage());
               case '/EventsOnlineOffline':
                 return customPageRoute(const EventsOnlineOffline());
@@ -199,6 +198,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar> wit
                 final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute( MyEventsWebinarsScreens(
                   courseName: args['courseName'],
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
                 ),
                 );
               case '/Orders':

@@ -21,7 +21,6 @@ dependencies:
   flutter_screenutil: ^5.9.3
   shared_preferences: ^2.3.4
   model_viewer_plus: ^1.9.1
-  chewie: ^1.8.5
   video_player: ^2.9.2
   retrofit: ^4.4.0
   logger: ^2.4.0
@@ -39,7 +38,11 @@ dependencies:
   modal_bottom_sheet: ^3.0.0
   lottie: ^3.3.1
   url_launcher: ^6.2.4
-
+  chewie:
+      git:
+        url: https://github.com/Garretlil/chewie.git
+        ref: master
+  hive_flutter: ^ 1.1.0
 
 dev_dependencies:
   flutter_test:
