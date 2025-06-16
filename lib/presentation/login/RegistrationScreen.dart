@@ -1,8 +1,11 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../core/Constants.dart';
 import '../loginNotifiers/RegistrationNotifier.dart';
-import 'CheckCode.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;
@@ -15,15 +18,70 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerProviderStateMixin {
   late Future<SharedPreferences> _prefsFuture;
+  bool _acceptedPolicy = false;
 
   @override
   void initState() {
     super.initState();
     _prefsFuture = SharedPreferences.getInstance();
+    _checkPolicyAccepted();
+  }
+
+  Future<void> _checkPolicyAccepted() async {
+    final prefs = await _prefsFuture;
+    bool accepted = prefs.getBool('accepted_policy') ?? false;
+    if (!accepted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {Future.delayed(const Duration(milliseconds: 800));_showPolicyDialog();});
+    } else {
+      setState(() => _acceptedPolicy = true);
+    }
+  }
+
+  Future<void> _showPolicyDialog() async {
+    if (!_acceptedPolicy) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          title: const Text('Политика конфиденциальности'),
+          content: const Text(
+            'Для продолжения регистрации вы должны принять политику конфиденциальности.',
+            style: TextStyle(color: Colors.blueGrey),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                launchUrl(
+                  Uri.parse('https://www.freeprivacypolicy.com/live/abe6746b-9054-409c-ba46-a67d4ff4d7dc'),
+                  mode: LaunchMode.inAppWebView,
+                );
+              },
+              child: const Text('Читать политику', style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                exit(0);
+              },
+              child: const Text('Отклонить', style: TextStyle(color: Colors.red)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final prefs = await _prefsFuture;
+                await prefs.setBool('accepted_policy', true);
+                setState(() => _acceptedPolicy = true);
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+              child: const Text('Принять', style: TextStyle(color: Colors.green)),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double paddingFactor = screenWidth * 0.06;
@@ -34,7 +92,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
       future: _prefsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator())); // Loading indicator
+          return const Scaffold(body: Center(child: CircularProgressIndicator.adaptive()));
         } else if (snapshot.hasError) {
           return Scaffold(body: Center(child: Text('Error: ${snapshot.error}')));
         } else {
@@ -42,7 +100,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
             create: (context) => RegistrationNotifier(context: context, vsync: this, prefs: snapshot.data!),
             child: Consumer<RegistrationNotifier>(
               builder: (context, registration, child) => Scaffold(
-                backgroundColor: Colors.transparent,
+                backgroundColor: background,
                 body: LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
@@ -50,71 +108,127 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                         constraints: BoxConstraints(minHeight: constraints.maxHeight),
                         child: IntrinsicHeight(
                           child: Stack(
-                                children: [
-                                  Positioned.fill(
-                                    child: Image.asset(
-                                      'assets/image.png',
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.fromLTRB(
-                                          paddingFactor * 1.2,
-                                          paddingFactor * 2.4,
-                                          paddingFactor, 0),
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  paddingFactor * 1.2,
+                                  paddingFactor * 2.4,
+                                  paddingFactor,
+                                  0,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Center(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Center(
-                                            child: Column(
-                                              children: [
-                                                Text(
-                                                  'AUTOGRAPH',
-                                                  style: TextStyle(
-                                                    fontSize: titleSizeFactor * 0.8,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'Inria Serif',
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  registration.prefs?.getBool('LangParams') == true ? 'Registration' : 'Регистрация',
-                                                  style: TextStyle(
-                                                    fontSize: titleSizeFactor,
-                                                    color: Colors.white,
-                                                    fontFamily: registration.prefs?.getBool('LangParams') == true ? 'Inria Serif' : 'Masvol',
-                                                  ),
-                                                ),
-                                              ],
+                                          Text(
+                                            'AUTOGRAPH',
+                                            style: TextStyle(
+                                              fontSize: titleSizeFactor * 0.8,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Inria Serif',
+                                              color: Colors.white,
                                             ),
                                           ),
-                                          SizedBox(height: spacingFactor * 2),
-                                          _buildTextField(registration.prefs?.getBool('LangParams') == true ? 'Name' : 'Имя', registration.nameController, snapshot.data!),
-                                          SizedBox(height: spacingFactor * 0.27),
-                                          _buildTextField(registration.prefs?.getBool('LangParams') == true ? 'Surname' : 'Фамилия', registration.surnameController, snapshot.data!),
-                                          SizedBox(height: spacingFactor * 0.27),
-                                          _buildTextField('Email', registration.emailController, snapshot.data!),
-                                          SizedBox(height: spacingFactor * 5),
-                                          Center(
-                                            child: InfiniteGradientButton(
-                                              onTap: () => registration.registerUser(() {
-                                                Navigator.pushNamed(context, '/CheckCodeScreen',);
-                                              }),
+                                          SizedBox(height: spacingFactor * 1),
+                                          Text(
+                                            registration.isRegistration ? 'Регистрация' : 'Вход',
+                                            style: TextStyle(
+                                              fontSize: titleSizeFactor,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.normal,
                                             ),
                                           ),
-                                          SizedBox(height: spacingFactor),
-                                          const Spacer(),
                                         ],
                                       ),
                                     ),
-                                ],
-                              ),//
+                                    SizedBox(height: spacingFactor * 0.4),
+                                    if (registration.isRegistration) ...[
+                                      _buildTextField(
+                                        registration.prefs?.getBool('LangParams') == true
+                                            ? 'Enter your name'
+                                            : 'Имя',
+                                        registration.nameController,
+                                        snapshot.data!,
+                                      ),
+                                    ],
+                                    if (registration.isRegistration) ...[
+                                      SizedBox(height: spacingFactor * 0.4),
+                                    _buildTextField(
+                                      registration.prefs?.getBool('LangParams') == true
+                                          ? 'Enter your surname'
+                                          : 'Фамилия',
+                                      registration.surnameController,
+                                      snapshot.data!,
+                                    ),
+                                    ],
+                                    SizedBox(height: spacingFactor * 0.4),
+                                    _buildTextField(
+                                      registration.prefs?.getBool('LangParams') == true ?
+                                      'Enter your Email' : 'Введите свой email',
+                                      registration.emailController,
+                                      snapshot.data!,
+                                    ),
+                                    SizedBox(height: spacingFactor * 0.4),
+                                    _buildTextField(
+                                      registration.prefs?.getBool('LangParams') == true ?
+                                      'Enter your Phone' : 'Введите свой номер телефона',
+                                      registration.phoneController,
+                                      snapshot.data!,
+                                    ),
+                                    SizedBox(height: spacingFactor * 0.4),
+                                    Center(
+                                      child: Text(
+                                        registration.isRegistration ? "Already have account?" : "Haven't account yet?",
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    SizedBox(height: spacingFactor * 0.1),
+                                    Center(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          HapticFeedback.selectionClick();
+                                          registration.switchSignMode();
+                                        },
+                                        child: Container(
+                                          width: 80,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.6),
+                                            borderRadius: BorderRadius.circular(7.0),
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              registration.isRegistration ? "Sign In!" : "Sign Up!",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.orange,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: spacingFactor * 1.7),
+                                    Center(
+                                      child: InfiniteGradientButton(
+                                        onTap: () => registration.registerUser(() {
+                                          Navigator.pushNamed(context, '/CheckCodeScreen');
+                                        }),
+                                      ),
+                                    ),
+                                    SizedBox(height: spacingFactor),
+                                    const Spacer(),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
                   },
                 ),
-                // Show SnackBar
                 bottomNavigationBar: registration.snackBarMessage != null
                     ? SnackBar(
                   content: Text(registration.snackBarMessage!),
@@ -135,20 +249,25 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
   Widget _buildTextField(String label, TextEditingController controller, SharedPreferences prefs) {
     return TextField(
       controller: controller,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
-        labelText: label,
-        labelStyle: TextStyle(color: Colors.white, fontFamily: prefs.getBool('LangParams') == true ? 'Inria Serif' : 'Masvol'),
+        hintText: label,
+        hintStyle: const TextStyle(fontSize: 15, color: Colors.white54),
         filled: true,
-        fillColor: Colors.white.withOpacity(0.3),
-        border: OutlineInputBorder(
+        fillColor: Colors.blueGrey.shade800,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 17.0),
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.0),
-          borderSide: const BorderSide(color: Colors.white, width: 5.0),
+          borderSide: BorderSide(color: Colors.blueGrey.shade800, width: 2.0),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15.0),
-          borderSide: const BorderSide(color: Colors.white, width: 1),
+          borderSide: BorderSide(color: Colors.orange.shade800, width: 2.0),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15.0),
+          borderSide: BorderSide(color: Colors.blueGrey.shade800, width: 2.0),
+        ),
       ),
     );
   }
@@ -185,7 +304,6 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
     _animation = Tween<double>(begin: 0.0, end: 1.1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.ease),
     );
-    _controller.repeat();
     setPref();
   }
 
@@ -203,53 +321,53 @@ class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
     double titleSizeFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
 
-    return GestureDetector(
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return CustomPaint(
-            painter: BorderPainter(animationValue: _animation.value),
+    return InkWell(
+      onTap: () => widget.onTap(),
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: spacingFactor * 5,
+        height: spacingFactor * 1,
+        alignment: Alignment.center,
+        decoration:  BoxDecoration(
+          gradient: LinearGradient(colors: [Colors.orange.shade700,Colors.red.shade700]),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(15),
+            bottomRight: Radius.circular(15),
+            topRight: Radius.circular(15),
+            bottomLeft: Radius.circular(15),
+          ),
+        ),
+        child: InkWell(
+          onTap: () {
+            widget.onTap();
+          },
+          child: Ink(
+            decoration: const BoxDecoration(
+                borderRadius:   BorderRadius.only(
+                  topLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                  topRight: Radius.circular(15),
+                  bottomLeft: Radius.circular(15),
+                ),
+                gradient: LinearGradient(colors: [Colors.orange,Colors.red]),
+                boxShadow:  [BoxShadow(color: Colors.orange)]
+            ),
             child: Container(
-              width: spacingFactor * 3.7,
-              height: spacingFactor * 0.9,
+              width: spacingFactor * 5,
+              height: spacingFactor * 1,
               alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: InkWell(
-                onTap: () {
-                  widget.onTap();
-                },
-                borderRadius: BorderRadius.circular(20),
-                child: Ink(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.transparent,
-                  ),
-                  child: Container(
-                    width: spacingFactor * 3.7,
-                    height: spacingFactor * 0.9,
-                    alignment: Alignment.center,
-                    child:Text(
-                      prefs?.getBool('LangParams') == true
-                          ? 'Continue'
-                          : 'Продолжить',
-                      style: TextStyle(
-                        fontSize: titleSizeFactor,
-                        color: Colors.white,
-                        fontFamily:
-                        prefs?.getBool('LangParams') == true
-                            ? 'Inria Serif'
-                            : 'ChUR',
-                      ),
-                    ),
-                  ),
+              child:Text(
+                prefs?.getBool('LangParams') == true
+                    ? 'Continue'
+                    : 'Продолжить',
+                style: TextStyle(
+                  fontSize: titleSizeFactor*0.9,
+                  color: Colors.white,
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -264,7 +382,7 @@ class BorderPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
       ..shader = LinearGradient(
-        colors: const [Colors.white, Colors.white, Colors.white],
+        colors: const [Colors.orange, Colors.orange, Colors.orange],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         stops: [animationValue - 0.1, animationValue, animationValue + 0.1],
@@ -273,11 +391,11 @@ class BorderPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    final RRect rrect = RRect.fromRectAndRadius(
+    final RRect rRect = RRect.fromRectAndRadius(
       Rect.fromLTWH(0, 0, size.width, size.height),
       const Radius.circular(15),
     );
-    canvas.drawRRect(rrect, paint);
+    canvas.drawRRect(rRect, paint);
   }
 
   @override
@@ -285,4 +403,3 @@ class BorderPainter extends CustomPainter {
     return oldDelegate.animationValue != animationValue;
   }
 }
-

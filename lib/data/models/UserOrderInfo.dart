@@ -1,5 +1,5 @@
 
-import '../../presentation/cdek_screen_integration/SdekWindowNotifier.dart';
+import '../../presentation/CDEK_integration/SdekWindowNotifier.dart';
 
 class UserOrderInfo {
   static final UserOrderInfo instance = UserOrderInfo._internal();

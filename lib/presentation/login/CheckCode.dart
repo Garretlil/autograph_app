@@ -121,11 +121,9 @@ class OtpInputFields extends StatefulWidget {
 }
 
 class _OtpInputFieldsState extends State<OtpInputFields> with SingleTickerProviderStateMixin{
-  //SharedPreferences? prefs;
   late Future<SharedPreferences> _prefsFuture;
 
   Future<void> setPref() async {
-    //prefs = await SharedPreferences.getInstance();
     setState(() {});
   }
 
@@ -149,7 +147,7 @@ class _OtpInputFieldsState extends State<OtpInputFields> with SingleTickerProvid
     {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Scaffold(body: Center(
-            child: CircularProgressIndicator()));
+            child: CircularProgressIndicator.adaptive()));
       } else if (snapshot.hasError) {
         return Scaffold(body: Center(child: Text('Error: ${snapshot.error}')));
       } else {

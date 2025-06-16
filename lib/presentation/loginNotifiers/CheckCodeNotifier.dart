@@ -48,7 +48,7 @@ class CheckCodeNotifier extends ChangeNotifier{
   Dio createInsecureDio() {
     final dio = Dio();
 
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+    (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
         (client) {
       client.badCertificateCallback = (cert, host, port) => true;
       return client;
@@ -77,6 +77,7 @@ class CheckCodeNotifier extends ChangeNotifier{
         prefs?.setString('session_key', response.session_key);
         print(prefs?.getString('session_key'));
         navigateToNextScreen(mounted);
+        await prefs?.setBool('isLoggedIn', true);
         for (var controller in controllers) {
           controller.clear();
         }

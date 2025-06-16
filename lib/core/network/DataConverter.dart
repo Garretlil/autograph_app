@@ -78,6 +78,22 @@ class CreateOrderResponse {
 
   Map<String, dynamic> toJson() => _$CreateOrderResponseToJson(this);
 }
+@JsonSerializable()
+class CreateOrderProductResponse {
+  final String message;
+  @JsonKey(name: 'order_id')
+  final int orderId;
+
+  CreateOrderProductResponse({
+    required this.message,
+    required this.orderId,
+  });
+
+  factory CreateOrderProductResponse.fromJson(Map<String, dynamic> json) =>
+      _$CreateOrderProductResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CreateOrderProductResponseToJson(this);
+}
 
 @JsonSerializable()
 class MeResponse {
@@ -241,18 +257,6 @@ class Course {
 
   Map<String, dynamic> toJson() => _$CourseToJson(this);
 }
-
-// @JsonSerializable()
-// class CourseResponse {
-//   final List<Course> courses;
-//
-//   CourseResponse({required this.courses});
-//
-//   factory CourseResponse.fromJson(List<dynamic> json) =>
-//   _$CourseResponseFromJson({'courses': json});
-//
-//   Map<String, dynamic> toJson() => _$CourseResponseToJson(this);
-// }
 
 @JsonSerializable()
 class WebinarResponse {

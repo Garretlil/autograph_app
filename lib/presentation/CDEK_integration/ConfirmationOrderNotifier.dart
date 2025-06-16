@@ -1,6 +1,5 @@
 import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer';
 import '../../core/network/CdekApi.dart';
 import '../../core/network/CdekAuth.dart';
 import '../../core/services/local_cart_products.dart';
@@ -167,7 +166,6 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     final newQuantity = currentQuantity! + change;
 
     if (newQuantity <= 0) {
-      //await removeItem(productId);
     } else {
       if (change > 0) {
         _localCart.addProductToCart(productId);
@@ -179,14 +177,9 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
   }
 
   Future<void> removeItem(int productId) async {
-    //_localCart.removeAllInstancesOfProduct(productId);
     await recalculateCosts();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
 
   Future<bool> placeOrder( ) async {
     _isLoading = true;
@@ -208,12 +201,11 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
           'quantity': quantity,
         };
       }).toList();
-      final backendResponse = await _cdekApi.sendOrderToServer(
-        userId: _userData.id.toString(),
-        pointCode: _userData.pointData.code,
+      final backendResponse = await _cdekApi.createCdekOrder(
+
+        point: _userData.pointData.code,
         items: orderItems,
-        deliveryCost: _deliveryCost ?? 0,
-        totalCost: _totalCost ?? 0,
+
       );
       final trackingNumber =backendResponse;
 

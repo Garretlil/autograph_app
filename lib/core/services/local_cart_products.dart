@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:autograph_app/data/models/product.dart';
 

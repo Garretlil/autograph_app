@@ -34,11 +34,6 @@ class _CartEvents extends State<CartEvents> {
 
   Dio createInsecureDio() {
     final dio = Dio();
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    };
     return dio;
   }
 
@@ -302,7 +297,6 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     }
     setState(() {});
   }
-  //bool isPaymentV=false;
   Map<String, dynamic> getPurchasedIndexes() {
     final webinarIds = PurchasedCourses.instance.getPurchasedIndexes();
     return {
@@ -319,7 +313,6 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
     await showModalBottomSheet(
       context: context,
       isScrollControlled: false,
-      //backgroundColor: Colors.transparent,
       builder: (context) => SbpModalBottomSheetWidget(informations, url),
     );
 
@@ -330,7 +323,7 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
   Dio createInsecureDio() {
     final dio = Dio();
 
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+    (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
         (client) {
       client.badCertificateCallback = (cert, host, port) => true;
       return client;
@@ -371,9 +364,11 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                   prefs.getString('session_key').toString(),
                     response.orderId.toString()
                 );
-                if(payResponse.message=='Product order payment processed successfully'){
+                print(payResponse.message);
+                if(payResponse.message=='Webinar order payment processed successfully'){
                   PurchasedCourses.instance.ids.add(response.orderId);
                 }
+                print(PurchasedCourses.instance.ids);
               },
               borderRadius: BorderRadius.circular(20),
               splashColor: Colors.black.withOpacity(0.1),
@@ -393,7 +388,6 @@ class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with Si
                   width: spacingFactorW*4.4,
                   height: spacingFactor*0.95,
                   alignment: Alignment.center,
-                  //padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child:  Text(
                     'PAY',
                     style: TextStyle(
@@ -454,10 +448,6 @@ class _SbpHeaderModalSheet extends State<SbpHeaderModalSheet> {
               color: Colors.white),
         ),
          SizedBox(height: spacingFactor*0.5),
-        // Image.asset(
-        //   'assets/sbp.png',
-        //   width: 130,
-        // ),
         if (widget.informations.isNotEmpty)
           Text(prefs?.getBool('LangParams') == true
               ? "Choose a bank"

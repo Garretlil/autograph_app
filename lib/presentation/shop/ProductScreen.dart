@@ -108,7 +108,6 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     clipBehavior: Clip.hardEdge,
                     child: ModelViewer(
                       backgroundColor: Colors.grey.withOpacity(0.5),
-                      //src: 'assets/prep16.glb',//baseUrlFinal + currentProduct.model_url!,
                       src: '$baseUrlFinal/static${currentProduct.model_url!}',
                       alt: '',
                       ar: false,

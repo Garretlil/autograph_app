@@ -59,7 +59,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
   void _onSearchChanged() {
     if (mounted) {
       setState(() {
-        // _searchQuery = _searchController.text.toLowerCase();
       });
     }
   }
@@ -76,7 +75,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (isSelected) ...[
-              //const Icon(Icons.wb_auto, size: 18, color: Colors.orange),
               const SizedBox(width: 4),
             ],
             Text(category),
@@ -92,7 +90,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double paddingFactor = screenWidth * 0.06;
     double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
 
@@ -265,7 +262,6 @@ class _CardCatalogState extends State<_CardCatalog> {
     double descriptionSizeFactor = screenWidth * 0.06;
 
     final productTitle = product.name ?? 'Название будет попозже(';
-    final productDescription = product.description ?? 'Описание будет попозже(';
     final productPrice = product.price ?? 0;
 
     return GestureDetector(
@@ -309,7 +305,6 @@ class _CardCatalogState extends State<_CardCatalog> {
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                //child: Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,),
                 child: Image.network(
                   '$baseUrlFinal/static${product.photo_url!}',
                   fit: BoxFit.cover,
@@ -489,7 +484,6 @@ class _AnimatedGridItem extends StatefulWidget {
   final bool isReadyToAnimate;
 
   const _AnimatedGridItem({
-    super.key,
     required this.child,
     required this.delay,
     required this.duration,
@@ -538,7 +532,6 @@ class _AnimatedGridItemState extends State<_AnimatedGridItem>
       curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
     ));
 
-    // Added blur animation with a different interval
     _blurAnimation = Tween<double>(
       begin: 10.0,
       end: 0.0,

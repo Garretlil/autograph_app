@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
-import '../../ScreensWithNavigationBar.dart';
 import '../../core/services/MetroStation.dart';
 import 'SdekWindowNotifier.dart';
 import 'createOrderScreen.dart';
@@ -137,7 +136,7 @@ class _CDEKWindowState extends State<CDEKWindow> {
                             Expanded(
                               child: Text(
                                 pointData.workTime,
-                                style: TextStyle(fontSize: 14),
+                                style: const TextStyle(fontSize: 14),
                               ),
                             ),
                           ],
@@ -402,7 +401,6 @@ class _BottomSheetDemoState extends State<BottomSheetDemo> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon container with gradient
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -482,7 +480,7 @@ class CustomDrawer extends StatefulWidget {
     this.minHeight = 0.0,
     this.maxHeight = 0.90,
     this.animationDuration =
-    const Duration(milliseconds: 300), // Faster animation
+    const Duration(milliseconds: 300),
     this.backgroundColor = Colors.white,
     this.barrierColor = Colors.black54,
   });
@@ -512,7 +510,6 @@ class _CustomDrawerState extends State<CustomDrawer>
 
     widget.controller?.attach(_controller);
 
-    // Enhanced easing curve for smoother animation
     const Curve curve = Curves.easeInOutCubic;
 
     _drawerAnimation = Tween<double>(
@@ -520,28 +517,24 @@ class _CustomDrawerState extends State<CustomDrawer>
       end: 1.0,
     ).animate(CurvedAnimation(parent: _controller, curve: curve));
 
-    // Increased scale effect for better depth perception
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.85, // More pronounced scale effect
+      end: 0.85,
     ).animate(CurvedAnimation(parent: _controller, curve: curve));
 
-    // Enhanced slide effect
     _slideAnimation = Tween<double>(
       begin: 0.0,
-      end: 24.0, // More pronounced slide
+      end: 24.0,
     ).animate(CurvedAnimation(parent: _controller, curve: curve));
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      // Calculate maxDrawerHeight based on parent width
       final maxDrawerHeight = constraints.maxHeight * widget.maxHeight;
 
       return Stack(
         children: [
-          // Main content with enhanced scale, slide and border radius animations
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
@@ -550,7 +543,6 @@ class _CustomDrawerState extends State<CustomDrawer>
                 child: Transform.translate(
                   offset: Offset(0, -_slideAnimation.value),
                   child: ClipRRect(
-                    // Animate border radius based on drawer animation
                     borderRadius: BorderRadius.vertical(
                       top: Radius.circular(_drawerAnimation.value * 16.0),
                     ),
@@ -561,7 +553,6 @@ class _CustomDrawerState extends State<CustomDrawer>
             },
           ),
 
-          // Enhanced barrier with fade animation
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
@@ -578,7 +569,6 @@ class _CustomDrawerState extends State<CustomDrawer>
             },
           ),
 
-          // Enhanced drawer with improved handle and shadow
           AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
@@ -612,9 +602,8 @@ class _CustomDrawerState extends State<CustomDrawer>
                       ),
                       child: Column(
                         children: [
-                          // Enhanced drag handle
                           Container(
-                            height: 24, // Reduced height
+                            height: 24,
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             alignment: Alignment.center,
                             child: Container(
@@ -643,7 +632,6 @@ class _CustomDrawerState extends State<CustomDrawer>
     });
   }
 
-  // Drag handlers remain the same as in your original code
   void _handleDragStart(DragStartDetails details) {
     _isDragging = true;
     _dragStartPoint = details.globalPosition.dy;
@@ -665,13 +653,10 @@ class _CustomDrawerState extends State<CustomDrawer>
     final velocity = details.primaryVelocity ?? 0;
 
     if (velocity > 0) {
-      // Dragging down
       _controller.reverse();
     } else if (velocity < 0) {
-      // Dragging up
       _controller.forward();
     } else {
-      // No velocity - snap to nearest end
       if (_controller.value > 0.5) {
         _controller.forward();
       } else {

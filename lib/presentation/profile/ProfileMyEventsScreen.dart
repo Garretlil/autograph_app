@@ -30,7 +30,6 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
     final paddingFactor = screenWidth * 0.06;
-    final spacingFactor = screenHeight * 0.06;
     final titleSizeFactor = screenWidth * 0.06;
     final nameEntries = PurchasedCourses.instance.namePurchasedCourses.entries.toList();
 

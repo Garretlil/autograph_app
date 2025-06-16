@@ -1,9 +1,7 @@
+import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/network/DataConverter.dart';
 import '../../core/network/network_layer.dart';
 import '../../core/services/user_service.dart';
 import '../../data/repositories/UserRepository.dart';
@@ -13,10 +11,18 @@ class RegistrationNotifier extends ChangeNotifier {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController surnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController=TextEditingController();
   late final AnimationController fadeController;
   late final Animation<double> fadeAnimation;
   final BuildContext context;
   String? _snackBarMessage;
+  bool isRegistration=true;
+  bool isPolicyAccepted = false;
+
+  void acceptPolicy() {
+    isPolicyAccepted = true;
+    notifyListeners();
+  }
 
   String? get snackBarMessage => _snackBarMessage;
 
@@ -31,62 +37,74 @@ class RegistrationNotifier extends ChangeNotifier {
   }
   Dio createInsecureDio() {
     final dio = Dio();
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    };
     return dio;
+  }
+  void switchSignMode(){
+    isRegistration=!isRegistration;
+    notifyListeners();
   }
 
   Future<void> registerUser(Function() onSuccess) async {
-    nameController.text='Houston';
-    surnameController.text='Cooper';
-    emailController.text='ed763136@gmail.com';
-    prefs?.setString('email', emailController.text);
-    if (nameController.text.isEmpty || surnameController.text.isEmpty || emailController.text.isEmpty) {
-      _snackBarMessage = prefs?.getBool('LangParams') == true ? 'Please fill all fields' : 'Заполните все поля';
+    final isReg = isRegistration;
+
+    if (isReg) {
+      nameController.text = 'Houston';
+      surnameController.text = 'Cooper';
+      emailController.text = 'ed763136@gmail.com';
+      phoneController.text='+79168273103';
+    }
+
+    final name = nameController.text;
+    final surname = surnameController.text;
+    final email = emailController.text;
+    final phone=phoneController.text;
+
+    if ((isReg && (name.isEmpty || surname.isEmpty || email.isEmpty)) ||
+        (!isReg && (surname.isEmpty || email.isEmpty))) {
+      _snackBarMessage = prefs?.getBool('LangParams') == true
+          ? 'Please fill all fields'
+          : 'Заполните все поля';
       notifyListeners();
       return;
     }
+
     try {
-      Map<String, dynamic> registrationData = {
-        'name': nameController.text,
-        'surname': surnameController.text,
-        'email': emailController.text,
-        'phone' : '89168273104'
+      final Map<String, dynamic> requestData = {
+        'surname': surname,
+        'email': email,
+        'phone' : phone
       };
-      // final apiService = Provider.of<AuthService>(context, listen: false);
-      // RegisterResponse response = await apiService.registerUser(registrationData);
+
+      if (isReg) {
+        requestData['name'] = name;
+      }
+
       final dio = createInsecureDio();
-      final client= AuthService(dio);
-      RegisterResponse response = await client.registerUser(registrationData);
-      fadeController.forward().then((_) {
-        onSuccess();
-      });
-      print(response.message);
+      final client = AuthService(dio);
+
+      if (isReg) {
+        RegisterResponse regResponse=await client.registerUser(requestData);
+        print(regResponse.message);
+      } else {
+        await client.loginUser(requestData);
+      }
+
+      fadeController.forward().then((_) => onSuccess());
+
       final userRepository = UserRepositoryImpl();
-      UserData.instance.name=registrationData['name'];
-      UserData.instance.surname=registrationData['surname'];
-      UserData.instance.email=registrationData['email'];
+      if (isReg) {
+        UserData.instance.name = name;
+      }
+      UserData.instance.surname = surname;
+      UserData.instance.email = email;
       userRepository.saveUserData(UserData.instance);
 
     } catch (e) {
-      Map<String, dynamic> registrationData = {
-        'name': nameController.text,
-        'surname': surnameController.text,
-        'email': emailController.text,
-      };
-      _snackBarMessage = prefs?.getBool('LangParams') == true ? 'Registration failed, try again' : 'Ошибка регистрации';
-      fadeController.forward();
-      fadeController.forward().then((_) {
-        onSuccess();
-      });
-      final userRepository = UserRepositoryImpl();
-      UserData.instance.name=registrationData['name'];
-      UserData.instance.surname=registrationData['surname'];
-      UserData.instance.email=registrationData['email'];
-      userRepository.saveUserData(UserData.instance);
+      _snackBarMessage = prefs?.getBool('LangParams') == true
+          ? (isReg ? 'Registration failed, try again' : 'Login failed, try again')
+          : (isReg ? 'Ошибка регистрации' : 'Ошибка входа');
+      fadeController.forward().then((_) => onSuccess());
+
       notifyListeners();
     }
   }

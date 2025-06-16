@@ -1,10 +1,11 @@
 import 'package:autograph_app/core/network/network_layer.dart';
 import 'package:autograph_app/data/models/product.dart';
-import 'package:autograph_app/presentation/cdek_screen_integration/ConfirmationOrderNotifier.dart';
+import 'package:autograph_app/presentation/CDEK_integration/ConfirmationOrderNotifier.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreensWithNavigationBar.dart';
 import 'core/Animation_manager.dart';
 import 'data/models/course.dart';
@@ -17,6 +18,9 @@ Future<void> main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  final tabNotifier = ValueNotifier<int>(0);
 
   runApp(
       MultiProvider(
@@ -33,19 +37,21 @@ Future<void> main() async {
               }
           )
         ],
-        child: const MyApp(),
+        child:  MyApp(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier),
       )
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  final ValueNotifier<int> tabNotifier;
+  const MyApp({super.key,required this.isLoggedIn,required this.tabNotifier,});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: const ScreensWithNavigationBar(),
+        home:  ScreensWithNavigationBar(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier,),
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.black,
         colorScheme: ColorScheme.fromSeed(

@@ -1,8 +1,7 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../core/services/local_cart_video.dart';
 import '../../../data/models/course.dart';
 
@@ -144,38 +143,38 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                             inactiveThumbColor: Colors.white54,
                             inactiveTrackColor: Colors.grey,
                             value: item['isOn'] ?? false,
-                            onChanged: (value) => _handleSwitchChange(index, value),
+                            onChanged: (value) => {HapticFeedback.lightImpact(),_handleSwitchChange(index, value)},
                           ),
                         ),
                       );
                     },
                   ),
                 ),
-                // Padding(
-                //   padding: EdgeInsets.only(
-                //     left: paddingFactor,
-                //     bottom: paddingFactor * 3.6,
-                //     top: paddingFactor * 0.2,
-                //   ),
-                //   child: Align(
-                //     alignment: Alignment.centerLeft,
-                //     child: ShaderMask(
-                //       shaderCallback: (bounds) => createGradient(bounds),
-                //       child: Text(
-                //         prefs?.getBool('LangParams') == true
-                //             ? 'TOTAL: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)}\$'
-                //             : 'Сумма: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)}\$',
-                //         style: TextStyle(
-                //           fontSize: titleSizeFactor * 1.05,
-                //           color: Colors.white,
-                //           fontFamily: prefs?.getBool('LangParams') == true
-                //               ? 'Inria Serif'
-                //               : 'ChUR',
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: paddingFactor,
+                    bottom: paddingFactor * 3.6,
+                    top: paddingFactor * 0.2,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => createGradient(bounds),
+                      child: Text(
+                        prefs?.getBool('LangParams') == true
+                            ? 'TOTAL: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)}\$'
+                            : 'Сумма: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)}\$',
+                        style: TextStyle(
+                          fontSize: titleSizeFactor * 1.05,
+                          color: Colors.white,
+                          fontFamily: prefs?.getBool('LangParams') == true
+                              ? 'Inria Serif'
+                              : 'ChUR',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           )

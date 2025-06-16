@@ -84,8 +84,7 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
                     minHeight: constraints.maxHeight,
                   ),
                   child: IntrinsicHeight(
-                    child: Stack(
-                      children: [
+                    child:
                         Padding(
                           padding: EdgeInsets.fromLTRB(
                             paddingFactor * 0.4,
@@ -119,16 +118,12 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
                                           ctx, '/EventsOnlineOffline',
                                         )
                                     ),
-                                    SizedBox(height: spacingFactor * 0.01),
-                                    SizedBox(height: spacingFactor * 0.01),
-                                    //const ThemeShowcaseCard(isDarkMode: false),
+                                    SizedBox(height: spacingFactor * 0.02),
                                   ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
                     ),
                   ),
                 ),
@@ -203,9 +198,7 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
               ),
               child: Container(
                 child: Column(
-                  //mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Header with icon
                     Container(
                       decoration: BoxDecoration(
                         color: widget.isDarkMode

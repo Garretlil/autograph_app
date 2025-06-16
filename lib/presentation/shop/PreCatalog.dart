@@ -1,8 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../home/HomePage.dart';
 
 class PreCatalogScreen extends StatefulWidget {
@@ -30,7 +28,6 @@ class _PreCatalogState extends State<PreCatalogScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;

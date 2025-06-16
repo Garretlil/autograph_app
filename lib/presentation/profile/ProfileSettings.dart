@@ -6,7 +6,8 @@ import '../../core/services/user_service.dart';
 
 
 class ProfileSettingsScreen extends StatefulWidget {
-  const ProfileSettingsScreen({super.key});
+  final ValueNotifier<int> tabNotifier;
+  const ProfileSettingsScreen({super.key,required this.tabNotifier});
 
   @override
   State<ProfileSettingsScreen> createState() => _ProfileSettingsScreenState();
@@ -15,15 +16,15 @@ class ProfileSettingsScreen extends StatefulWidget {
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   bool isEnglish = true;
   late SharedPreferences prefs;
+  bool prefsLoaded = false;
+
   Future<void> setPref() async {
     prefs = await SharedPreferences.getInstance();
-    if(prefs.getBool('LangParams')==true){
-      isEnglish=true;
-    }
-    else{
-      isEnglish=false;
-    }
+    setState(() {
+      prefsLoaded = true;
+    });
   }
+
   @override
   void initState() {
     super.initState();
@@ -35,88 +36,97 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
     double spacingFactorW=screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
-      appBar: PreferredSize(
-        preferredSize: Size(screenWidth, kToolbarHeight - 20),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-            child: AppBar(
-              forceMaterialTransparency: true,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'AUTOGRAPH',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
-                    ),
+    if (!prefsLoaded) {
+      return const Center(child: CircularProgressIndicator.adaptive());
+    }
+    else {
+      return Scaffold(
+          extendBodyBehindAppBar: true,
+          backgroundColor: Colors.transparent,
+          appBar: PreferredSize(
+            preferredSize: Size(screenWidth, kToolbarHeight - 20),
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                child: AppBar(
+                  forceMaterialTransparency: true,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new_outlined),
+                    color: Colors.white,
+                    onPressed: () => Navigator.of(context).pop(),
                   ),
-                ],
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'AUTOGRAPH',
+                        style: TextStyle(
+                          fontSize: titleSizeFactor * 0.85,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inria Serif',
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  centerTitle: true,
+                ),
               ),
-              centerTitle: true,
             ),
           ),
-        ),
-      ),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/image.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07,vertical: screenHeight*0.15),
-          child: Column(
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/image.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07,
+                    vertical: screenHeight * 0.15),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildInfoSection("PERSONAL INFORMATION:", ""),
-                    SizedBox(height: spacingFactor*0.3),
+                    SizedBox(height: spacingFactor * 0.1),
                     _buildInfoSection("NAME:", UserData.instance.name),
-                    SizedBox(height: spacingFactor*0.3),
+                    const Divider(),
+                    SizedBox(height: spacingFactor * 0.1),
                     _buildInfoSection("SURNAME:", UserData.instance.surname),
-                    SizedBox(height: spacingFactor*0.3),
-                    _buildInfoSection("PHONE NUMBER:", UserData.instance.phoneNumber),
-                    SizedBox(height: spacingFactor*0.3),
+                    const Divider(),
+                    SizedBox(height: spacingFactor * 0.1),
+                    _buildInfoSection(
+                        "PHONE NUMBER:", UserData.instance.phoneNumber),
+                    const Divider(),
+                    SizedBox(height: spacingFactor * 0.1),
                     _buildInfoSection("EMAIL:", UserData.instance.email),
-                    SizedBox(height:spacingFactor*0.3),
+                    const Divider(),
+                    SizedBox(height: spacingFactor * 0.1),
                     _buildInfoSection("COUNTRY:", UserData.instance.country),
-                    SizedBox(height: spacingFactor*0.5),
+                    const Divider(),
+                    SizedBox(height: spacingFactor * 0.5),
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildLanguageOption("RUS", !isEnglish),
-                           SizedBox(width: spacingFactorW*0.5),
-                           Text(
+                          SizedBox(width: spacingFactorW * 0.5),
+                          Text(
                             "|",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: subtitleSizeFactor,
                             ),
                           ),
-                          SizedBox(width: spacingFactorW*0.5),
+                          SizedBox(width: spacingFactorW * 0.5),
                           _buildLanguageOption("ENG", isEnglish),
                         ],
                       ),
@@ -128,17 +138,73 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                         children: [
                           Text('Telegram'),
                           SizedBox(width: 5,),
-                          Icon(Icons.telegram,color: Colors.blue,)
+                          Icon(Icons.telegram, color: Colors.blue,)
                         ],
                       ),
                     ),
-              //SizedBox(width: spacingFactorW*0.5),
+                    SizedBox(height: spacingFactor * 0.8,),
+                    Center(
+                        child: InkWell(
+                          onTap: () {},
+                          borderRadius: BorderRadius.circular(15),
+                          child: Container(
+                            width: spacingFactor * 5,
+                            height: spacingFactor * 1,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade700,
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                                bottomLeft: Radius.circular(20),
+                              ),
+                            ),
+                            child: InkWell(
+                              onTap: ()  {
+                                 prefs.setBool('isLoggedIn', false);
+                                 prefs.setBool('accepted_policy', false);
+                                 widget.tabNotifier.value = 0;
+                              },
+                              child: Ink(
+                                decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15),
+                                      bottomRight: Radius.circular(15),
+                                      topRight: Radius.circular(15),
+                                      bottomLeft: Radius.circular(15),
+                                    ),
+                                    gradient: LinearGradient(
+                                        colors: [Colors.orange, Colors.red]),
+                                    boxShadow: [BoxShadow(color: Colors.orange)]
+                                ),
+                                child: Container(
+                                  width: spacingFactor * 5,
+                                  height: spacingFactor * 1,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    prefs.getBool('LangParams') == true
+                                        ? 'Удалить аккаунт'
+                                        : 'Delete account',
+                                    style: TextStyle(
+                                      fontSize: titleSizeFactor * 0.9,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                    )
+                    //SizedBox(width: spacingFactorW*0.5),
+                  ],
+                ),
+              )
             ],
-          ),
           )
-        ],
-      )
-    );
+      );
+    }
   }
 
   void openTelegram() async {
@@ -201,7 +267,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white70 : Colors.transparent,
+          color: isSelected ? Colors.orange : Colors.grey.shade900,
           borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

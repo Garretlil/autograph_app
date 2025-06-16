@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:autograph_app/presentation/cdek_screen_integration/CDEKWindow.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +6,7 @@ import '../../core/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
+import '../CDEK_integration/CDEKWindow.dart';
 
 class CartProductsScreen extends StatefulWidget {
   const CartProductsScreen({super.key,required this.toggleBottomNavigationBar});
@@ -247,7 +247,6 @@ class _CardCatalog extends StatefulWidget {
   final VoidCallback onQuantityChanged;
 
   const _CardCatalog({
-    super.key,
     required this.product,
     required this.screenWidth,
     required this.screenHeight,
@@ -306,7 +305,6 @@ class _CardCatalogState extends State<_CardCatalog> {
     double descriptionSizeFactor = screenWidth * 0.06;
 
     final productTitle = product.name ?? 'Название будет попозже(';
-    final productDescription = product.description ?? 'Описание будет попозже(';
     final productPrice = product.price ?? 0;
 
     return GestureDetector(
@@ -345,19 +343,15 @@ class _CardCatalogState extends State<_CardCatalog> {
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                // child: Image.asset(
-                //   product.photo_url!,
-                //   fit: BoxFit.cover,
-                // ),
                   child: Image.network(
                     '$baseUrlFinal/static${product.photo_url!}',
                     fit: BoxFit.cover,
                     loadingBuilder: (context, child, loadingProgress) {
                       if (loadingProgress == null) return child;
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator.adaptive());
                     },
                     errorBuilder: (context, error, stackTrace) {
-                      return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
+                      return const Text('Не удалось загрузить');
                     },
                   )
               ),
@@ -378,7 +372,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                     const SizedBox(height: 4),
                     const SizedBox(height: 6),
                     Text(
-                      '$productPrice \₽',
+                      '$productPrice ₽',
                       style: TextStyle(
                         color: Colors.orange,
                         fontFamily: 'Inria Serif',

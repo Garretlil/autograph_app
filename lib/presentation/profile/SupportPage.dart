@@ -35,12 +35,8 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double paddingFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
     double spacingFactorW=screenWidth * 0.06;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
 
     return Scaffold(
         extendBodyBehindAppBar: true,
@@ -98,16 +94,16 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
                   SizedBox(height: spacingFactorW),
                    Row(children:
                      [
-                       Text('autograph@dentistry.com',
+                       Text('ed763135@gmail.com',
                         style: TextStyle(fontSize: screenWidth*0.05),
                        ),
                        SizedBox(width: spacingFactorW*0.5),
                        GestureDetector(
                            onTap: ()  {
-                             Clipboard.setData(const ClipboardData(text: 'autograph@dentistry.com'));
-                             // ScaffoldMessenger.of(context).showSnackBar(
-                             //    SnackBar(content: Text('Почта скопирована в буфер обмена',style: TextStyle(fontSize: screenWidth*0.06,color: Colors.white),),backgroundColor: Colors.transparent,),
-                             // );
+                             Clipboard.setData(const ClipboardData(text: 'ed763135@gmail.com'));
+                             ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Почта скопирована в буфер обмена',style: TextStyle(fontSize: screenWidth*0.04,color: Colors.white),),backgroundColor: Colors.grey,),
+                             );
                            },
                            child:
                          const Icon(Icons.copy_outlined,color: Colors.grey,size: 20,)

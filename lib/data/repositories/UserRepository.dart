@@ -1,5 +1,4 @@
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../core/services/user_service.dart';
 
 abstract class UserRepository {

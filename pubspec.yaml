@@ -43,6 +43,7 @@ dependencies:
         url: https://github.com/Garretlil/chewie.git
         ref: master
   hive_flutter: ^ 1.1.0
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +56,10 @@ dev_dependencies:
   json_serializable: ^6.8.0
   gradient_borders: ^1.0.1
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
 
 flutter_native_splash:
   android: true

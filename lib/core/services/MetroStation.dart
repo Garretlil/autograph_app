@@ -42,10 +42,8 @@ Future<List<MetroStation>> fetchMetroStations() async {
         stations.add(MetroStation.fromJson(station, lineName, hexColor));
       }
     }
-    // for (final station in stations){
-    //   print(station.name);
-    // }
     return stations;
+
   } else {
     throw Exception('Failed to load metro stations');
   }

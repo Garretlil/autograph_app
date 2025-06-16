@@ -1,20 +1,13 @@
-import 'package:dio/io.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:autograph_app/core/network/DataConverter.dart';
+import 'package:autograph_app/core/network/network_layer.dart';
 import 'package:uuid/uuid.dart';
-import '../../presentation/cdek_screen_integration/SdekWindowNotifier.dart';
+import '../../presentation/CDEK_integration/SdekWindowNotifier.dart';
 import 'CdekAuth.dart';
 import 'package:dio/dio.dart';
 
 class CdekApi {
   Dio createInsecureDio() {
     final dio = Dio();
-
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    };
-
     return dio;
   }
 
@@ -22,7 +15,6 @@ class CdekApi {
   late final Dio _dio;
 
   CdekApi(this.auth){
-    final prefs=SharedPreferences.getInstance();
     _dio=createInsecureDio();
   }
 
@@ -37,7 +29,6 @@ class CdekApi {
       },
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
-    //print(response.data);
     if (response.statusCode == 200) {
       print('Data loaded');
       if (response.data is! List) {
@@ -75,7 +66,6 @@ class CdekApi {
       ],
       "tariff_code": 136
     };
-
     try {
       final response = await dio.post(
         'https://api.cdek.ru/v2/calculator/tariff',
@@ -88,7 +78,7 @@ class CdekApi {
         ),
       );
       return response.data['delivery_sum']?.toDouble();
-    } on DioException catch (e) {
+    } on DioException {
       return null;
     }
   }
@@ -126,65 +116,32 @@ class CdekApi {
     }
   }
   Future<bool> createCdekOrder({
-    required String orderUuid,
-    required String recipientName,
-    required String recipientPhone,
-    required DeliveryPoint point,
+    required String point,
     required List<Map<String, dynamic>> items,
-    required double length,
-    required double width,
-    required double height,
-    required double weight,
+
   }) async {
     final token = await auth.getToken();
     final dio = createInsecureDio();
-    const uuid = Uuid();
-    final orderUuid = uuid.v4();
+    final client =ProductService(dio);
 
-    final requestBody = {
-      "type": point.type=='PVZ' ? 1 : 0,
-      "number": orderUuid,
-      "recipient": {
-        "name": recipientName,
-        "phones": [
-          {"number": recipientPhone}
-        ]
-      },
-      "delivery_point": point.code,
-      "tariff_code": 136,
-      "packages": [
-        {
-          "number": "1",
-          "weight": weight.toInt(),
-          "length": length.toInt(),
-          "width": width.toInt(),
-          "height": height.toInt(),
-          "items": items,
-        }
+    final data = {
+      "delivery_point": point,
+      "comment": "test",
+      "product_items": [
+        {"product_id": 1, "quantity": 20}
       ]
     };
 
     try {
-      final response = await dio.post(
-        'https://api.cdek.ru/v2/orders',
-        data: requestBody,
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-            'Content-Type': 'application/json',
-          },
-        ),
-      );
-
-      print('СДЭК заказ создан: ${response.data}');
-      return response.statusCode == 200 || response.statusCode == 201;
-    } on DioException catch (e) {
-      print('Ошибка при создании заказа: ${e.response?.data ?? e.message}');
+      CreateOrderProductResponse response = await client.createOrder('76acb143-f0ce-42f9-89f6-884ad6af5ffa', data);
+      print('Заказ на сдек номер: ${response.message}');
+      return true;
+    } catch (e) {
+      print('Ошибка при запросе: $e');
       return false;
     }
   }
 
-//prefs?.getString('session_key')??
 }
 class DeliveryPoint {
   final String code;

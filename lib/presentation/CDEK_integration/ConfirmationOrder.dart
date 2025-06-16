@@ -21,10 +21,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final titleSizeFactor = screenWidth * 0.06;
-    final subtitleSizeFactor = screenWidth * 0.06;
-    final spacingFactor = screenHeight * 0.06;
     final productsProvider = Provider.of<Products>(context, listen: false);
     return ChangeNotifierProvider(
       create: (_) => ConfirmationOrderNotifier(productsProvider),
@@ -65,11 +62,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
           builder: (context, notifier, child) {
             if (notifier.isLoading && notifier.deliveryCost == null && notifier.error == null) {
               return Center(child:
-                  CircularProgressIndicator.adaptive(backgroundColor: Colors.grey.shade800,)
-                  // Lottie.asset(
-                    // width: 100,
-                    // height: 100,
-                    // 'assets/loadAnim.json'),
+              CircularProgressIndicator.adaptive(backgroundColor: Colors.grey.shade800,)
               );
             }
             if (notifier.error != null && notifier.deliveryCost == null) {
@@ -108,7 +101,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'КОРЗИНА'),
                   if (notifier.isLoading)
-                     Padding(
+                    Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -145,12 +138,12 @@ class ConfirmationOrderScreen extends StatelessWidget {
                     Text('Ошибка расчета: ${notifier.error}', style: const TextStyle(fontSize: 16, color: Colors.red)),
                   if (deliveryCost != null)
                     Row(children: [
-                          Icon(Icons.directions_walk,color: Colors.grey.shade800,size: screenWidth*0.05,),
-                          Text(
-                            ' Самовывоз из ПВЗ: ${deliveryCost.toStringAsFixed(0)} ₽',
-                            style: const TextStyle(fontSize: 16,color: Colors.black),
-                          ),
-                        ]
+                      Icon(Icons.directions_walk,color: Colors.grey.shade800,size: screenWidth*0.05,),
+                      Text(
+                        ' Самовывоз из ПВЗ: ${deliveryCost.toStringAsFixed(0)} ₽',
+                        style: const TextStyle(fontSize: 16,color: Colors.black),
+                      ),
+                    ]
                     ),
                   const SizedBox(height: 16),
                   const Divider(),
@@ -184,19 +177,19 @@ class ConfirmationOrderScreen extends StatelessWidget {
                   Center(
                     child: GestureDetector(
                       onTap:
-                          notifier.isLoading || totalCost == null
+                      notifier.isLoading || totalCost == null
                           ? null
                           : () async {
-                             final success= await notifier.placeOrder();
-                             if (success && context.mounted){
-                               Navigator.pushReplacementNamed(context, '/CartEvents');
-                             }
-                             else {
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                 const SnackBar(content: Text('Ошибка при оформлении заказа')),
-                               );
-                             }
-                          },
+                        final success= await notifier.placeOrder();
+                        if (success && context.mounted){
+                          Navigator.pushReplacementNamed(context, '/CartEvents');
+                        }
+                        else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Ошибка при оформлении заказа')),
+                          );
+                        }
+                      },
                       child: Opacity(
                         opacity: notifier.isLoading || totalCost == null ? 0.5 : 1.0,
                         child: Container(
@@ -322,8 +315,6 @@ class _CardCatalog extends StatelessWidget {
     final productTitle = product.name ?? 'Нет названия';
     final productDescription = product.description ?? 'Нет описания';
     final productPrice = double.tryParse(product.price ?? '0') ?? 0.0;
-    final photoUrl = product.photo_url ?? 'assets/placeholder.png';
-
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -344,10 +335,10 @@ class _CardCatalog extends StatelessWidget {
                 width: imageSize,
                 margin: EdgeInsets.only(right: paddingFactor * 0.5),
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: const [
-                      BoxShadow(color: Colors.transparent, blurRadius: 4, offset: Offset(0, 2)),
-                    ],
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [
+                    BoxShadow(color: Colors.transparent, blurRadius: 4, offset: Offset(0, 2)),
+                  ],
                 ),
                 clipBehavior: Clip.hardEdge,
                 child:Image.network(
@@ -412,44 +403,6 @@ class _CardCatalog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Container(
-                  //   decoration: BoxDecoration(
-                  //     color: Colors.orange,
-                  //     borderRadius: BorderRadius.circular(10),
-                  //   ),
-                  //   width: paddingFactor * 7,
-                  //   height: screenHeight * 0.22,
-                  //   child: Row(
-                  //     mainAxisSize: MainAxisSize.values[1],
-                  //     children: [
-                  //       IconButton(
-                  //         icon: Icon(Icons.remove, color: Colors.white, size: 22),
-                  //         onPressed: () => notifier.updateItemQuantity(product.id!, -1),
-                  //         padding: EdgeInsets.zero,
-                  //       ),
-                  //       const SizedBox(width: 1),
-                  //       Text(
-                  //         '$quantity',
-                  //         style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600,color: Colors.black),
-                  //       ),
-                  //       const SizedBox(width: 1),
-                  //       IconButton(
-                  //         icon: Icon(Icons.add, color: Colors.white, size: 22),
-                  //         onPressed: () => notifier.updateItemQuantity(product.id!, 1),
-                  //         padding: EdgeInsets.zero,
-                  //         constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 8),
-                  // IconButton(
-                  //   icon: const Icon(Icons.delete_rounded, color: Colors.red, size: 24),
-                  //   onPressed: () => notifier.removeItem(product.id!),
-                  //   tooltip: 'Удалить товар из корзины',
-                  //   padding: EdgeInsets.zero,
-                  //   constraints: const BoxConstraints(),
-                  // ),
                 ],
               )
             else

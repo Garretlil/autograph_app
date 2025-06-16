@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/user_service.dart';
-import '../../data/models/UserOrderInfo.dart';
 import '../../data/repositories/UserRepository.dart';
 import 'ConfirmationOrder.dart';
 import 'SdekWindowNotifier.dart';
@@ -37,7 +36,7 @@ class _CreateOrderState extends State<CreateOrderScreen> with SingleTickerProvid
       future: _prefsFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator())); // Loading indicator
+          return const Scaffold(body: Center(child: CircularProgressIndicator.adaptive())); // Loading indicator
         } else if (snapshot.hasError) {
           return Scaffold(body: Center(child: Text('Error: ${snapshot.error}')));
         } else {
@@ -95,8 +94,6 @@ class _CreateOrderState extends State<CreateOrderScreen> with SingleTickerProvid
                                           child: const Column(
                                             mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
-                                              //Icon(Icons.get_app_sharp,size: 25,color: Colors.white,),
-                                              //SizedBox(height: 5,),
                                               Text('Продолжить',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w500,fontSize: 22),)
                                             ],
                                           ),
@@ -129,7 +126,6 @@ class _CreateOrderState extends State<CreateOrderScreen> with SingleTickerProvid
         color: Colors.black,
         fontFamily: prefs.getBool('LangParams') == true ? 'Inria Serif' : 'Inria Serif',
       ),
-      //keyboardType: TextInputType.phone,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: Colors.black, fontFamily: prefs.getBool('LangParams') == true ? 'Inria Serif' : 'Inria Serif'),
