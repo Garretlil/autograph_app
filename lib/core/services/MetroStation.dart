@@ -24,28 +24,8 @@ class MetroStation {
 
   static Color _hexToColor(String hex) {
     hex = hex.replaceAll("#", "");
-    if (hex.length == 6) hex = "FF$hex"; // add alpha
+    if (hex.length == 6) hex = "FF$hex";
     return Color(int.parse(hex, radix: 16));
-  }
-}
-Future<List<MetroStation>> fetchMetroStations() async {
-  final response = await http.get(Uri.parse('https://api.hh.ru/metro/1'));
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    List<MetroStation> stations = [];
-
-    for (final line in data['lines']) {
-      final String lineName = line['name'];
-      final String hexColor = line['hex_color'];
-      for (final station in line['stations']) {
-        stations.add(MetroStation.fromJson(station, lineName, hexColor));
-      }
-    }
-    return stations;
-
-  } else {
-    throw Exception('Failed to load metro stations');
   }
 }
 

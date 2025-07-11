@@ -4,44 +4,27 @@ import 'dart:ui';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/network/DataConverter.dart';
+import '../../core/services/SharedP.dart';
 import 'OrderStatus.dart';
 import '../../../core/network/network_layer.dart';
 import '../../../core/services/local_cart_video.dart';
 import '../../../data/models/purchased_course.dart';
 
-class CartEvents extends StatefulWidget {
+class CartEvents extends StatelessWidget {
   final void Function(bool) toggleBottomNavigationBar;
   final void Function(bool) toggleCircleCart;
-  const CartEvents({super.key, required this.toggleBottomNavigationBar,required this.toggleCircleCart});
 
-  @override
-  State<CartEvents> createState() => _CartEvents();
-}
-
-
-class _CartEvents extends State<CartEvents> {
-  SharedPreferences? prefs;
-
-  Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    if (mounted) setState(() {});
-  }
-
-  Dio createInsecureDio() {
-    final dio = Dio();
-    return dio;
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    setPref();
-  }
+  const CartEvents({
+    super.key,
+    required this.toggleBottomNavigationBar,
+    required this.toggleCircleCart,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +49,7 @@ class _CartEvents extends State<CartEvents> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new_outlined),
                 color: Colors.white,
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.pop(context),
               ),
               title: Text(
                 'AUTOGRAPH',
@@ -90,320 +73,213 @@ class _CartEvents extends State<CartEvents> {
               fit: BoxFit.cover,
             ),
           ),
-          Column(
-            children: [
-              SizedBox(height: screenHeight * 0.13),
-              Expanded(
-                child: LocalCartVideo.instance.getCart().isEmpty
-                    ? Center(
-                  child: Text(
-                    prefs?.getBool('LangParams') == true
-                        ? 'Your cart is empty :('
-                        : 'Корзина пуста :(',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 1.05,
-                      color: Colors.white,
-                      fontFamily: prefs?.getBool('LangParams') == true
-                          ? 'Inria Serif'
-                          : 'ChUR',
-                    ),
+          Consumer<LocalCartVideo>(
+            builder: (context, cart, _) {
+              return Column(
+                children: [
+                  SizedBox(height: screenHeight * 0.13),
+                  Expanded(
+                    child: cart.isCartEmpty
+                        ? _buildEmptyCartText(titleSizeFactor)
+                        : _buildCartList(cart, context, screenWidth, spacingFactor, subtitleSizeFactor),
                   ),
-                )
-                    : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.only(bottom: spacingFactor * 6),
-                        itemCount: LocalCartVideo.instance.getSelectedCourses().length,
-                        itemBuilder: (context, index) {
-                          final courseName = LocalCartVideo.instance.getSelectedCourses()[index];
-                          final webinars = LocalCartVideo.instance.getSelectedWebinars(courseName);
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  vertical: spacingFactor * 0.1,
-                                  horizontal: screenWidth * 0.05,
+  Widget _buildEmptyCartText(double titleSizeFactor) {
+    return Center(
+      child: Text(
+        AppPrefs.prefs.getBool('LangParams') == true
+            ? 'Your cart is empty :('
+            : 'Корзина пуста :(',
+        style: TextStyle(
+          fontSize: titleSizeFactor * 1.05,
+          color: Colors.white,
+          fontFamily: AppPrefs.prefs.getBool('LangParams') == true ? 'Inria Serif' : 'ChUR',
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCartList(
+      LocalCartVideo cart,
+      BuildContext context,
+      double screenWidth,
+      double spacingFactor,
+      double subtitleSizeFactor,
+      ) {
+    final selectedCourses = cart.getSelectedCourses();
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.only(bottom: spacingFactor * 6),
+            itemCount: selectedCourses.length,
+            itemBuilder: (context, index) {
+              final courseName = selectedCourses[index];
+              final webinars = cart.getSelectedWebinars(courseName);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    children: webinars.map((webinar) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: spacingFactor * 0.1,
+                          horizontal: screenWidth * 0.06,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    cart.removeWebinarFromCourse(courseName, webinar);
+                                    toggleCircleCart(cart.isProductsInCart);
+                                  },
+                                  child: const Icon(
+                                    Icons.delete_rounded,
+                                    color: Colors.red,
+                                  ),
                                 ),
-                                child: Text(
-                                  courseName,
+                                const SizedBox(width: 10.0),
+                                Text(
+                                  webinar['title'] ?? '',
                                   style: TextStyle(
-                                    fontSize: subtitleSizeFactor,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: subtitleSizeFactor * 0.7,
+                                    fontWeight: FontWeight.normal,
                                     color: Colors.white,
                                     fontFamily: 'Inria Serif',
                                   ),
                                 ),
-                              ),
-                              Column(
-                                children: webinars.map((webinar) {
-                                  return Padding(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: spacingFactor * 0.1,
-                                      horizontal: screenWidth * 0.06,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                if (LocalCartVideo.instance.removeWebinarFromCourse(courseName, webinar)) {
-                                                  widget.toggleCircleCart(false);
-                                                }
-                                                setState(() {});
-                                              },
-                                              child: const Icon(
-                                                Icons.remove_circle_outlined,
-                                                color: Colors.red,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10.0),
-                                            Text(
-                                              webinar['word'] ?? '',
-                                              style: TextStyle(
-                                                fontSize: subtitleSizeFactor * 0.7,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.white,
-                                                fontFamily: 'Inria Serif',
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Text(
-                                          '${webinar['cost'] ?? 0}\$',
-                                          style: TextStyle(
-                                            fontSize: subtitleSizeFactor * 0.8,
-                                            color: Colors.white,
-                                            fontFamily: 'Inria Serif',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: spacingFactor,
-                        vertical: spacingFactor * 0.5,
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                prefs?.getBool('LangParams') == true
-                                    ? 'TOTAL:    '
-                                    : 'Сумма:    ',
-                                style: TextStyle(
-                                  fontSize: subtitleSizeFactor * 0.9,
-                                  color: Colors.white,
-                                  fontFamily: prefs?.getBool('LangParams') == true
-                                      ? 'Inria Serif'
-                                      : 'ChUR',
-                                ),
-                              ),
-                              Text(
-                                '${LocalCartVideo.instance.getTotalPrice()}\$',
-                                style: TextStyle(
-                                  fontSize: subtitleSizeFactor*0.9,
-                                  color: Colors.white,
-                                  fontFamily: 'Inria Serif',
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: spacingFactor * 0.5),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: spacingFactor * 2),
-                            child: GradientAnimatedButton(
-                              toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                            Text(
+                              '${webinar['cost'] ?? 0} ₽',
+                              style: TextStyle(
+                                fontSize: subtitleSizeFactor * 0.8,
+                                color: Colors.white,
+                                fontFamily: 'Inria Serif',
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        _buildTotalAndPayment(cart, spacingFactor, subtitleSizeFactor),
+      ],
+    );
+  }
+
+  Widget _buildTotalAndPayment(LocalCartVideo cart, double spacingFactor, double subtitleSizeFactor) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: spacingFactor,
+        vertical: spacingFactor * 0.5,
+      ),
+      child: Column(
+        children: [
+          SizedBox(height: spacingFactor * 0.5),
+          Padding(
+            padding: EdgeInsets.only(bottom: spacingFactor * 1.5,left: subtitleSizeFactor*8),
+            child: PaymentButton(toggleBottomNavigationBar: toggleBottomNavigationBar),
           ),
         ],
       ),
     );
   }
 }
-class GradientAnimatedButton extends StatefulWidget {
 
+class PaymentButton extends StatelessWidget {
   final void Function(bool) toggleBottomNavigationBar;
-  const GradientAnimatedButton({super.key, required this.toggleBottomNavigationBar});
 
-  @override
-  State<GradientAnimatedButton> createState() => _GradientAnimatedButtonState();
-}
-
-class _GradientAnimatedButtonState extends State<GradientAnimatedButton> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  final url = 'https://www.sberbank.com/sms/pbpn?requisiteNumber=79670999064';
-  late SharedPreferences prefs;
-  Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {});
-  }
-  @override
-  void initState() {
-    super.initState();
-    setPref();
-    getInstalledBanks();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 5),
-      vsync: this,
-    );
-
-    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-    _controller.repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-  List<C2bmemberModel> informations = [];
-
-  /// Получаем установленные банки
-  Future<void> getInstalledBanks() async {
-    try {
-      informations.addAll (await Sbp.getInstalledBanks(
-        C2bmembersModel.fromJson(c2bmembersData),
-        useAndroidLocalIcons: false,
-        useAndroidLocalNames: false,
-      ));
-    } on Exception catch (e) {
-      throw Exception(e);
-    }
-    setState(() {});
-  }
-  Map<String, dynamic> getPurchasedIndexes() {
-    final webinarIds = PurchasedCourses.instance.getPurchasedIndexes();
-    return {
-      'webinar_items': webinarIds
-          .map((id) => {'webinar_id': id})
-          .toList(),
-    };
-  }
-  Future<void> _showPaymentWidget() async {
-    setState(() {
-      widget.toggleBottomNavigationBar(false);
-    });
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: false,
-      builder: (context) => SbpModalBottomSheetWidget(informations, url),
-    );
-
-    setState(() {
-      widget.toggleBottomNavigationBar(true);
-    });
-  }
-  Dio createInsecureDio() {
-    final dio = Dio();
-
-    (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    };
-
-    return dio;
-  }
+  const PaymentButton({super.key, required this.toggleBottomNavigationBar});
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    double subtitleSizeFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
-    double spacingFactorW = screenWidth*0.06;
-    return GestureDetector(
-      onTap: () {
-      },
-      child: Material(
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final subtitleSizeFactor = screenWidth * 0.06;
+    final spacingFactor = screenHeight * 0.06;
+    final spacingFactorW = screenWidth * 0.06;
+
+    return Consumer<LocalCartVideo>(
+      builder: (context, cart, _) {
+        final bool isButtonActive = !cart.isCartEmpty && !cart.isLoading;
+
+        return GestureDetector(
+          onTap: isButtonActive
+              ? () => cart.handlePayment(
+            context: context,
+            toggleBottomNavigationBar: toggleBottomNavigationBar,
+          )
+              : null,
+          child: Material(
             color: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: BorderRadius.circular(23),
             ),
             child: InkWell(
-              onTap: () async {
-                await _showPaymentWidget();
-                PurchasedCourses.instance.addToPurchased();
-                final dio = createInsecureDio();
-                final client = CourseVideoService(dio);
-                print(prefs.getString('session_key').toString());
-                final body = getPurchasedIndexes();
-                print("Session Key: ${prefs.getString('session_key')}");
-                print("Body: ${jsonEncode(body)}");
-                CreateOrderResponse response = await client.createOrder(
-                    prefs.getString('session_key').toString(),
-                    getPurchasedIndexes());
-                PayOrderResponse payResponse = await client.payOrder(
-                  prefs.getString('session_key').toString(),
-                    response.orderId.toString()
-                );
-                print(payResponse.message);
-                if(payResponse.message=='Webinar order payment processed successfully'){
-                  PurchasedCourses.instance.ids.add(response.orderId);
-                }
-                print(PurchasedCourses.instance.ids);
-              },
-              borderRadius: BorderRadius.circular(20),
-              splashColor: Colors.black.withOpacity(0.1),
+              onTap: isButtonActive
+                  ? () => cart.handlePayment(
+                context: context,
+                toggleBottomNavigationBar: toggleBottomNavigationBar,
+              )
+                  : null,
+              borderRadius: BorderRadius.circular(23),
+              splashColor: isButtonActive ? Colors.black.withOpacity(0.1) : Colors.transparent,
               child: Ink(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  gradient: LinearGradient(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient:  const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color.lerp(Colors.grey, Colors.grey, _animation.value)!,
-                      Color.lerp(Colors.grey, Colors.grey, _animation.value)!,
-                    ],
+                    colors: [Colors.orange, Colors.orange]
                   ),
                 ),
                 child: Container(
-                  width: spacingFactorW*4.4,
-                  height: spacingFactor*0.95,
+                  width: spacingFactorW * 4.4,
+                  height: spacingFactor * 0.95,
                   alignment: Alignment.center,
-                  child:  Text(
-                    'PAY',
+                  child: cart.isLoading
+                      ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
+                  )
+                      : Text(
+                    '${LocalCartVideo.instance.getTotalPrice()} ₽',
                     style: TextStyle(
                       fontSize: subtitleSizeFactor,
                       fontFamily: 'Inria Serif',
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white.withOpacity(isButtonActive ? 1.0 : 0.4),
                     ),
                   ),
                 ),
               ),
             ),
           ),
+        );
+      },
     );
   }
 }
+
 
 class SbpHeaderModalSheet extends StatefulWidget{
   final List<C2bmemberModel> informations;

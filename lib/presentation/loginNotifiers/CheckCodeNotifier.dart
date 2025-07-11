@@ -1,36 +1,35 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/network/DataConverter.dart';
 import '../../core/network/network_layer.dart';
+import '../../core/services/SharedP.dart';
+import '../../core/utils/dialog_utils.dart';
 import '../home/HomePage.dart';
 
 class CheckCodeNotifier extends ChangeNotifier{
-  final SharedPreferences? prefs;
-  late final AnimationController fadeController;
-  late final Animation<double> fadeAnimation;
   final BuildContext context;
   final List<TextEditingController> controllers =
   List.generate(4, (index) => TextEditingController());
   final List<FocusNode> focusNodes = List.generate(4, (index) => FocusNode());
   String code = '';
   final FocusNode rawKeyboardFocusNode = FocusNode();
+  final String email;
+  final String phone;
 
-  CheckCodeNotifier({required this.context, required TickerProvider vsync, required this.prefs}) {
-    fadeController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: vsync,
-    );
-    fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: fadeController, curve: Curves.easeOut),
-    );
+  CheckCodeNotifier({
+    required this.context,
+    required TickerProvider vsync,
+    required this.phone,
+    required this.email
+  }) {
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       rawKeyboardFocusNode.requestFocus();
     });
     setNode();
   }
+
   void onKeyPress(RawKeyEvent event) {
     if (event is RawKeyDownEvent && event.logicalKey.keyLabel == 'Backspace') {
       for (int i = 0; i < controllers.length; i++) {
@@ -45,17 +44,15 @@ class CheckCodeNotifier extends ChangeNotifier{
     }
     notifyListeners();
   }
-  Dio createInsecureDio() {
-    final dio = Dio();
 
-    (dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback = (cert, host, port) => true;
-      return client;
-    };
-
-    return dio;
+  void clearNodes(){
+    for (var controller in controllers) {
+      controller.clear();
+    }
+    focusNodes[0].requestFocus();
   }
+
+  Dio createInsecureDio() => Dio();
 
   Future<void> onChanged(int index, String value,bool mounted) async {
     if (value.isNotEmpty && index < 3) {
@@ -67,30 +64,37 @@ class CheckCodeNotifier extends ChangeNotifier{
 
       try {
         final dio = createInsecureDio();
-        final client= AuthService(dio);
-        Map<String, dynamic> confirmationData = {
-          'email': 'ed763136@gmail.com',
+        final client = AuthService(dio);
+
+        final confirmationData = {
+          'email': email,
           'code': code,
         };
-        ConfirmationResponse response =
-        await client.verifyEmail(confirmationData);
-        prefs?.setString('session_key', response.session_key);
-        print(prefs?.getString('session_key'));
-        navigateToNextScreen(mounted);
-        await prefs?.setBool('isLoggedIn', true);
-        for (var controller in controllers) {
-          controller.clear();
+
+        final response = await client.verifyEmail(confirmationData);
+        clearNodes();
+         AppPrefs.prefs.setString('session_key', response.session_key);
+         AppPrefs.prefs.setBool('isLoggedIn', true);
+
+        if (mounted) {
+          navigateToNextScreen(true);
         }
 
-      } catch (error) {
-        print(error);
-        navigateToNextScreen(mounted);
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
-          color: _isDark ? Colors.black : Colors.black,
-          width: double.infinity,
-          height: double.infinity,
-        );
+      } on SocketException {
+        showErrorDialog(context, 'Нет подключения к интернету.');
+      } on DioException catch (e) {
+        if (e.response?.statusCode == 401) {
+          showErrorDialog(context, 'Неверный код подтверждения.');
+        } else if (e.response?.statusCode == 400){
+          print(e);
+          clearNodes();
+          showErrorDialog(context, '"Неправильный проверочный код, повторите попытку"');
+        } else {
+          print(e);
+          showErrorDialog(context, 'Ошибка сервера. Повторите позже.');
+        }
+      } catch (e) {
+        showErrorDialog(context, 'Неизвестная ошибка: $e');
       }
       notifyListeners();
     }
@@ -122,7 +126,6 @@ class CheckCodeNotifier extends ChangeNotifier{
       transitionDuration: const Duration(milliseconds: 500),
     );
   }
-
   final bool _isDark = false;
 
   Future<void> setNode()  async {
@@ -131,9 +134,4 @@ class CheckCodeNotifier extends ChangeNotifier{
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    fadeController.dispose();
-  }
 }

@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/Constants.dart';
+import '../../Theme/SysTheme/Constants.dart';
+import '../../core/services/SharedP.dart';
 import '../loginNotifiers/RegistrationNotifier.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -31,7 +32,10 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
     final prefs = await _prefsFuture;
     bool accepted = prefs.getBool('accepted_policy') ?? false;
     if (!accepted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {Future.delayed(const Duration(milliseconds: 800));_showPolicyDialog();});
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Future.delayed(const Duration(milliseconds: 800));_showPolicyDialog();
+        }
+      );
     } else {
       setState(() => _acceptedPolicy = true);
     }
@@ -122,16 +126,23 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                     Center(
                                       child: Column(
                                         children: [
-                                          Text(
-                                            'AUTOGRAPH',
-                                            style: TextStyle(
-                                              fontSize: titleSizeFactor * 0.8,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Inria Serif',
-                                              color: Colors.white,
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(20),
+                                                gradient: const LinearGradient(colors: [Colors.brown,Colors.brown])
+                                            ),
+                                            child: Text(
+                                              '  AUTOGRAPH  ',
+                                              style: TextStyle(
+                                                fontSize: titleSizeFactor * 0.8,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Inria Serif',
+                                                color: Colors.white,
+                                              ),
                                             ),
                                           ),
-                                          SizedBox(height: spacingFactor * 1),
+
+                                          SizedBox(height: spacingFactor * 0.5),
                                           Text(
                                             registration.isRegistration ? 'Регистрация' : 'Вход',
                                             style: TextStyle(
@@ -143,14 +154,16 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                         ],
                                       ),
                                     ),
-                                    SizedBox(height: spacingFactor * 0.4),
+                                    SizedBox(height: spacingFactor * 0.7),
                                     if (registration.isRegistration) ...[
                                       _buildTextField(
                                         registration.prefs?.getBool('LangParams') == true
                                             ? 'Enter your name'
-                                            : 'Имя',
+                                            : 'Введите свое имя',
                                         registration.nameController,
                                         snapshot.data!,
+                                        TextInputType.name,
+                                        registration.nameIsOk,
                                       ),
                                     ],
                                     if (registration.isRegistration) ...[
@@ -158,9 +171,11 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                     _buildTextField(
                                       registration.prefs?.getBool('LangParams') == true
                                           ? 'Enter your surname'
-                                          : 'Фамилия',
+                                          : 'Введите свою фамилию',
                                       registration.surnameController,
                                       snapshot.data!,
+                                      TextInputType.name,
+                                      registration.surnameIsOk
                                     ),
                                     ],
                                     SizedBox(height: spacingFactor * 0.4),
@@ -169,6 +184,8 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                       'Enter your Email' : 'Введите свой email',
                                       registration.emailController,
                                       snapshot.data!,
+                                      TextInputType.emailAddress,
+                                      registration.emailIsOk
                                     ),
                                     SizedBox(height: spacingFactor * 0.4),
                                     _buildTextField(
@@ -176,11 +193,13 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                       'Enter your Phone' : 'Введите свой номер телефона',
                                       registration.phoneController,
                                       snapshot.data!,
+                                      TextInputType.phone,
+                                      registration.phoneIsOk
                                     ),
                                     SizedBox(height: spacingFactor * 0.4),
                                     Center(
                                       child: Text(
-                                        registration.isRegistration ? "Already have account?" : "Haven't account yet?",
+                                        registration.isRegistration ? "Уже есть аккаунт?" : "Еще нет аккаунта?",
                                         style: const TextStyle(fontWeight: FontWeight.bold),
                                       ),
                                     ),
@@ -192,14 +211,14 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                           registration.switchSignMode();
                                         },
                                         child: Container(
-                                          width: 80,
+                                          width: registration.isRegistration ? screenWidth * 0.2 : screenWidth * 0.3,
                                           decoration: BoxDecoration(
                                             color: Colors.grey.withOpacity(0.6),
                                             borderRadius: BorderRadius.circular(7.0),
                                           ),
                                           child: Center(
                                             child: Text(
-                                              registration.isRegistration ? "Sign In!" : "Sign Up!",
+                                              registration.isRegistration ? "Войти" : "Регистрация",
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.orange,
@@ -211,10 +230,19 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                     ),
                                     SizedBox(height: spacingFactor * 1.7),
                                     Center(
-                                      child: InfiniteGradientButton(
+                                      child: GradientButton(
                                         onTap: () => registration.registerUser(() {
-                                          Navigator.pushNamed(context, '/CheckCodeScreen');
+                                          Navigator.pushNamed(
+                                              context, '/CheckCodeScreen',
+                                            arguments: {
+                                              'name': registration.nameController.text,
+                                              'surname': registration.surnameController.text,
+                                              'email': registration.emailController.text,
+                                              'phone': registration.phoneController.text,
+                                            },
+                                          );
                                         }),
+                                        text: 'Продолжить',
                                       ),
                                     ),
                                     SizedBox(height: spacingFactor),
@@ -246,11 +274,18 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
     );
   }
 
-  Widget _buildTextField(String label, TextEditingController controller, SharedPreferences prefs) {
+  Widget _buildTextField(String label,
+      TextEditingController controller,
+      SharedPreferences prefs,
+      TextInputType keyBoardType,
+      bool isValid,
+      ) {
     return TextField(
       controller: controller,
       style: const TextStyle(color: Colors.white),
+      keyboardType: keyBoardType,
       decoration: InputDecoration(
+        errorText: isValid ? null : 'Данные введены неправильно',
         hintText: label,
         hintStyle: const TextStyle(fontSize: 15, color: Colors.white54),
         filled: true,
@@ -274,132 +309,68 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
 }
 
 
-class InfiniteGradientButton extends StatefulWidget {
+class GradientButton extends StatefulWidget {
   final VoidCallback onTap;
+  final String text;
 
-  const InfiniteGradientButton({super.key, required this.onTap});
+  const GradientButton({super.key, required this.onTap,required this.text});
 
   @override
-  State<InfiniteGradientButton> createState() => _InfiniteGradientButtonState();
+  State<GradientButton> createState() => _GradientButtonState();
 }
 
-class _InfiniteGradientButtonState extends State<InfiniteGradientButton>
+class _GradientButtonState extends State<GradientButton>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
-  SharedPreferences? prefs;
 
-  Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {});
-  }
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 3),
-      vsync: this,
-    );
-
-    _animation = Tween<double>(begin: 0.0, end: 1.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.ease),
-    );
-    setPref();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final titleSizeFactor = screenWidth * 0.06;
+    final spacingFactor = screenHeight * 0.06;
 
-    double titleSizeFactor = screenWidth * 0.06;
-    double spacingFactor = screenHeight * 0.06;
-
-    return InkWell(
-      onTap: () => widget.onTap(),
-      borderRadius: BorderRadius.circular(15),
-      child: Container(
-        width: spacingFactor * 5,
-        height: spacingFactor * 1,
-        alignment: Alignment.center,
-        decoration:  BoxDecoration(
-          gradient: LinearGradient(colors: [Colors.orange.shade700,Colors.red.shade700]),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(15),
-            bottomRight: Radius.circular(15),
-            topRight: Radius.circular(15),
-            bottomLeft: Radius.circular(15),
-          ),
-        ),
-        child: InkWell(
-          onTap: () {
-            widget.onTap();
-          },
+    return Consumer<RegistrationNotifier>(
+      builder: (context, registration, child) {
+        final isActive = registration.buttonActive;
+        return InkWell(
+          onTap: isActive ? widget.onTap : null,
+          borderRadius: BorderRadius.circular(15),
           child: Ink(
-            decoration: const BoxDecoration(
-                borderRadius:   BorderRadius.only(
-                  topLeft: Radius.circular(15),
-                  bottomRight: Radius.circular(15),
-                  topRight: Radius.circular(15),
-                  bottomLeft: Radius.circular(15),
-                ),
-                gradient: LinearGradient(colors: [Colors.orange,Colors.red]),
-                boxShadow:  [BoxShadow(color: Colors.orange)]
+            width: spacingFactor * 5,
+            height: spacingFactor * 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: isActive
+                    ? [Colors.orange, Colors.red]
+                    : [Colors.grey, Colors.grey],
+              ),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: isActive
+                  ? const [BoxShadow(color: Colors.orange)]
+                  : [],
             ),
-            child: Container(
-              width: spacingFactor * 5,
-              height: spacingFactor * 1,
-              alignment: Alignment.center,
-              child:Text(
-                prefs?.getBool('LangParams') == true
+            child: Center(
+              child: Text(
+                AppPrefs.prefs.getBool('LangParams') == true
                     ? 'Continue'
-                    : 'Продолжить',
+                    : widget.text,
                 style: TextStyle(
-                  fontSize: titleSizeFactor*0.9,
+                  fontSize: titleSizeFactor * 0.9,
                   color: Colors.white,
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
+
 }
 
-class BorderPainter extends CustomPainter {
-  final double animationValue;
-
-  BorderPainter({required this.animationValue});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..shader = LinearGradient(
-        colors: const [Colors.orange, Colors.orange, Colors.orange],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        stops: [animationValue - 0.1, animationValue, animationValue + 0.1],
-        tileMode: TileMode.mirror,
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    final RRect rRect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      const Radius.circular(15),
-    );
-    canvas.drawRRect(rRect, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant BorderPainter oldDelegate) {
-    return oldDelegate.animationValue != animationValue;
-  }
-}

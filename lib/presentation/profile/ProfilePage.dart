@@ -40,7 +40,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW=screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-
     return Scaffold(
       body:
       Container(
@@ -161,7 +160,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-
               const Spacer(),
               SizedBox(height: spacingFactor),
             ],

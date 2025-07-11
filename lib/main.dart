@@ -3,23 +3,22 @@ import 'package:autograph_app/data/models/product.dart';
 import 'package:autograph_app/presentation/CDEK_integration/ConfirmationOrderNotifier.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreensWithNavigationBar.dart';
-import 'core/Animation_manager.dart';
+import 'core/services/SharedP.dart';
+import 'core/services/local_cart_products.dart';
+import 'core/services/local_cart_video.dart';
 import 'data/models/course.dart';
 
+
 Future<void> main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
+  await AppPrefs.init();
   await CourseWebinars.instance.init();
   final products = Products();
   await products.initialize();
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-  ]);
-  final prefs = await SharedPreferences.getInstance();
-  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+  final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
   final tabNotifier = ValueNotifier<int>(0);
 
   runApp(
@@ -28,14 +27,18 @@ Future<void> main() async {
           Provider(create: (_) => AuthService(Dio())),
           Provider(create: (_) => CourseVideoService(Dio())),
           Provider(create: (_) => ProductService(Dio())),
+          ChangeNotifierProvider.value(value: CourseWebinars.instance),
           ChangeNotifierProvider(create: (_) => products),
-          ChangeNotifierProvider(create: (_) => AnimationSyncManager()),
+          ChangeNotifierProvider(create: (_) => LocalCartVideo.instance),
           ChangeNotifierProvider(
               create: (context) {
                 final productsProvider = context.read<Products>();
                 return ConfirmationOrderNotifier(productsProvider);
               }
-          )
+          ),
+          ChangeNotifierProvider<LocalCartProducts>.value(
+            value: LocalCartProducts.instance,
+          ),
         ],
         child:  MyApp(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier),
       )

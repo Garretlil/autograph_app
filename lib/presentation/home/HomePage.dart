@@ -1,8 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/Animation_manager.dart';
+import '../../core/services/SharedP.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,10 +10,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
-  SharedPreferences? prefs;
   Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {});
+    print(AppPrefs.prefs.getString('session_key'));
   }
 
   @override
@@ -28,7 +24,6 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    context.watch<AnimationSyncManager>().controller.stop();
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
@@ -102,21 +97,23 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
                                      ThemeShowcaseCard(
                                         isDarkMode: false,
                                         isPhantoms: true,
-                                        sectionTitle: 'Phantoms',
+                                        sectionTitle: 'Фантомы',
                                         icon: Icons.shopping_bag,
-                                        description: 'The best teeth models',
-                                        nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',)
+                                        description: 'Лучшие модели зубов',
+                                        nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',),
+                                       image: 'assets/homepage2.jpg',
                                     ),
                                     SizedBox(height: spacingFactor * 0.01),
                                      ThemeShowcaseCard(
                                         isDarkMode: true,
-                                        sectionTitle: 'Events',
+                                        sectionTitle: 'Мероприятия',
                                         icon: Icons.ondemand_video,
-                                        description: 'Advanced restoration courses',
+                                        description: 'Курсы по реставрации',
                                         isPhantoms: false,
                                         nextScreen: (ctx) => Navigator.pushNamed(
-                                          ctx, '/EventsOnlineOffline',
-                                        )
+                                          ctx, '/EventsOnline',
+                                        ),
+                                         image: 'assets/homepage.jpg',
                                     ),
                                     SizedBox(height: spacingFactor * 0.02),
                                   ],
@@ -144,6 +141,7 @@ class ThemeShowcaseCard extends StatefulWidget {
   final String description;
   final bool isPhantoms;
   final void Function(BuildContext) nextScreen;
+  final String image;
 
   const ThemeShowcaseCard({
     super.key,
@@ -152,7 +150,8 @@ class ThemeShowcaseCard extends StatefulWidget {
     required this.icon,
     required this.description,
     required this.isPhantoms,
-    required this.nextScreen
+    required this.nextScreen,
+    required this.image
   });
   @override
   State<ThemeShowcaseCard> createState() => _ThemeShowcaseCard();
@@ -271,10 +270,12 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(1),
+                      padding: const EdgeInsets.only(top: 2),
                       child: Stack(
                         children: [
                           Container(
+                            height: screenHeight*0.23,
+                            width: screenWidth*0.9,
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.only(
                                   topRight: Radius.circular(22),
@@ -291,20 +292,19 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
                               ],
                             ),
                             child: ClipRRect(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
                               borderRadius: const BorderRadius.only(
                                   topRight: Radius.circular(0),
                                   topLeft: Radius.circular(0),
                                   bottomLeft: Radius.circular(20),
                                   bottomRight: Radius.circular(20)
                               ),
-                              child: Image.asset('assets/fon3.png'),
+                              child: Image.asset(widget.image),
                             ),
                           ),
-
                         ],
                       ),
                     )
-
                   ],
                 ),
               ),
@@ -312,54 +312,6 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
             )
           ),
         )
-    );
-  }
-
-  Widget _buildInfoRow(
-      BuildContext context, {
-        required IconData icon,
-        required String title,
-        required String value,
-      }) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
-            ),
-          ),
-          child: Icon(
-            icon,
-            size: 20,
-            color: widget.isDarkMode ? Colors.blue : Colors.orange,
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodySmall?.color,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

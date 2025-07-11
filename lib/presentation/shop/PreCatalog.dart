@@ -110,6 +110,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'POSTERIOR',
                           },
                         ),
+                        image:'assets/Posterior.jpg',
                       ),
                       SizedBox(height: spacingFactor * 0.01),
                       ThemeShowcaseCard(
@@ -130,6 +131,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'ANTERIOR',
                           },
                         ),
+                        image:'assets/Anterior.jpg',
                       ),
                       SizedBox(height: spacingFactor * 0.01),
                       ThemeShowcaseCard(
@@ -150,6 +152,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'НАБОРЫ',
                           },
                         ),
+                        image:'assets/homepage.jpg',
                       ),
                     ],
                   ),

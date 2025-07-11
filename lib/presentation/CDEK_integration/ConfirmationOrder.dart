@@ -1,14 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/Constants.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
-import '../../core/services/user_service.dart';
 import '../../data/models/product.dart';
 import 'ConfirmationOrderNotifier.dart';
 
 class ConfirmationOrderScreen extends StatelessWidget {
-  const ConfirmationOrderScreen({super.key});
+  final void Function(bool) toggleBottomNavigationBar;
+  const ConfirmationOrderScreen({super.key,required this.toggleBottomNavigationBar});
 
   Shader createGradient(Rect bounds) {
     return const LinearGradient(
@@ -86,18 +86,17 @@ class ConfirmationOrderScreen extends StatelessWidget {
             final deliveryCost = notifier.deliveryCost;
             final totalCost = notifier.totalCost;
             final cartItems = notifier.cartItems;
-            final userData = UserData.instance;
             return Padding(
               padding: const EdgeInsets.all(16),
               child: ListView(
                 children: [
                   const _SectionTitle(text: 'ДАННЫЕ ПОЛУЧАТЕЛЯ'),
-                  Text(userData.fullName.isEmpty ? 'Имя не указано' : userData.fullName, style: const TextStyle(fontSize: 16,color: Colors.black)),
-                  Text(userData.email.isEmpty ? 'Email не указан' : userData.email, style: const TextStyle(fontSize: 16,color: Colors.black)),
-                  Text(userData.phoneNumber.isEmpty ? 'Телефон не указан' : userData.phoneNumber, style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(notifier.loadedData.name.isEmpty ? 'Имя не указано' : '${notifier.loadedData.name} ${notifier.loadedData.surname}', style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(notifier.loadedData.email.isEmpty ? 'Email не указан' : notifier.loadedData.email, style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(notifier.loadedData.phoneNumber.isEmpty ? 'Телефон не указан' : notifier.loadedData.phoneNumber, style: const TextStyle(fontSize: 16,color: Colors.black)),
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'ПУНКТ ВЫДАЧИ'),
-                  Text(userData.pointData.description.isEmpty ? 'Пункт выдачи не выбран' : userData.pointData.description, style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(notifier.loadedData.pointData.description.isEmpty ? 'Пункт выдачи не выбран' : notifier.loadedData.pointData.description, style: const TextStyle(fontSize: 16,color: Colors.black)),
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'КОРЗИНА'),
                   if (notifier.isLoading)
@@ -180,15 +179,16 @@ class ConfirmationOrderScreen extends StatelessWidget {
                       notifier.isLoading || totalCost == null
                           ? null
                           : () async {
-                        final success= await notifier.placeOrder();
-                        if (success && context.mounted){
-                          Navigator.pushReplacementNamed(context, '/CartEvents');
-                        }
-                        else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Ошибка при оформлении заказа')),
-                          );
-                        }
+                        final success= await notifier.placeOrder(context,toggleBottomNavigationBar);
+                        Future.delayed(const Duration(milliseconds: 1000));
+                        // if (success && context.mounted){
+                        //   Navigator.pushReplacementNamed(context, '/CartEvents');
+                        // }
+                        // else {
+                        //   ScaffoldMessenger.of(context).showSnackBar(
+                        //     const SnackBar(content: Text('Ошибка при оформлении заказа')),
+                        //   );
+                        // }
                       },
                       child: Opacity(
                         opacity: notifier.isLoading || totalCost == null ? 0.5 : 1.0,
@@ -349,7 +349,12 @@ class _CardCatalog extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator.adaptive());
                   },
                   errorBuilder: (context, error, stackTrace) {
-                    return Center(child: Text('Ошибка загрузки',style: TextStyle(color: Colors.white,fontSize: titleSizeFactor*0.6),));// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
+                    return Center(
+                        child: Text(
+                          'Ошибка загрузки',
+                          style: TextStyle(color: Colors.black,fontSize: titleSizeFactor*0.8),
+                        )
+                    );// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
                   },
                 ),
               ),

@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/services/SharedP.dart';
+
 
 class CartChooseScreen extends StatefulWidget {
   const CartChooseScreen({super.key});
@@ -11,9 +13,7 @@ class CartChooseScreen extends StatefulWidget {
 }
 
 class _CartChooseScreen extends State<CartChooseScreen> {
-  SharedPreferences? prefs;
   Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
     setState(() {});
   }
   @override
@@ -74,11 +74,11 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   onTap: () {
                     Navigator.pushNamed(context, '/CartEvents');
                   },
-                  child: Text(prefs?.getBool('LangParams') == true
+                  child: Text(AppPrefs.prefs.getBool('LangParams') == true
                       ? 'Events'
                       : 'Мероприятия',
                       style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                      prefs?.getBool('LangParams') == true
+                      AppPrefs.prefs.getBool('LangParams') == true
                           ? 'Inria Serif'
                           : 'ChUR',)
                   ),
@@ -89,11 +89,11 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   onTap: () {
                     Navigator.pushNamed(context, '/CartProducts');
                   },
-                child: Text(prefs?.getBool('LangParams') == true
+                child: Text(AppPrefs.prefs.getBool('LangParams') == true
                     ? 'Products'
                     : 'Продукция',
                     style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                    prefs?.getBool('LangParams') == true
+                    AppPrefs.prefs.getBool('LangParams') == true
                         ? 'Inria Serif'
                         : 'ChUR',)
                 ),

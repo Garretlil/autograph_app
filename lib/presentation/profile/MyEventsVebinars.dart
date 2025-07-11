@@ -1,11 +1,12 @@
 import 'dart:io';
 import 'dart:ui';
+import 'package:autograph_app/core/services/SharedP.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
-import '../../core/Constants.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../data/models/purchased_course.dart';
 
 class MyEventsWebinarsScreens extends StatefulWidget {
@@ -128,7 +129,7 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                             Expanded(
                               child: VideoPlayerView(
                                 toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
-                                url: '$baseUrlFinal/video/${item[index]['id']}',
+                                url: '$baseUrlFinal/courses/video/${item[index]['id']}',
                                 thumbnailUrl: 'assets/fon2.png',
                                 dataSourceType: DataSourceType.network,
                                 duration: item[index]['duration'].toString(),
@@ -386,7 +387,7 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
       case DataSourceType.network:
         _videoPlayerController = VideoPlayerController.network(
           widget.url,
-          httpHeaders: {'x-session-key': '069648d4-835b-424d-a712-3cc0ba5d391e'},
+          httpHeaders: {'x-session-key': 'd6841575-36d1-4dda-804a-8b5c0c8206b5'},
         );
         break;
       case DataSourceType.file:

@@ -803,7 +803,7 @@ class EnhancedStarPainter extends CustomPainter {
           Paint()..shader = screenGlowGradient.createShader(screenGlowRect));
 
       final radius =
-          size.width / 2 * (1 + explosionProgress * 2.5); // Increased radius
+          size.width / 2 * (1 + explosionProgress * 2.5);
 
       canvas.drawCircle(
           center,
@@ -825,7 +825,7 @@ class EnhancedStarPainter extends CustomPainter {
             Paint()
               ..color = primaryColor.withOpacity(0.9 * (1 - explosionProgress))
               ..style = PaintingStyle.stroke
-              ..strokeWidth = 3 // Increased width
+              ..strokeWidth = 3
               ..maskFilter = MaskFilter.blur(BlurStyle.normal, blur * 1.5));
       }
 

@@ -13,6 +13,63 @@ class Catalog {
 }
 
 @JsonSerializable()
+class ProductOrderResponse {
+  final List<ProductOrders> product_orders;
+
+  ProductOrderResponse({required this.product_orders});
+
+  factory ProductOrderResponse.fromJson(Map<String, dynamic> json) =>
+      _$ProductOrderResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProductOrderResponseToJson(this);
+}
+
+@JsonSerializable()
+class ProductOrder{
+  final int? quantity;
+  final Product product;
+
+  ProductOrder({
+    required this.quantity,
+    required this.product,
+  });
+
+  factory ProductOrder.fromJson(Map<String, dynamic> json) =>
+      _$ProductOrderFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProductOrderToJson(this);
+
+}
+
+@JsonSerializable()
+class ProductOrders {
+  final String id;
+  final int user_id;
+  final String? total_cost;
+  final String? created_at;
+  final String? cdek_tracknumber;
+  final String? cdek_status;
+  final List<ProductOrder> items;
+
+  ProductOrders({
+    required this.id,
+    required this.user_id,
+    required this.items,
+    required this.total_cost,
+    required this.cdek_status,
+    required this.created_at,
+    required this.cdek_tracknumber,
+  });
+
+  factory ProductOrders.fromJson(Map<String, dynamic> json) =>
+      _$ProductOrdersFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProductOrdersToJson(this);
+}
+
+
+
+@JsonSerializable()
 class Product {
   final String? name;
   final String? description;
@@ -23,6 +80,7 @@ class Product {
   final double? width;
   final double? length;
   final double? weight;
+  final bool? available;
   final String? section;
 
   @JsonKey(name: 'subsection')
@@ -42,6 +100,7 @@ class Product {
     this.weight,
     this.section,
     this.subSection,
+    this.available,
     this.id,
   });
 
@@ -82,7 +141,7 @@ class CreateOrderResponse {
 class CreateOrderProductResponse {
   final String message;
   @JsonKey(name: 'order_id')
-  final int orderId;
+  final String orderId;
 
   CreateOrderProductResponse({
     required this.message,
@@ -105,6 +164,27 @@ class MeResponse {
   factory MeResponse.fromJson(Map<String, dynamic> json) => _$MeResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$MeResponseToJson(this);
+}
+
+@JsonSerializable()
+class DeleteAccountResponse {
+  final String message;
+
+  DeleteAccountResponse({required this.message,});
+
+  factory DeleteAccountResponse.fromJson(Map<String, dynamic> json) => _$DeleteAccountResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DeleteAccountResponseToJson(this);
+}
+@JsonSerializable()
+class PolicyAgreeResponse {
+  final String message;
+
+  PolicyAgreeResponse({required this.message,});
+
+  factory PolicyAgreeResponse.fromJson(Map<String, dynamic> json) => _$PolicyAgreeResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PolicyAgreeResponseToJson(this);
 }
 
 @JsonSerializable()
@@ -178,7 +258,7 @@ class PurchasedWebinar {
   final String? preview_url;
   final int? course_id;
   final int? duration;
-  final String? price;
+  final double price;
   final int? id;
   final String? video_url;
 
@@ -278,4 +358,77 @@ class ConfirmationResponse {
       _$ConfirmationResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ConfirmationResponseToJson(this);
+}
+class DeliveryPoint {
+  final String code;
+  final String name;
+  final String address;
+  final String nearestMetro;
+  final String workTime;
+  final double longitude;
+  final double latitude;
+  final String type;
+  final List<String> phones;
+  final List<String> images;
+
+
+  DeliveryPoint( {
+    required this.code,
+    required this.name,
+    required this.address,
+    required this.nearestMetro,
+    required this.workTime,
+    required this.longitude,
+    required this.latitude,
+    required this.type,
+    required this.phones,
+    required this.images,
+
+  });
+
+  factory DeliveryPoint.fromJson(Map<String, dynamic> json) {
+    return DeliveryPoint(
+      code: json['code'] ?? 'Неизвестный код',
+      name: json['name'] ?? 'Без названия',
+      address: json['address_comment'] ?? 'Адрес не указан',
+      nearestMetro: json['nearest_metro_station'] ?? 'Метро не указано',
+      workTime: json['work_time'] ?? 'Режим работы не указан',
+      latitude: (json['location']?['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (json['location']?['longitude'] as num?)?.toDouble() ?? 0.0,
+      type: json['type'] ?? 'Тип пвз не указан',
+      phones: (json['phones'] as List<dynamic>?)
+          ?.map((p) => p['number'].toString())
+          .toList() ?? [],
+      images: (json['office_image_list'] as List<dynamic>?)
+          ?.map((img) => img['url'].toString())
+          .toList() ?? [],
+    );
+  }
+
+}
+
+class Address {
+  final String city;
+  final String street;
+  final String house;
+
+  Address({required this.city, required this.street, required this.house});
+
+  factory Address.fromJson(Map<String, dynamic> json) {
+    return Address(
+      city: json['city'],
+      street: json['street'],
+      house: json['house'],
+    );
+  }
+}
+
+class Phone {
+  final String number;
+
+  Phone({required this.number});
+
+  factory Phone.fromJson(Map<String, dynamic> json) {
+    return Phone(number: json['number']);
+  }
 }

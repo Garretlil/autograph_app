@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/services/SharedP.dart';
+
 
 class DetailsScreenForSection extends StatefulWidget {
   final String section;
@@ -14,9 +16,9 @@ class DetailsScreenForSection extends StatefulWidget {
 }
 
 class _DetailsScreenForSection extends State<DetailsScreenForSection> {
-  SharedPreferences? prefs;
+
   Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
+
     setState(() {});
   }
   @override
@@ -97,21 +99,21 @@ class _DetailsScreenForSection extends State<DetailsScreenForSection> {
                         },
                       );
                     },
-                    child: Text(prefs?.getBool('LangParams') == true
+                    child: Text(AppPrefs.prefs.getBool('LangParams') == true
                         ? 'Webinars'
                         : 'Программа',
                         style: TextStyle(fontSize:titleSizeFactor*1.3,color:Colors.white,fontFamily:
-                        prefs?.getBool('LangParams') == true
+                        AppPrefs.prefs.getBool('LangParams') == true
                             ? 'Inria Serif'
                             : 'ChUR',)
                     ),
                   ),
-                  SizedBox(height: spacingFactor*1.9),
-                  Text(prefs?.getBool('LangParams') == true
+                  SizedBox(height: spacingFactor*3.5),
+                  Text(AppPrefs.prefs.getBool('LangParams') == true
                       ? 'TRAILER'
                       : 'Трейлер',
                       style: TextStyle(fontSize:titleSizeFactor*1.3,color:Colors.white,fontFamily:
-                      prefs?.getBool('LangParams') == true
+                      AppPrefs.prefs.getBool('LangParams') == true
                           ? 'Inria Serif'
                           : 'ChUR',)
                   ),

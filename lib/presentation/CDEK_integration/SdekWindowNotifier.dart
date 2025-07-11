@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
-
 import '../../core/network/CdekApi.dart';
 import '../../core/network/CdekAuth.dart';
+import '../../core/network/DataConverter.dart';
+import '../../core/network/MetroStationApi.dart';
 import '../../core/services/MetroStation.dart';
 import '../../core/services/gps_module.dart';
 import 'CustomClusterPainter.dart';
-
 
 class PointPlaceMark{
   final double latitude;
@@ -35,7 +35,7 @@ class CDEKWindowNotifier extends ChangeNotifier {
   static const clientSecret = 'RglJK9tAYIUUhP2Dt3NuBChjm7iESwkf';
 
   late final CdekAuth auth;
-  late final CdekApi api;
+  late final CDEKApi api;
   List<MetroStation>? stations;
 
 
@@ -47,7 +47,7 @@ class CDEKWindowNotifier extends ChangeNotifier {
 
   CDEKWindowNotifier() {
     auth = CdekAuth(clientId: clientId, clientSecret: clientSecret);
-    api = CdekApi(auth);
+    api = CDEKApi(auth);
     stations=[];
   }
 

@@ -3,9 +3,9 @@ import 'package:autograph_app/core/services/local_cart_products.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/Constants.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
+import '../../core/services/SharedP.dart';
 import '../../data/models/product.dart';
 
 class CatalogViewScreen extends StatefulWidget {
@@ -30,12 +30,10 @@ class CatalogViewScreen extends StatefulWidget {
 }
 
 class _CatalogViewScreen extends State<CatalogViewScreen> {
-  SharedPreferences? prefs;
   final TextEditingController _searchController = TextEditingController();
   String selectedCategory='';
 
   Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
     if (mounted) {
       setState(() {});
     }
@@ -95,6 +93,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
 
     return Consumer<Products>(
       builder: (context, productsData, child) {
+
         final filteredProducts = productsData.products.products
             ?.where((product) =>
         product.section!.contains(widget.section) &&
@@ -108,11 +107,12 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
             screenHeight: screenHeight,
             autoRotate: widget.autoRotate,
             disableZoom: widget.disableZoom,
-            isEnglish: prefs?.getBool('LangParams') ?? false,
+            isEnglish: AppPrefs.prefs.getBool('LangParams') ?? false,
           ));
         }
         final categories = productsData.categories[widget.section]!;
-
+        return Consumer<LocalCartProducts>(
+          builder: (context, cart, _) {
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: PreferredSize(
@@ -180,6 +180,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                             }),
                           ),
                           const SizedBox(height: 1),
+                          if(widget.section!='ANTERIOR')
                           Row(
                             children: [
                               Padding(
@@ -200,11 +201,13 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
         );
       },
     );
+      },
+    );
   }
 }
 
 
-class _CardCatalog extends StatefulWidget {
+class _CardCatalog extends StatelessWidget {
   final Product product;
   final double screenWidth;
   final double screenHeight;
@@ -221,41 +224,25 @@ class _CardCatalog extends StatefulWidget {
     required this.isEnglish,
   });
 
-  @override
-  State<_CardCatalog> createState() => _CardCatalogState();
-}
+  void toggleCartStatus(BuildContext context, bool isInCart) {
+    final cart = context.read<LocalCartProducts>();
 
-class _CardCatalogState extends State<_CardCatalog> {
-  bool isAddedToCart = false;
-
-  void toggleCartStatus(BuildContext context) {
-
-    final productId = widget.product.id;
-    print(widget.product);
-
-    if (!isAddedToCart) {
-      LocalCartProducts.instance.addProductToCart(productId!);
+    final productId = product.id!;
+    if (!isInCart) {
+      cart.addProductToCart(productId);
     } else {
-      LocalCartProducts.instance.removeProductFromCart(productId!);
+      cart.removeProductFromCart(productId);
     }
 
-    setState(() {
-      isAddedToCart = !isAddedToCart;
-    });
-  }
-  void t(){}
-
-  @override
-  void initState(){
-    super.initState();
-    isAddedToCart = LocalCartProducts.instance.initIsProductInCart(widget.product.id!);
+    HapticFeedback.lightImpact();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = widget.screenWidth;
-    final screenHeight = widget.screenHeight;
-    final product = widget.product;
+    final cart = context.watch<LocalCartProducts>();
+    final productId = product.id!;
+    final isInCart = cart.isProductInCart(productId);
+    final count = cart.countProductInCart(productId);
 
     double paddingFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
@@ -272,51 +259,46 @@ class _CardCatalogState extends State<_CardCatalog> {
           arguments: {
             'screenHeight': screenHeight,
             'screenWidth': screenWidth,
-            'autoRotate': widget.autoRotate,
-            'disableZoom': widget.disableZoom,
+            'autoRotate': autoRotate,
+            'disableZoom': disableZoom,
             'product': product,
           },
         );
       },
       child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: Colors.black.withOpacity(0.2),
         child: Padding(
-          padding: EdgeInsets.only(
-              left: paddingFactor * 0.17,
-              right: paddingFactor * 0.1,
-              top: paddingFactor * 0.1,
-              bottom:paddingFactor * 0.1
-          ),
+          padding: EdgeInsets.all(paddingFactor * 0.1),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Center(child:
-              Container(
-                height: screenHeight * 0.18,
-                width: screenWidth * 0.36,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(color: Colors.black26, blurRadius: 5),
-                  ],
+              Center(
+                child: Container(
+                  height: screenHeight * 0.2,
+                  width: screenWidth * 0.36,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: Image.network(
+                    '$baseUrlFinal/static${product.photo_url!}',
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator.adaptive());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Center(
+                        child: Text(
+                          'Ошибка загрузки',
+                          style: TextStyle(color: Colors.white, fontSize: titleSizeFactor * 0.6),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-                clipBehavior: Clip.hardEdge,
-                child: Image.network(
-                  '$baseUrlFinal/static${product.photo_url!}',
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(child: CircularProgressIndicator.adaptive());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(child: Text('Ошибка загрузки',style: TextStyle(color: Colors.white,fontSize: titleSizeFactor*0.6),));// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
-                  },
-                )
-              ),
               ),
               Text(
                 productTitle,
@@ -329,15 +311,52 @@ class _CardCatalogState extends State<_CardCatalog> {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                '$productPrice \$',
+                '$productPrice ₽',
                 style: TextStyle(
                   color: Colors.white,
                   fontFamily: 'Inria Serif',
                   fontSize: titleSizeFactor * 0.8,
                 ),
               ),
-              !isAddedToCart? GestureDetector(
-                onTap: () => {toggleCartStatus(context),HapticFeedback.lightImpact()},
+              isInCart
+                  ? Container(
+                  width: paddingFactor * 7,
+                  height: screenHeight * 0.049,
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(15),
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.white.withOpacity(0.45), Colors.white.withOpacity(0.45)]
+                    ),
+                  ),
+                  child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.remove, color: Colors.white),
+                    onPressed: () {
+                      final cart = context.read<LocalCartProducts>();
+                      cart.removeProductFromCart(productId);
+                      HapticFeedback.lightImpact();
+                    },
+                  ),
+                  Text('$count',
+                      style: const TextStyle(fontSize: 16, color: Colors.white)),
+                  IconButton(
+                    icon: const Icon(Icons.add, color: Colors.white),
+                    onPressed: () {
+                      final cart = context.read<LocalCartProducts>();
+                      cart.addProductToCart(productId);
+                      HapticFeedback.lightImpact();
+                    },
+                  ),
+                ],
+              )
+              )
+                  : GestureDetector(
+                onTap: () => toggleCartStatus(context, isInCart),
                 child: Container(
                   width: paddingFactor * 7,
                   height: screenHeight * 0.049,
@@ -346,17 +365,13 @@ class _CardCatalogState extends State<_CardCatalog> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: isAddedToCart
-                          ? [Colors.red, Colors.red]
-                          : [  buttonCard,  buttonCard],
+                      colors: [buttonCard, buttonCard],
                     ),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Center(
                     child: Text(
-                      isAddedToCart
-                          ? 'Удалить из корзины'
-                          : 'Добавить в корзину',
+                      'Добавить в корзину',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: titleSizeFactor * 0.6,
@@ -364,50 +379,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                     ),
                   ),
                 ),
-              ) :
-              GestureDetector(
-                onTap:() => HapticFeedback.lightImpact(),
-                child: Container(
-                    width: paddingFactor * 7,
-                    height: screenHeight * 0.049,
-                    padding: const EdgeInsets.symmetric(vertical: 9),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isAddedToCart
-                            ? [Colors.white.withOpacity(0.45), Colors.white.withOpacity(0.45)]
-                            : [Colors.teal, Colors.blue],
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child:
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          child: const Icon(Icons.remove, color: Colors.white),
-                          onTap: () => {setState(() {
-                            if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
-                              LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
-                            }
-                            if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
-                              isAddedToCart=!isAddedToCart;
-                            }
-                          }),HapticFeedback.lightImpact()},
-                        ),
-                        Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
-                          style: const TextStyle(fontSize: 16,color: Colors.white),
-                        ),
-                        GestureDetector(
-                            child: const Icon(Icons.add,color: Colors.white,),
-                            onTap: ()=>{setState(() {
-                              LocalCartProducts.instance.addProductToCart(product.id!);
-                            }),HapticFeedback.lightImpact()}
-                        ),
-                      ],
-                    )
-                ),
-              )
+              ),
             ],
           ),
         ),
@@ -415,6 +387,7 @@ class _CardCatalogState extends State<_CardCatalog> {
     );
   }
 }
+
 
 class AnimatedGrid extends StatefulWidget {
   final List<Widget> children;
@@ -611,4 +584,3 @@ class GridAnimatedDemo extends StatelessWidget {
     );
   }
 }
-

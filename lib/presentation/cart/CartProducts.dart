@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/Constants.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
+import '../../core/services/SharedP.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
 import '../CDEK_integration/CDEKWindow.dart';
@@ -17,18 +17,12 @@ class CartProductsScreen extends StatefulWidget {
 }
 
 class _CartProductsScreen extends State<CartProductsScreen> {
-  SharedPreferences? prefs;
-  int totalCost=0;
 
-  Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {});
-  }
+  int totalCost=LocalCartProducts.instance.calcTotalCost().round();
 
   @override
   void initState() {
     super.initState();
-    setPref();
   }
 
   @override
@@ -115,7 +109,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                             screenHeight: screenHeight,
                             autoRotate: false,
                             disableZoom: true,
-                            isEnglish: prefs?.getBool('LangParams') ?? false,
+                            isEnglish: AppPrefs.prefs.getBool('LangParams') ?? false,
                             onQuantityChanged: () {
                               setState(() {
                                 totalCost = LocalCartProducts.instance.calcTotalCost().round();
@@ -129,13 +123,13 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                 )
                 : Center(
                 child: Text(
-                  prefs?.getBool('LangParams') == true
+                  AppPrefs.prefs.getBool('LangParams') == true
                       ? 'Your cart is empty :('
                       : 'Корзина пуста :(',
                   style: TextStyle(
                     fontSize: titleSizeFactor * 1.05,
                     color: Colors.white,
-                    fontFamily: prefs?.getBool('LangParams') == true
+                    fontFamily: AppPrefs.prefs.getBool('LangParams') == true
                         ? 'Inria Serif'
                         : 'ChUR',
                   ),
@@ -161,7 +155,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                         color: Colors.transparent,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(30),
-                          onTap: _showBottomSheet,
+                          onTap: () => _showBottomSheet(widget.toggleBottomNavigationBar),
                           child:  Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -185,7 +179,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
     );
   }
 
-  void _showBottomSheet() {
+  void _showBottomSheet(toggle) {
     showModalBottomSheet(
       enableDrag: false,
       isScrollControlled: true,
@@ -223,8 +217,8 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                       ),
                     ),
                   ),
-                  const Expanded(
-                    child: CDEKWindow(),
+                  Expanded(
+                    child: CDEKWindow(toggleBottomNavigationBar: toggle),
                   ),
                 ],
               );
@@ -275,7 +269,6 @@ class _CardCatalogState extends State<_CardCatalog> {
     }
     else {isAddedToCart=false;}
     setState(() {});
-
   }
 
   void toggleCartStatus(BuildContext context) {
@@ -351,7 +344,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                       return const Center(child: CircularProgressIndicator.adaptive());
                     },
                     errorBuilder: (context, error, stackTrace) {
-                      return const Text('Не удалось загрузить');
+                      return const Center(child: Text('Не удалось загрузить'));
                     },
                   )
               ),
@@ -369,8 +362,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
                     Text(
                       '$productPrice ₽',
                       style: TextStyle(

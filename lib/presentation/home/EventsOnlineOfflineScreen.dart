@@ -2,6 +2,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../core/services/SharedP.dart';
+
 class EventsOnlineOffline extends StatefulWidget {
   const EventsOnlineOffline({super.key});
 
@@ -10,9 +12,7 @@ class EventsOnlineOffline extends StatefulWidget {
 }
 
 class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
-  SharedPreferences? prefs;
   Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
     setState(() {});
   }
 
@@ -105,14 +105,14 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                           Navigator.pushNamed(context, '/EventsOnline');
                         },
                         child: Text(
-                          prefs?.getBool('LangParams') == true
+                          AppPrefs.prefs.getBool('LangParams') == true
                               ? 'ONLINE'
                               : 'Онлайн',
                           style: TextStyle(
                             fontSize: titleSizeFactor * 1.2,
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: prefs?.getBool('LangParams') == true
+                            fontWeight: FontWeight.normal,
+                            fontFamily: AppPrefs.prefs.getBool('LangParams') == true
                                 ? 'Inria Serif'
                                 : 'ChUR',
                           ),
@@ -123,14 +123,14 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
                         onTap: () {
                         },
                         child: Text(
-                          prefs?.getBool('LangParams') == true
+                          AppPrefs.prefs.getBool('LangParams') == true
                               ? 'OFFLINE'
                               : 'Оффлайн',
                           style: TextStyle(
                             fontSize: titleSizeFactor * 1.2,
                             color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: prefs?.getBool('LangParams') == true
+                            fontWeight: FontWeight.normal,
+                            fontFamily: AppPrefs.prefs.getBool('LangParams') == true
                                 ? 'Inria Serif'
                                 : 'ChUR',
                           ),
@@ -148,6 +148,8 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
   }
 }
 class NeonGradientCardDemo extends StatelessWidget {
+  const NeonGradientCardDemo({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(

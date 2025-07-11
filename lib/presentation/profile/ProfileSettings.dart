@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/services/user_service.dart';
+import '../../core/services/SharedP.dart';
 
 
 class ProfileSettingsScreen extends StatefulWidget {
@@ -15,22 +14,10 @@ class ProfileSettingsScreen extends StatefulWidget {
 
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   bool isEnglish = true;
-  late SharedPreferences prefs;
-  bool prefsLoaded = false;
-
-  Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    setState(() {
-      prefsLoaded = true;
-    });
-  }
 
   @override
   void initState() {
     super.initState();
-    setPref().then((_) {
-      setState(() {});
-    });
   }
   @override
   Widget build(BuildContext context) {
@@ -41,10 +28,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     double spacingFactorW=screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
 
-    if (!prefsLoaded) {
-      return const Center(child: CircularProgressIndicator.adaptive());
-    }
-    else {
       return Scaffold(
           extendBodyBehindAppBar: true,
           backgroundColor: Colors.transparent,
@@ -97,20 +80,20 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                   children: [
                     _buildInfoSection("PERSONAL INFORMATION:", ""),
                     SizedBox(height: spacingFactor * 0.1),
-                    _buildInfoSection("NAME:", UserData.instance.name),
+                    _buildInfoSection("NAME:", AppPrefs.prefs.getString('name')!),
                     const Divider(),
                     SizedBox(height: spacingFactor * 0.1),
-                    _buildInfoSection("SURNAME:", UserData.instance.surname),
+                    _buildInfoSection("SURNAME:", AppPrefs.prefs.getString('surname')!),
                     const Divider(),
                     SizedBox(height: spacingFactor * 0.1),
                     _buildInfoSection(
-                        "PHONE NUMBER:", UserData.instance.phoneNumber),
+                        "PHONE NUMBER:", AppPrefs.prefs.getString('phoneNumber')!),
                     const Divider(),
                     SizedBox(height: spacingFactor * 0.1),
-                    _buildInfoSection("EMAIL:", UserData.instance.email),
+                    _buildInfoSection("EMAIL:", AppPrefs.prefs.getString('email')!),
                     const Divider(),
                     SizedBox(height: spacingFactor * 0.1),
-                    _buildInfoSection("COUNTRY:", UserData.instance.country),
+                    _buildInfoSection("COUNTRY:", AppPrefs.prefs.getString('country')!),
                     const Divider(),
                     SizedBox(height: spacingFactor * 0.5),
                     Center(
@@ -161,9 +144,12 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                               ),
                             ),
                             child: InkWell(
-                              onTap: ()  {
-                                 prefs.setBool('isLoggedIn', false);
-                                 prefs.setBool('accepted_policy', false);
+                              onTap: () async {
+                                 AppPrefs.prefs.setBool('isLoggedIn', false);
+                                 AppPrefs.prefs.setBool('accepted_policy', false);
+                                 // final sessionKey=prefs.getString('session_key');
+                                 // await AuthService(Dio()).deleteAccount(sessionKey!);
+                                 AppPrefs.prefs.setString('session_key', '');
                                  widget.tabNotifier.value = 0;
                               },
                               child: Ink(
@@ -183,7 +169,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                                   height: spacingFactor * 1,
                                   alignment: Alignment.center,
                                   child: Text(
-                                    prefs.getBool('LangParams') == true
+                                    AppPrefs.prefs.getBool('LangParams') == false
                                         ? 'Удалить аккаунт'
                                         : 'Delete account',
                                     style: TextStyle(
@@ -205,7 +191,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
           )
       );
     }
-  }
+
 
   void openTelegram() async {
     final tgUrl = Uri.parse('tg://resolve?domain=bobrovich_dent');
@@ -258,10 +244,10 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
         setState(() {
           isEnglish = (language == "ENG");
           if (language=="ENG"){
-            prefs.setBool('LangParams', true);
+            AppPrefs.prefs.setBool('LangParams', true);
           }
           else {
-            prefs.setBool('LangParams', false);
+            AppPrefs.prefs.setBool('LangParams', false);
           }
         });
       },

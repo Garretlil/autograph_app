@@ -1,8 +1,8 @@
-import 'package:autograph_app/core/Constants.dart';
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
@@ -35,7 +35,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   void initState() {
     super.initState();
     setPref();
-    isAddedToCart = LocalCartProducts.instance.initIsProductInCart(widget.product.id!);
+    isAddedToCart = LocalCartProducts.instance.isProductInCart(widget.product.id!);
   }
 
   Future<void> setPref() async {

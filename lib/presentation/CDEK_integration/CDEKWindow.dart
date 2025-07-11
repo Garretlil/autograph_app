@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:yandex_mapkit/yandex_mapkit.dart';
 import '../../core/services/MetroStation.dart';
+import '../../core/services/user_service.dart';
+import 'ConfirmationOrder.dart';
 import 'SdekWindowNotifier.dart';
 import 'createOrderScreen.dart';
 
 class CDEKWindow extends StatefulWidget {
-  const CDEKWindow({super.key});
+  final void Function(bool) toggleBottomNavigationBar ;
+  const CDEKWindow({super.key,required this.toggleBottomNavigationBar});
 
   @override
   State<CDEKWindow> createState() => _CDEKWindowState();
@@ -30,7 +33,7 @@ class _CDEKWindowState extends State<CDEKWindow> {
       child: Consumer<CDEKWindowNotifier>(
         builder: (context, CDEKWindow, child) {
           CDEKWindow.onPlacemarkTap = (pointData) {
-            _showBottomSheet(pointData,CDEKWindow.stations);
+            _showBottomSheet(pointData,CDEKWindow.stations,widget.toggleBottomNavigationBar);
           };
           return Scaffold(
             backgroundColor: Colors.white,
@@ -38,6 +41,7 @@ class _CDEKWindowState extends State<CDEKWindow> {
               children: [
                 Positioned.fill(
                   child: YandexMap(
+                    nightModeEnabled: true,
                     onMapCreated: (mapWindow) {
                       CDEKWindow.onMapCreated(mapWindow);
                     },
@@ -73,7 +77,7 @@ class _CDEKWindowState extends State<CDEKWindow> {
       },
     );
   }
-  void _showBottomSheet(PointPlaceMark pointData, List<MetroStation>? stations) {
+  void _showBottomSheet(PointPlaceMark pointData, List<MetroStation>? stations,toggle) {
     final text=split(pointData.description);
     final targetStations= getMatchingStations(stations!,pointData.metro);
     showModalBottomSheet(
@@ -84,12 +88,14 @@ class _CDEKWindowState extends State<CDEKWindow> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(30),bottom: Radius.circular(30)),
       ),
       builder: (context) {
+        double screenHeight=MediaQuery.of(context).size.height;
+        double screenWidth=MediaQuery.of(context).size.width;
         return ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(30),bottom: Radius.circular(30)),
           child: DraggableScrollableSheet(
             expand: false,
-            initialChildSize: 0.5,
-            minChildSize: 0.5,
+            initialChildSize: 0.4,
+            minChildSize: 0.4,
             maxChildSize: 1.0,
             builder: (context, scrollController) {
               return Column(
@@ -98,20 +104,21 @@ class _CDEKWindowState extends State<CDEKWindow> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Center(
                       child: Container(
-                        height: 5,
-                        width: 70,
+                        height: screenHeight*0.005,
+                        width: screenWidth*0.15,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
-                          color: Colors.grey[400],
+                          color: Colors.green[400],
                         ),
                       ),
                     ),
                   ),
                   Text(pointData.type=='PVZ'? 'Пункт выдачи СДЭК' : 'Постамат СДЭК'),
+                  Text(text[0]),
                   Text(text[1],style: const TextStyle(fontWeight: FontWeight.w800 ),),
-                  const SizedBox(height: 10,),
+                   SizedBox(height: screenHeight*0.005,),
                   Padding(
-                      padding: const EdgeInsets.only(left: 10),
+                      padding: EdgeInsets.only(left: screenWidth*0.02),
                       child:
                       Column(children: [
                         Row(
@@ -144,19 +151,21 @@ class _CDEKWindowState extends State<CDEKWindow> {
                       ]
                       )
                   ),
-                  const SizedBox(height: 90,),
+                   SizedBox(height: screenHeight*0.07,),
                   GestureDetector(
                     onTap: ()=>
+                      {UserData.instance.pointData=pointData,
                         Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => CreateOrderScreen(pointData: pointData)),
-                     ),
+                        MaterialPageRoute(builder: (context) => ConfirmationOrderScreen( toggleBottomNavigationBar: toggle,)),
+                        ),
+                      },
                     child: Container(
                       decoration: const BoxDecoration(
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                           color: Colors.green
                       ),
-                      width: 200,
-                      height: 90,
+                      width: screenWidth*0.5,
+                      height: screenHeight*0.1,
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

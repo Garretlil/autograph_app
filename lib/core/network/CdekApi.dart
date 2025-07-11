@@ -1,22 +1,18 @@
 import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:autograph_app/core/network/network_layer.dart';
-import 'package:uuid/uuid.dart';
+import 'package:autograph_app/core/services/SharedP.dart';
 import '../../presentation/CDEK_integration/SdekWindowNotifier.dart';
+import '../exceptions/unauthorized_exception.dart';
+import '../utils/api_handler.dart';
 import 'CdekAuth.dart';
 import 'package:dio/dio.dart';
 
-class CdekApi {
-  Dio createInsecureDio() {
-    final dio = Dio();
-    return dio;
-  }
+class CDEKApi {
+  Dio createInsecureDio() => Dio();
 
   final CdekAuth auth;
-  late final Dio _dio;
 
-  CdekApi(this.auth){
-    _dio=createInsecureDio();
-  }
+  CDEKApi(this.auth);
 
   Future<List<DeliveryPoint>> fetchDeliveryPoints() async {
     final token= await auth.getToken();
@@ -82,139 +78,41 @@ class CdekApi {
       return null;
     }
   }
-  Future<String> sendOrderToServer({
-    required String userId,
-    required String pointCode,
-    required List<Map<String, dynamic>> items,
-    required double deliveryCost,
-    required double totalCost,
-  }) async {
-    try {
-      final response = await _dio.post(
-        'https://yourserver.com/api/orders',
-        data: {
-          'userId': userId,
-          'pointCode': pointCode,
-          'items': items,
-          'deliveryCost': deliveryCost,
-          'totalCost': totalCost,
-          'date': DateTime.now().toIso8601String(),
-        },
-        options: Options(
-          headers: {'x-session-key': 'a55b540d-d85f-473d-9a03-5ff7ea46d30e'},
-        ),
-      );
-      final data = response.data;
-      if (data != null && data['trackingNumber'] != null) {
-        return data['trackingNumber'] as String;
-      } else {
-        return '';
-      }
-    } catch (e) {
-      print('Ошибка при отправке заказа: $e');
-      return '';
-    }
-  }
-  Future<bool> createCdekOrder({
+
+  Future<void> createCdekOrder({
     required String point,
     required List<Map<String, dynamic>> items,
-
+    required double length,
+    required double height,
+    required double width,
+    required double weight,
   }) async {
-    final token = await auth.getToken();
     final dio = createInsecureDio();
-    final client =ProductService(dio);
+    final client = ProductService(dio);
 
     final data = {
       "delivery_point": point,
       "comment": "test",
-      "product_items": [
-        {"product_id": 1, "quantity": 20}
-      ]
+      "product_items": items,
+      "package_size": {
+        "height": height.toInt(),
+        "length": length.toInt(),
+        "weight": weight.toInt(),
+        "width": width.toInt(),
+      }
     };
-
-    try {
-      CreateOrderProductResponse response = await client.createOrder('76acb143-f0ce-42f9-89f6-884ad6af5ffa', data);
-      print('Заказ на сдек номер: ${response.message}');
-      return true;
-    } catch (e) {
-      print('Ошибка при запросе: $e');
-      return false;
+    print(data);
+    final sessionKey = AppPrefs.prefs.getString('session_key');
+    if (sessionKey == null || sessionKey.isEmpty) {
+      throw UnauthorizedException();
     }
+    CreateOrderProductResponse response = await safeRequest(() {
+      return client.createOrder(sessionKey, data);
+    });
+    print('Заказ оформлен: ${response.message}');
   }
 
-}
-class DeliveryPoint {
-  final String code;
-  final String name;
-  final String address;
-  final String nearestMetro;
-  final String workTime;
-  final double longitude;
-  final double latitude;
-  final String type;
-  final List<String> phones;
-  final List<String> images;
 
-
-  DeliveryPoint( {
-    required this.code,
-    required this.name,
-    required this.address,
-    required this.nearestMetro,
-    required this.workTime,
-    required this.longitude,
-    required this.latitude,
-    required this.type,
-    required this.phones,
-    required this.images,
-
-  });
-
-  factory DeliveryPoint.fromJson(Map<String, dynamic> json) {
-    return DeliveryPoint(
-      code: json['code'] ?? 'Неизвестный код',
-      name: json['name'] ?? 'Без названия',
-      address: json['address_comment'] ?? 'Адрес не указан',
-      nearestMetro: json['nearest_metro_station'] ?? 'Метро не указано',
-      workTime: json['work_time'] ?? 'Режим работы не указан',
-      latitude: (json['location']?['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (json['location']?['longitude'] as num?)?.toDouble() ?? 0.0,
-      type: json['type'] ?? 'Тип пвз не указан',
-      phones: (json['phones'] as List<dynamic>?)
-          ?.map((p) => p['number'].toString())
-          .toList() ?? [],
-      images: (json['office_image_list'] as List<dynamic>?)
-          ?.map((img) => img['url'].toString())
-          .toList() ?? [],
-    );
-  }
-
-}
-
-class Address {
-  final String city;
-  final String street;
-  final String house;
-
-  Address({required this.city, required this.street, required this.house});
-
-  factory Address.fromJson(Map<String, dynamic> json) {
-    return Address(
-      city: json['city'],
-      street: json['street'],
-      house: json['house'],
-    );
-  }
-}
-
-class Phone {
-  final String number;
-
-  Phone({required this.number});
-
-  factory Phone.fromJson(Map<String, dynamic> json) {
-    return Phone(number: json['number']);
-  }
 }
 
 List<DeliveryPoint> parseDeliveryPoints(dynamic data) {

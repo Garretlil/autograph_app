@@ -87,68 +87,141 @@ class _EventsOnline extends State<EventsOnline> {
             return GestureDetector(
               onTap: () => Navigator.pushNamed(
                 context,
-                '/DetailsScreenForSection',
-                arguments: {'section': courseName},
+                '/CourseDetail',
+                arguments: {'courseName': courseName},
               ),
-              child: Center(
-                child: Container(
-                  decoration:  const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  width: screenWidth *0.91,
-                  height: screenHeight * 0.25,
-                  margin: EdgeInsets.only(
-                    top: cardMarginFactor * 0.25,
-                    bottom: cardMarginFactor * 0.001,
-                  ),
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color:
-                             Colors.blue.withOpacity(0.3),
-                        width: 2,
-                      ),
-                    ),
-                    color: Colors.grey.shade800,
-                    child: Padding(
-                      padding: EdgeInsets.all(cardPaddingFactor * 0.5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            courseName,
-                            style: TextStyle(
-                              fontSize: subtitleSizeFactor,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              fontFamily: 'Inria Serif',
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          SizedBox(height: screenHeight * 0.005),
-                          Expanded(
-                            child: Text(
-                              courseDescription,
-                              style: TextStyle(
-                                fontSize: descriptionSizeFactor * 0.8,
-                                color: Colors.white70,
-                                fontFamily: 'Inria Serif',
-                              ),
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              child: CourseShowcaseCard(courseName: courseName, isDarkMode: true,)
             );
           },
         ),
       ),
+    );
+  }
+}
+class CourseShowcaseCard extends StatefulWidget {
+  final bool isDarkMode;
+  final String courseName;
+
+  const CourseShowcaseCard({
+    super.key,
+    required this.isDarkMode,
+    required this.courseName
+  });
+  @override
+  State<CourseShowcaseCard> createState() => _CourseShowcaseCard();
+}
+class _CourseShowcaseCard extends State<CourseShowcaseCard> with SingleTickerProviderStateMixin{
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+    return Center(
+          child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SizedBox(
+                height: screenHeight * 0.345,
+                width: screenWidth*1.2,
+                child:Card(
+                  elevation: widget.isDarkMode ? 8.0 : 8.0,
+                  shadowColor: widget.isDarkMode
+                      ? Colors.blue.withOpacity(0.4)
+                      : Colors.orange.withOpacity(0.2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: widget.isDarkMode
+                          ? Colors.blue.withOpacity(0.2)
+                          : Colors.orange.withOpacity(0.2),
+                      width: 2,
+                    ),
+                  ),
+                  child: Container(
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: widget.isDarkMode
+                                ? Colors.blue.withOpacity(0.1)
+                                : Colors.orange.withOpacity(0.1),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(20),
+                              topRight: Radius.circular(20),
+                            ),
+                          ),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.courseName,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge
+                                          ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: widget.isDarkMode
+                                            ? Colors.blue
+                                            : Colors.orange,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Stack(
+                            children: [
+                              Container(
+                                height: screenHeight*0.25,
+                                width: screenWidth*0.9,
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.only(
+                                      topRight: Radius.circular(22),
+                                      topLeft: Radius.circular(22),
+                                      bottomLeft: Radius.circular(20),
+                                      bottomRight: Radius.circular(20)
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const ClipRRect(
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(0),
+                                      topLeft: Radius.circular(0),
+                                      bottomLeft: Radius.circular(20),
+                                      bottomRight: Radius.circular(20)
+                                  ),
+                                  //child: Image.asset(widget.image),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              )
+          ),
     );
   }
 }

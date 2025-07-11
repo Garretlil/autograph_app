@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:autograph_app/presentation/cart/CartChoose.dart';
 import 'package:autograph_app/presentation/cart/CartEvents.dart';
 import 'package:autograph_app/presentation/cart/CartProducts.dart';
+import 'package:autograph_app/presentation/home/CourseDetailScreen.dart';
 import 'package:autograph_app/presentation/home/DetailsScreenForSection.dart';
 import 'package:autograph_app/presentation/home/EventsOnline.dart';
 import 'package:autograph_app/presentation/home/EventsOnlineOfflineScreen.dart';
@@ -18,6 +19,7 @@ import 'package:autograph_app/presentation/shop/ProductScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'core/services/SharedP.dart';
 import 'presentation/profile/ProfileMyEventsScreen.dart';
 import 'presentation/profile/ProfileOrders.dart';
 import 'presentation/profile/ProfileSettings.dart';
@@ -42,7 +44,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
   int _selectedIndex = 0;
   bool isBottomNavVisible = false;
   bool isCircleVisible = false;
-  late SharedPreferences prefs;
   bool prefsLoaded = false;
   late bool isLog;
 
@@ -56,14 +57,13 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
   }
 
   Future<void> setPref() async {
-    prefs = await SharedPreferences.getInstance();
-    final storedIsLoggedIn = prefs.getBool('isLoggedIn');
+    final storedIsLoggedIn = AppPrefs.prefs.getBool('isLoggedIn');
     if (mounted) {
       setState(() {
         if (storedIsLoggedIn != null) {
           isLog = storedIsLoggedIn;
         } else {
-          prefs.setBool('isLoggedIn', widget.isLoggedIn);
+          AppPrefs.prefs.setBool('isLoggedIn', widget.isLoggedIn);
           isLog = widget.isLoggedIn;
         }
         prefsLoaded = true;
@@ -73,7 +73,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
 
   void _onTabChange() {
     final newIndex = widget.tabNotifier.value;
-    final loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    final loggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
 
     if (_selectedIndex == newIndex && isLog == loggedIn) {
       _navigatorKeys[newIndex].currentState?.popUntil((route) => route.isFirst);
@@ -155,8 +155,12 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                       toggleBottomNavigationBar: _toggleBottomNavigationBar));
                 }
               case '/CheckCodeScreen':
+                final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute(CheckCodeScreen(
-                    toggleBottomNavigationBar: _toggleBottomNavigationBar));
+                    toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                    email: args['email'],
+                    phone: args['phone'],
+                ));
               case '/HomePage':
                 _toggleBottomNavigationBar(true);
                 return customPageRoute(const HomePage());
@@ -184,6 +188,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                   product: args['product'],
                 ));
               case '/EventsOnline':
+                _toggleBottomNavigationBar(true);
                 return customPageRoute(const EventsOnline());
               case '/DetailsScreenForSection':
                 final args = settings.arguments as Map<String, dynamic>;
@@ -193,9 +198,19 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                 );
               case '/ListOfVebinars':
                 final args = settings.arguments as Map<String, dynamic>;
+                _toggleBottomNavigationBar(true);
                 return customPageRoute( ListOfVebinars(
-                  section: args['section'], toggleCircleCart: _toggleCircleCart,
+                  section: args['courseName'], toggleCircleCart: _toggleCircleCart,
+                  toggle: _toggleBottomNavigationBar,
                 ),
+                );
+              case '/CourseDetail':
+                final args = settings.arguments as Map<String, dynamic>;
+                _toggleBottomNavigationBar(false);
+                return customPageRoute(CourseViewScreen(
+                    courseName: args['courseName'],
+                    toggle: _toggleBottomNavigationBar,
+                  ),
                 );
               default:
                 return customPageRoute(RegistrationScreen(
@@ -204,6 +219,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
           case 1:
             switch (settings.name) {
               case '/':
+                _toggleBottomNavigationBar(true);
                 return customPageRoute(const CartChooseScreen());
               case '/CartEvents':
                 return customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
@@ -235,9 +251,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                 ),
                 );
               case '/Orders':
-                return customPageRoute(const ProfileOrdersScreen());
-              case '/ProfileOrders':
-                return customPageRoute(const ProfileOrdersScreen());
+                _toggleBottomNavigationBar(false);
+                return customPageRoute(ProfileOrdersScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
               case '/Support':
                 return customPageRoute(const SupportPageScreen());
               default:
@@ -296,7 +311,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                           child: GNav(
                             iconSize: spacingFactor * 0.5,
                             backgroundColor: Colors.grey.shade600.withOpacity(0.6),
-                            color: Colors.grey.shade400,
+                            color: Colors.blueGrey.shade400,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             activeColor: Colors.white,
                             tabBackgroundColor: Colors.transparent,
@@ -307,7 +322,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                             ),
                             selectedIndex: _selectedIndex,
                             onTabChange: (index) {
-                              // Let the notifier handle the logic
                               widget.tabNotifier.value = index;
                             },
                             tabs: const [

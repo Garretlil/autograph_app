@@ -1,23 +1,32 @@
-import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/network/network_layer.dart';
 import '../../core/services/user_service.dart';
+import '../../core/utils/api_handler.dart';
 import '../../data/repositories/UserRepository.dart';
 
 class RegistrationNotifier extends ChangeNotifier {
   final SharedPreferences? prefs;
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController surnameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController=TextEditingController();
-  late final AnimationController fadeController;
-  late final Animation<double> fadeAnimation;
+  final TextEditingController nameController = TextEditingController()..text='';
+  final TextEditingController surnameController = TextEditingController()..text='';
+  final TextEditingController emailController = TextEditingController()..text='';
+  final TextEditingController phoneController=TextEditingController()..text='';
+
   final BuildContext context;
   String? _snackBarMessage;
   bool isRegistration=true;
   bool isPolicyAccepted = false;
+  bool get isLangEn => prefs?.getBool('LangParams') ?? false;
+  bool nameIsOk = true;
+  bool surnameIsOk = true;
+  bool emailIsOk = true;
+  bool phoneIsOk = true;
+  final nameRegExp = RegExp(r"^[a-zA-Zа-яА-ЯёЁ\-]{0,50}$");
+  final surnameRegExp = RegExp(r"^[a-zA-Zа-яА-ЯёЁ\-]{0,50}$");
+  final emailRegExp = RegExp(r"^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+  final phoneRegExp = RegExp(r"^$|^(\+7|8)\d{10}$");
+  bool buttonActive=false;
 
   void acceptPolicy() {
     isPolicyAccepted = true;
@@ -26,88 +35,118 @@ class RegistrationNotifier extends ChangeNotifier {
 
   String? get snackBarMessage => _snackBarMessage;
 
-  RegistrationNotifier({required this.context, required TickerProvider vsync, required this.prefs}) {
-    fadeController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: vsync,
-    );
-    fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(
-      CurvedAnimation(parent: fadeController, curve: Curves.easeOut),
-    );
+  RegistrationNotifier({
+    required this.context,
+    required TickerProvider vsync,
+    required this.prefs
+  }){
+    nameController.addListener(checkInputData);
+    surnameController.addListener(checkInputData);
+    emailController.addListener(checkInputData);
+    phoneController.addListener(checkInputData);
   }
-  Dio createInsecureDio() {
-    final dio = Dio();
-    return dio;
-  }
+  Dio createInsecureDio() =>  Dio();
+
   void switchSignMode(){
     isRegistration=!isRegistration;
     notifyListeners();
   }
 
+  void checkInputData() {
+    final name = nameController.text.trim();
+    final surname = surnameController.text.trim();
+    final email = emailController.text.trim();
+    final phone = phoneController.text.replaceAll(RegExp(r'[^\d+]'), '');
+
+    nameIsOk = nameRegExp.hasMatch(name);
+    surnameIsOk = surnameRegExp.hasMatch(surname);
+    emailIsOk = emailRegExp.hasMatch(email);
+    phoneIsOk = phoneRegExp.hasMatch(phone);
+
+    final isNameValid = nameIsOk && name.isNotEmpty;
+    final isSurnameValid = surnameIsOk && surname.isNotEmpty;
+    final isEmailValid = emailIsOk && email.isNotEmpty;
+    final isPhoneValid = phoneIsOk && phone.isNotEmpty;
+
+    if (isRegistration) {
+      buttonActive = isNameValid && isSurnameValid && isEmailValid && isPhoneValid;
+    } else {
+      buttonActive = isEmailValid && isPhoneValid;
+    }
+
+    notifyListeners();
+  }
+
+
+
   Future<void> registerUser(Function() onSuccess) async {
     final isReg = isRegistration;
 
     if (isReg) {
-      nameController.text = 'Houston';
-      surnameController.text = 'Cooper';
-      emailController.text = 'ed763136@gmail.com';
-      phoneController.text='+79168273103';
+
+      // nameController.text = 'Кирилл';
+      // surnameController.text = 'Бобрович';
+      // emailController.text = 'kirasgod@gmail.com';
+      // phoneController.text = '+79853156267';
     }
 
     final name = nameController.text;
     final surname = surnameController.text;
     final email = emailController.text;
-    final phone=phoneController.text;
+    final phone = phoneController.text;
 
-    if ((isReg && (name.isEmpty || surname.isEmpty || email.isEmpty)) ||
-        (!isReg && (surname.isEmpty || email.isEmpty))) {
-      _snackBarMessage = prefs?.getBool('LangParams') == true
-          ? 'Please fill all fields'
-          : 'Заполните все поля';
+    final langEn = prefs?.getBool('LangParams') == true;
+
+    if ((isReg && (name.isEmpty || surname.isEmpty || email.isEmpty || phone.isEmpty)) ||
+        (!isReg && (phone.isEmpty || email.isEmpty))) {
+      _snackBarMessage = isLangEn ? 'Please fill all fields' : 'Заполните все поля';
       notifyListeners();
       return;
     }
 
-    try {
-      final Map<String, dynamic> requestData = {
-        'surname': surname,
-        'email': email,
-        'phone' : phone
-      };
+    final requestData = {
+      'email': email,
+      if (isReg) 'phone': phone,
+      if (isReg) 'name': name,
+      if(isReg) 'surname': surname,
+    };
 
-      if (isReg) {
-        requestData['name'] = name;
-      }
+    await handleApiCall(
+      context: context,
+      request: () async {
+        final dio = createInsecureDio();
+        final client = AuthService(dio);
+        if (isReg) {
+          final response = await client.registerUser(requestData);
+          print(response.message);
+        } else {
+          final response = await client.loginUser(requestData);
+          print(response.message);
+        }
 
-      final dio = createInsecureDio();
-      final client = AuthService(dio);
+        final userRepository = UserRepositoryImpl();
+        if (isReg) {
+          UserData.instance.name = name;
+          UserData.instance.surname = surname;
+        }
+        UserData.instance.email = email;
+        UserData.instance.phoneNumber = phone;
 
-      if (isReg) {
-        RegisterResponse regResponse=await client.registerUser(requestData);
-        print(regResponse.message);
-      } else {
-        await client.loginUser(requestData);
-      }
-
-      fadeController.forward().then((_) => onSuccess());
-
-      final userRepository = UserRepositoryImpl();
-      if (isReg) {
-        UserData.instance.name = name;
-      }
-      UserData.instance.surname = surname;
-      UserData.instance.email = email;
-      userRepository.saveUserData(UserData.instance);
-
-    } catch (e) {
-      _snackBarMessage = prefs?.getBool('LangParams') == true
-          ? (isReg ? 'Registration failed, try again' : 'Login failed, try again')
-          : (isReg ? 'Ошибка регистрации' : 'Ошибка входа');
-      fadeController.forward().then((_) => onSuccess());
-
-      notifyListeners();
-    }
+        await userRepository.saveUserData(UserData.instance);
+      },
+      onSuccess: (_) {
+        onSuccess();
+      },
+      onUnauthorized: () {
+        _snackBarMessage = langEn
+            ? (isReg ? 'Session expired during registration' : 'Session expired')
+            : (isReg ? 'Сессия истекла во время регистрации' : 'Сессия истекла');
+        notifyListeners();
+        //Navigator.pushReplacementNamed(context, '/login');
+      },
+    );
   }
+
 
   void clearSnackBarMessage() {
     _snackBarMessage = null;
@@ -119,7 +158,7 @@ class RegistrationNotifier extends ChangeNotifier {
     nameController.dispose();
     surnameController.dispose();
     emailController.dispose();
-    fadeController.dispose();
+    surnameController.dispose();
     super.dispose();
   }
 }

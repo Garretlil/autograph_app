@@ -1,31 +1,26 @@
 import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:flutter/material.dart';
+import '../../core/exceptions/app_exception.dart';
 import '../../core/network/CdekApi.dart';
 import '../../core/network/CdekAuth.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../core/services/user_service.dart';
+import '../../core/utils/api_handler.dart';
 import '../../data/models/product.dart';
+import '../../data/repositories/UserRepository.dart';
+import '../../domain/entities/BoxModel.dart';
 
-enum Boxes {
-  XS(volume: 1836, dimensions: [17.0, 12.0, 9.0]),
-  S(volume: 8740, dimensions: [23.0, 19.0, 10.0]),
-  M(volume: 12375, dimensions: [33.0, 25.0, 15.0]);
-
-  final double volume;
-  final List<double> dimensions;
-  const Boxes({
-    required this.volume,
-    required this.dimensions,
-  });
-}
 
 class ConfirmationOrderNotifier extends ChangeNotifier {
   static const String _clientId = 'NYnDZhNexvHneGnk29cdGpZuAxwFot6J';
   static const String _clientSecret = 'RglJK9tAYIUUhP2Dt3NuBChjm7iESwkf';
-  final CdekApi _cdekApi;
-  final UserData _userData = UserData.instance;
+
+  final CDEKApi _cdekApi;
   final LocalCartProducts _localCart = LocalCartProducts.instance;
   final Products _productsProvider;
+  final userRepository = UserRepositoryImpl();
+
+  late UserData loadedData;
 
   Map<String, dynamic> _boxCalculationResult = {'sizes': [], 'cost': 0.0, 'weight': 0.0};
   double? _deliveryCost;
@@ -43,22 +38,36 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
   Map<int, int> get cartQuantities => _localCart.getCart();
 
   ConfirmationOrderNotifier(this._productsProvider)
-      : _cdekApi = CdekApi(CdekAuth(clientId: _clientId, clientSecret: _clientSecret)) {
-
+      : _cdekApi = CDEKApi(CdekAuth(clientId: _clientId, clientSecret: _clientSecret)) {
     _initialize();
   }
 
   Future<void> _initialize() async {
-    await recalculateCosts();
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      loadedData = await userRepository.loadUserData();
+      final currentPointData = UserData.instance.pointData;
+      if (currentPointData.code.isNotEmpty) {
+        loadedData.pointData = currentPointData;
+      }
+
+      await recalculateCosts();
+    } catch (e) {
+      _error = 'Ошибка при инициализации: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void _calculateBoxSizeAndCartCost() {
     final allProducts = _productsProvider.products.products ?? [];
     final cartIdsMap = _localCart.getCart();
     final cartIds = cartIdsMap.keys.toSet();
-    _filteredProducts = allProducts
-        .where((p) => p.id != null && cartIds.contains(p.id))
-        .toList();
+
+    _filteredProducts = allProducts.where((p) => p.id != null && cartIds.contains(p.id)).toList();
 
     double volume = 0;
     double weight = 0;
@@ -67,71 +76,68 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     for (var item in _filteredProducts) {
       final quantity = cartIdsMap[item.id] ?? 0;
       if (quantity > 0) {
-
-        final itemHeight = item.height;
-        final itemLength = item.length;
-        final itemWidth = item.width;
-        final itemWeight = item.weight;
+        volume += (item.height ?? 0) * (item.length ?? 0) * (item.width ?? 0) * quantity;
+        weight += item.weight! * quantity;
         final itemPrice = double.tryParse(item.price ?? '0') ?? 0.0;
-
-        volume += itemHeight! * itemLength! * itemWidth! * quantity;
-        weight += itemWeight! * quantity;
         currentCartCost += itemPrice * quantity;
       }
     }
 
-    List<double> dimensions = [];
+    List<double> dimensions;
     if (volume <= Boxes.XS.volume) {
       dimensions = Boxes.XS.dimensions;
     } else if (volume <= Boxes.S.volume) {
       dimensions = Boxes.S.dimensions;
-    } else if (volume <= Boxes.M.volume) {
-      dimensions = Boxes.M.dimensions;
     } else {
       dimensions = Boxes.M.dimensions;
-
     }
+
     final finalWeight = weight <= 0 ? 0.001 : weight;
     _boxCalculationResult = {
       'sizes': [...dimensions, finalWeight],
       'cost': currentCartCost,
-      'weight': finalWeight
+      'weight': finalWeight,
     };
   }
 
-  Future<void> _fetchDeliveryCost() async {
-    if (_boxCalculationResult['sizes'] == null || (_boxCalculationResult['sizes'] as List).length < 4) {
+  Future<bool> _fetchDeliveryCost() async {
+    if ((_boxCalculationResult['sizes'] as List).length < 4) {
       _error = 'Не удалось определить размеры посылки.';
       _deliveryCost = null;
-      return;
+      return false;
     }
+
     final sizes = _boxCalculationResult['sizes'] as List<double>;
-    if (_userData.pointData.code.isEmpty) {
+
+    if (loadedData.pointData.code.isEmpty) {
       _error = 'Пункт выдачи не выбран.';
       _deliveryCost = null;
-      return;
+      return false;
     }
+
     try {
       final cost = await _cdekApi.calculateDeliveryCost(
-        _userData.pointData,
+        loadedData.pointData,
         sizes[0],
         sizes[1],
         sizes[2],
         sizes[3],
       );
-      if (cost != null) {
 
+      if (cost != null) {
         _deliveryCost = cost + 100.0;
         _error = null;
+        return true;
       } else {
-        _error = 'Не удалось рассчитать стоимость доставки (null).';
-        _deliveryCost = null;
+        _error = 'Не удалось рассчитать стоимость доставки.';
+        return false;
       }
     } catch (e) {
-      _error = 'Ошибка расчета доставки: ${e.toString()}';
-      _deliveryCost = null;
+      _error = 'Ошибка расчета доставки: $e';
+      return false;
     }
   }
+
   void _calculateTotalCost() {
     if (_deliveryCost != null) {
       _totalCost = cartCost + _deliveryCost!;
@@ -146,18 +152,18 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     _deliveryCost = null;
     _totalCost = null;
     notifyListeners();
+
     try {
       _calculateBoxSizeAndCartCost();
-      if (_error == null) {
-        await _fetchDeliveryCost();
+      final deliveryFetched = await _fetchDeliveryCost();
+      if (deliveryFetched) {
+        _calculateTotalCost();
       }
-      _calculateTotalCost();
     } catch (e) {
-      _error = 'Произошла ошибка при обновлении данных.';
+      _error = 'Произошла ошибка при обновлении данных: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
-
     }
   }
 
@@ -165,8 +171,7 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     final currentQuantity = _localCart.countProductInCart(productId);
     final newQuantity = currentQuantity! + change;
 
-    if (newQuantity <= 0) {
-    } else {
+    if (newQuantity > 0) {
       if (change > 0) {
         _localCart.addProductToCart(productId);
       } else {
@@ -180,52 +185,52 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     await recalculateCosts();
   }
 
-
-  Future<bool> placeOrder( ) async {
+  Future<void> placeOrder(BuildContext context,void Function(bool) toggle) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
-    try {
-      final sizes = List<double>.from(_boxCalculationResult['sizes'] ?? []);
-      if (sizes.length < 4 || _userData.pointData.code.isEmpty) {
-        throw Exception("Недостаточно данных для оформления заказа");
-      }
 
-      final cartMap = _localCart.getCart();
-      final orderItems = _filteredProducts.map((product) {
-        final quantity = cartMap[product.id] ?? 1;
-        return {
-          'id': product.id,
-          'name': product.name,
-          'price': product.price,
-          'quantity': quantity,
-        };
-      }).toList();
-      final backendResponse = await _cdekApi.createCdekOrder(
+    await handleApiCall(
+      context: context,
+      request: () async {
+        final sizes = List<double>.from(_boxCalculationResult['sizes'] ?? []);
+        if (sizes.length < 4 || loadedData.pointData.code.isEmpty) {
+          throw AppException("Недостаточно данных для оформления заказа.");
+        }
+        final cartMap = _localCart.getCart();
+        final orderItems = _filteredProducts.map((product) {
+          final quantity = cartMap[product.id] ?? 1;
+          return {
+            'product_id': product.id,
+            'quantity': quantity,
+          };
+        }).toList();
 
-        point: _userData.pointData.code,
-        items: orderItems,
+        await _cdekApi.createCdekOrder(
+          point: loadedData.pointData.code,
+          items: orderItems,
+          length: sizes[0],
+          height: sizes[1],
+          width: sizes[2],
+          weight: sizes[3],
+        );
 
-      );
-      final trackingNumber =backendResponse;
-
-      if (trackingNumber == '') {
-        return true;
-      }
-
-      _localCart.clearCart();
-      await recalculateCosts();
-      notifyListeners();
-      return true;
-
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-      return true;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+        _localCart.clearCart();
+        await recalculateCosts();
+      },
+      onSuccess: (_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Заказ успешно оформлен")),
+        );
+        Navigator.popUntil(context, (route) => route.isFirst);
+        toggle(true);
+      },
+      onUnauthorized: () {
+        _error = "Сессия истекла. Повторите вход.";
+      },
+    );
+    _isLoading = false;
+    notifyListeners();
   }
 
 }
