@@ -48,7 +48,6 @@ Future<T> safeRequest<T>(Future<T> Function() request) async {
       throw UnauthorizedException();
     }
     else if ((status) == 400) {
-      // print(e.response?.data['detail']);
       throw AppException(e.response?.data['detail']);
     } else if (status == 500) {
       throw AppException("Ошибка на сервере. Попробуйте позже.");

@@ -16,7 +16,6 @@ class LocalCartProducts extends ChangeNotifier {
         allProducts.products!.firstWhere((elem) => elem.id == product.key).price ?? '0',
       ) * product.value;
     }
-    notifyListeners();
     return totalCost;
   }
 
@@ -24,20 +23,34 @@ class LocalCartProducts extends ChangeNotifier {
 
   int? countProductInCart(int productIndex) => _selectedProducts[productIndex];
 
-  void addProductToCart(int productIndex) {
+  void addProductToCart(int productIndex,void Function(bool) toggleCart) {
     _selectedProducts[productIndex] = (_selectedProducts[productIndex] ?? 0) + 1;
+    if (_selectedProducts.isNotEmpty){
+      toggleCart(true);
+    }
     notifyListeners();
   }
 
-  void removeProductFromCart(int productIndex) {
+  void removeProductFromCart(int productIndex,void Function(bool) toggleCart) {
     if (_selectedProducts.containsKey(productIndex)) {
       if (_selectedProducts[productIndex]! > 1) {
         _selectedProducts[productIndex] = _selectedProducts[productIndex]! - 1;
       } else {
         _selectedProducts.remove(productIndex);
       }
+      if(_selectedProducts.isEmpty){
+        toggleCart(false);
+      }
       notifyListeners();
     }
+  }
+
+  void removeObjectFromCart(int id,void Function(bool) toggleCart){
+    _selectedProducts.remove(id);
+    if (_selectedProducts.isEmpty){
+      toggleCart(false);
+    }
+    notifyListeners();
   }
 
   void clearCart() {

@@ -1,7 +1,11 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../data/models/course.dart';
+import '../../AnimatedBackButton.dart';
+import '../../Theme/SysTheme/Constants.dart';
 
 class EventsOnline extends StatefulWidget {
   const EventsOnline({super.key});
@@ -22,90 +26,131 @@ class _EventsOnline extends State<EventsOnline> {
   void initState() {
     super.initState();
     setPref();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final courseWebinars = CourseWebinars.instance;
+      if (!courseWebinars.isInitialized) {
+        courseWebinars.forceInit();
+      }
+    });
+  }
+  Shader createGradient(Rect bounds) {
+
+    if (bounds.isEmpty) {
+      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
+    }
+    return const LinearGradient(
+      colors: [Colors.blue, Colors.white],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(bounds);
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    final paddingFactor = screenWidth * 0.06;
     final titleSizeFactor = screenWidth * 0.06;
-    final subtitleSizeFactor = screenWidth * 0.06;
-    final cardMarginFactor = screenHeight * 0.06;
-    final cardPaddingFactor = screenWidth * 0.06;
-    final descriptionSizeFactor = screenWidth * 0.06;
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
-      appBar: PreferredSize(
-        preferredSize: Size(screenWidth, kToolbarHeight - 20),
-        child: ClipRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-            child: AppBar(
-              forceMaterialTransparency: true,
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              title: Text(
-                'AUTOGRAPH',
-                style: TextStyle(
-                  fontSize: titleSizeFactor * 0.85,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inria Serif',
-                  color: Colors.white,
+    return Consumer<CourseWebinars>(
+        builder: (context, courseWebinars, _)
+    {
+      if (courseWebinars.isLoading || courseWebinars.webinarsByCourse.isEmpty) {
+        return const Center(child: CircularProgressIndicator.adaptive());
+      }
+
+      return Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Colors.transparent,
+        appBar: PreferredSize(
+          preferredSize: Size(screenWidth, kToolbarHeight - 20),
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+              child: AppBar(
+                forceMaterialTransparency: true,
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                leading: FadedIconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
+                title: ShaderMask(
+                  shaderCallback: (bounds) => createGradient(bounds),
+                  child: Text(
+                    'AUTOGRAPH',
+                    style: TextStyle(
+                      fontSize: titleSizeFactor * 0.85,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Inria Serif',
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                centerTitle: true,
               ),
-              centerTitle: true,
             ),
           ),
         ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
+        body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/image.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: ListView.builder(
+            itemCount: CourseWebinars.instance.webinarsByCourse.length,
+            itemBuilder: (context, index) {
+              final courseName = CourseWebinars.instance.webinarsByCourse.keys
+                  .elementAt(index);
+              print(courseName);
+              final webinars = CourseWebinars.instance
+                  .webinarsByCourse[courseName];
+              final courseDescription = webinars?.firstWhere(
+                    (webinar) => webinar.containsKey('description'),
+                orElse: () => {'description': 'No description available'},
+              )['description'] ?? 'No description available';
+              final coursePreview = webinars?.firstWhere(
+                    (webinar) => webinar.containsKey('preview_url'),
+                orElse: () => {'preview_url': 'No description available'},
+              )['preview_url'] ?? 'No description available';
+
+              return GestureDetector(
+                  onTap: () =>
+                  {
+                    print(coursePreview),
+                    Navigator.pushNamed(
+                      context,
+                      '/CourseDetail',
+                      arguments: {
+                        'courseName': courseName,
+                        'description': courseDescription,
+                        'coursePreview' : coursePreview
+                      },
+                    ),},
+                  child: CourseShowcaseCard(courseName: courseName,
+                      isDarkMode: true,
+                      coursePreview: coursePreview)
+              );
+            },
           ),
         ),
-        child: ListView.builder(
-          itemCount: CourseWebinars.instance.webinarsByCourse.length,
-          itemBuilder: (context, index) {
-            final courseName = CourseWebinars.instance.webinarsByCourse.keys.elementAt(index);
-            final webinars = CourseWebinars.instance.webinarsByCourse[courseName];
-            final courseDescription = webinars?.firstWhere(
-                  (webinar) => webinar.containsKey('description'),
-              orElse: () => {'description': 'No description available'},
-            )['description'] ?? 'No description available';
-
-            return GestureDetector(
-              onTap: () => Navigator.pushNamed(
-                context,
-                '/CourseDetail',
-                arguments: {'courseName': courseName},
-              ),
-              child: CourseShowcaseCard(courseName: courseName, isDarkMode: true,)
-            );
-          },
-        ),
-      ),
+      );
+    }
     );
   }
 }
 class CourseShowcaseCard extends StatefulWidget {
   final bool isDarkMode;
   final String courseName;
+  final String coursePreview;
 
   const CourseShowcaseCard({
     super.key,
     required this.isDarkMode,
-    required this.courseName
+    required this.courseName,
+    required this.coursePreview
   });
   @override
   State<CourseShowcaseCard> createState() => _CourseShowcaseCard();
@@ -120,9 +165,10 @@ class _CourseShowcaseCard extends State<CourseShowcaseCard> with SingleTickerPro
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
+    double titleSizeFactor = screenWidth * 0.06;
     return Center(
           child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(left:10 ,top:15 ,right:10 ,bottom:10 ),
               child: SizedBox(
                 height: screenHeight * 0.345,
                 width: screenWidth*1.2,
@@ -180,42 +226,33 @@ class _CourseShowcaseCard extends State<CourseShowcaseCard> with SingleTickerPro
                             ],
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Stack(
-                            children: [
-                              Container(
-                                height: screenHeight*0.25,
-                                width: screenWidth*0.9,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.only(
-                                      topRight: Radius.circular(22),
-                                      topLeft: Radius.circular(22),
-                                      bottomLeft: Radius.circular(20),
-                                      bottomRight: Radius.circular(20)
+                        Expanded(
+                          child: FractionallySizedBox(
+                            widthFactor: 0.98,
+                            child: AspectRatio(
+                              aspectRatio: 18 / 9,
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+                                child: CachedNetworkImage(
+                                  imageUrl: '$baseUrlFinal/static${widget.coursePreview}',
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator.adaptive(),
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
+                                  errorWidget: (context, url, error) => Center(
+                                    child: Text(
+                                      'Ошибка загрузки',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: titleSizeFactor * 0.6,
+                                      ),
                                     ),
-                                  ],
-                                ),
-                                child: const ClipRRect(
-                                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(0),
-                                      topLeft: Radius.circular(0),
-                                      bottomLeft: Radius.circular(20),
-                                      bottomRight: Radius.circular(20)
                                   ),
-                                  //child: Image.asset(widget.image),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),

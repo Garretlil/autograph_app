@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../AnimatedBackButton.dart';
 import '../home/HomePage.dart';
 
 class PreCatalogScreen extends StatefulWidget {
@@ -22,6 +23,16 @@ class _PreCatalogState extends State<PreCatalogScreen> {
   void initState() {
     super.initState();
     setPref();
+  }
+  Shader createGradient(Rect bounds) {
+    if (bounds.isEmpty) {
+      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
+    }
+    return const LinearGradient(
+      colors: [Colors.orange, Colors.white],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(bounds);
   }
 
   @override
@@ -45,23 +56,20 @@ class _PreCatalogState extends State<PreCatalogScreen> {
               backgroundColor: Colors.transparent,
               forceMaterialTransparency: true,
               elevation: 0,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                  size: iconSizeFactor,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+              leading: FadedIconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
-              title: Text(
-                'AUTOGRAPH',
-                style: TextStyle(
-                  fontSize: titleSizeFactor * 0.85,
-                  fontWeight: FontWeight.w600,
-                  fontFamily: 'Inria Serif',
-                  color: Colors.white,
+              title: ShaderMask(
+                shaderCallback: (bounds) => createGradient(bounds),
+                child: Text(
+                  'AUTOGRAPH',
+                  style: TextStyle(
+                    fontSize: titleSizeFactor * 0.85,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inria Serif',
+                    color: Colors.white,
+                  ),
                 ),
               ),
               centerTitle: true,
@@ -117,7 +125,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                         isDarkMode: false,
                         isPhantoms: false,
                         sectionTitle: 'ANTERIOR',
-                        icon: Icons.ondemand_video,
+                        icon: Icons.shopping_bag,
                         description: 'Advanced restoration courses',
                         nextScreen: (ctx) => Navigator.pushNamed(
                           ctx,
@@ -138,7 +146,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                         isDarkMode: false,
                         isPhantoms: false,
                         sectionTitle: 'НАБОРЫ',
-                        icon: Icons.ondemand_video,
+                        icon: Icons.shopping_bag,
                         description: 'Advanced restoration courses',
                         nextScreen: (ctx) => Navigator.pushNamed(
                           ctx,
@@ -152,7 +160,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'НАБОРЫ',
                           },
                         ),
-                        image:'assets/homepage.jpg',
+                        image:'assets/Anterior.jpg',
                       ),
                     ],
                   ),

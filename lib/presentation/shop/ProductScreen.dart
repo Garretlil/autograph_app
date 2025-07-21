@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
@@ -15,6 +16,7 @@ class ProductViewScreen extends StatefulWidget {
     required this.screenWidth,
     required this.screenHeight,
     required this.product,
+    required this.toggleCart
   });
 
   final bool autoRotate;
@@ -22,6 +24,7 @@ class ProductViewScreen extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
   final Product product;
+  final void Function(bool) toggleCart;
 
   @override
   State<ProductViewScreen> createState() => _ProductViewScreenState();
@@ -51,9 +54,9 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     print(widget.product);
 
     if (!isAddedToCart) {
-      LocalCartProducts.instance.addProductToCart(productId!);
+      LocalCartProducts.instance.addProductToCart(productId!,widget.toggleCart);
     } else {
-      LocalCartProducts.instance.removeProductFromCart(productId!);
+      LocalCartProducts.instance.removeProductFromCart(productId!,widget.toggleCart);
     }
 
     setState(() {
@@ -107,22 +110,19 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     ),
                     clipBehavior: Clip.hardEdge,
                     child: ModelViewer(
-                      backgroundColor: Colors.grey.withOpacity(0.5),
+                      backgroundColor: Colors.grey.shade800,
                       src: '$baseUrlFinal/static${currentProduct.model_url!}',
                       alt: '',
                       ar: false,
                       autoRotate: widget.autoRotate,
                       disableZoom: widget.disableZoom,
+                        orientation: "1 0 0 -90deg"
                     ),
                   ),
                 ),
                 SizedBox(height: spacingFactor * 0.1),
                 _buildInfoCard(
-                  title: '1. Надпись autograph на app bar '
-                      'сделать наравне со стрелочкой «назад» '
-                      'на всех экранах (референт уровня стрелочки - '
-                      'главный экран home Убрать подписи и иконки под'
-                      ' AUTOGRAPH на app bar ',
+                  title: currentProduct.description!,
                   titleSizeFactor: titleSizeFactor,
                 ),
                 SizedBox(height: spacingFactor),
@@ -177,7 +177,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                             child: const Icon(Icons.remove, color: Colors.white),
                             onTap: () => setState(() {
                               if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
-                                LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
+                                LocalCartProducts.instance.removeProductFromCart(widget.product.id!,widget.toggleCart);
                               }
                               if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
                                 isAddedToCart=!isAddedToCart;
@@ -190,7 +190,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                           GestureDetector(
                               child: const Icon(Icons.add,color: Colors.white,),
                               onTap: ()=>setState(() {
-                                LocalCartProducts.instance.addProductToCart(widget.product.id!);
+                                LocalCartProducts.instance.addProductToCart(widget.product.id!,widget.toggleCart);
                               })
                           ),
                         ],
@@ -202,9 +202,9 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
             Positioned(
               top: 62,
               left: 15,
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new, color: Colors.white,size: iconSizeFactor,),
-                onPressed: () => Navigator.pop(context),
+              child: FadedIconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
             ),
           ],

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../AnimatedBackButton.dart';
+
 
 class CheckCodeScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;
@@ -56,10 +58,9 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
               forceMaterialTransparency: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
+              leading: FadedIconButton(
                 onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               centerTitle: true,
               title: Text(

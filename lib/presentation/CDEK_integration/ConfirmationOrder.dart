@@ -1,6 +1,9 @@
 import 'dart:ui';
+import 'package:autograph_app/presentation/CDEK_integration/CDEKWindowNotifier.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../data/models/product.dart';
@@ -8,7 +11,10 @@ import 'ConfirmationOrderNotifier.dart';
 
 class ConfirmationOrderScreen extends StatelessWidget {
   final void Function(bool) toggleBottomNavigationBar;
-  const ConfirmationOrderScreen({super.key,required this.toggleBottomNavigationBar});
+  final String fullName;
+  final String phoneNumber;
+  final PointPlaceMark point;
+  const ConfirmationOrderScreen({super.key,required this.toggleBottomNavigationBar,required this.fullName,required this.phoneNumber,required this.point});
 
   Shader createGradient(Rect bounds) {
     return const LinearGradient(
@@ -37,12 +43,9 @@ class ConfirmationOrderScreen extends StatelessWidget {
                 forceMaterialTransparency: true,
                 backgroundColor: Colors.white70,
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                  color: Colors.grey.shade700,
-                  onPressed: () => {
-                    Navigator.of(context).pop()
-                  },
+                leading: FadedIconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
                 title: Text(
                   'Подтверждение заказа',
@@ -91,9 +94,9 @@ class ConfirmationOrderScreen extends StatelessWidget {
               child: ListView(
                 children: [
                   const _SectionTitle(text: 'ДАННЫЕ ПОЛУЧАТЕЛЯ'),
-                  Text(notifier.loadedData.name.isEmpty ? 'Имя не указано' : '${notifier.loadedData.name} ${notifier.loadedData.surname}', style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(fullName, style: const TextStyle(fontSize: 16,color: Colors.black)),
                   Text(notifier.loadedData.email.isEmpty ? 'Email не указан' : notifier.loadedData.email, style: const TextStyle(fontSize: 16,color: Colors.black)),
-                  Text(notifier.loadedData.phoneNumber.isEmpty ? 'Телефон не указан' : notifier.loadedData.phoneNumber, style: const TextStyle(fontSize: 16,color: Colors.black)),
+                  Text(phoneNumber, style: const TextStyle(fontSize: 16,color: Colors.black)),
                   const SizedBox(height: 16),
                   const _SectionTitle(text: 'ПУНКТ ВЫДАЧИ'),
                   Text(notifier.loadedData.pointData.description.isEmpty ? 'Пункт выдачи не выбран' : notifier.loadedData.pointData.description, style: const TextStyle(fontSize: 16,color: Colors.black)),
@@ -179,16 +182,8 @@ class ConfirmationOrderScreen extends StatelessWidget {
                       notifier.isLoading || totalCost == null
                           ? null
                           : () async {
-                        final success= await notifier.placeOrder(context,toggleBottomNavigationBar);
+                        final success= await notifier.placeOrder(context,toggleBottomNavigationBar,fullName,phoneNumber);
                         Future.delayed(const Duration(milliseconds: 1000));
-                        // if (success && context.mounted){
-                        //   Navigator.pushReplacementNamed(context, '/CartEvents');
-                        // }
-                        // else {
-                        //   ScaffoldMessenger.of(context).showSnackBar(
-                        //     const SnackBar(content: Text('Ошибка при оформлении заказа')),
-                        //   );
-                        // }
                       },
                       child: Opacity(
                         opacity: notifier.isLoading || totalCost == null ? 0.5 : 1.0,
@@ -341,25 +336,24 @@ class _CardCatalog extends StatelessWidget {
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                child:Image.network(
-                  '$baseUrlFinal/static${product.photo_url!}',
+                child:CachedNetworkImage(
+                  imageUrl: '$baseUrlFinal/static${product.photo_url!}',
                   fit: BoxFit.cover,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(child: CircularProgressIndicator.adaptive());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Center(
-                        child: Text(
-                          'Ошибка загрузки',
-                          style: TextStyle(color: Colors.black,fontSize: titleSizeFactor*0.8),
-                        )
-                    );// return Image.asset('assets/IMG_8248.PNG',fit: BoxFit.cover,);
-                  },
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator.adaptive(),
+                  ),
+                  errorWidget: (context, url, error) => Center(
+                    child: Text(
+                      'Ошибка загрузки',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: titleSizeFactor * 0.6,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-
             Expanded(
               child: GestureDetector(
                 onTap: () => _navigateToProduct(context),
@@ -409,18 +403,6 @@ class _CardCatalog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                 ],
-              )
-            else
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: ElevatedButton(
-                  onPressed: () => notifier.updateItemQuantity(product.id!, 1),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    textStyle: const TextStyle(fontSize: 12),
-                  ),
-                  child: const Text("Добавить"),
-                ),
               )
           ],
         ),

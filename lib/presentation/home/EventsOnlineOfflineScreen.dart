@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../../AnimatedBackButton.dart';
 import '../../core/services/SharedP.dart';
 
 class EventsOnlineOffline extends StatefulWidget {
@@ -30,7 +29,6 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double iconSizeFactor = screenWidth * 0.06;
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
@@ -46,15 +44,9 @@ class _EventsOnlineOfflineState extends State<EventsOnlineOffline> {
               forceMaterialTransparency: true,
               backgroundColor: Colors.black.withOpacity(0.3),
               elevation: 0,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back_ios_new_outlined,
-                  size: iconSizeFactor * 1,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+              leading: FadedIconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

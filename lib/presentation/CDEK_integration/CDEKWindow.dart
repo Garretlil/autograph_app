@@ -4,7 +4,7 @@ import 'package:yandex_mapkit/yandex_mapkit.dart';
 import '../../core/services/MetroStation.dart';
 import '../../core/services/user_service.dart';
 import 'ConfirmationOrder.dart';
-import 'SdekWindowNotifier.dart';
+import 'CDEKWindowNotifier.dart';
 import 'createOrderScreen.dart';
 
 class CDEKWindow extends StatefulWidget {
@@ -18,7 +18,7 @@ class CDEKWindow extends StatefulWidget {
 class _CDEKWindowState extends State<CDEKWindow> {
   late final YandexMapController _mapController;
   var _mapZoom = 0.0;
-  final _drawerController = CustomDrawerController();
+  // final _drawerController = CustomDrawerController();
 
   @override
   void dispose() {
@@ -156,7 +156,7 @@ class _CDEKWindowState extends State<CDEKWindow> {
                     onTap: ()=>
                       {UserData.instance.pointData=pointData,
                         Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => ConfirmationOrderScreen( toggleBottomNavigationBar: toggle,)),
+                        MaterialPageRoute(builder: (context) => CreateOrderScreen( toggleBottomNavigationBar: toggle, pointData: pointData,)),
                         ),
                       },
                     child: Container(

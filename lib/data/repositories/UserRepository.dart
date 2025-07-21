@@ -14,8 +14,6 @@ class UserRepositoryImpl implements UserRepository {
     await prefs.setString('surname', userData.surname);
     await prefs.setString('email', userData.email);
     await prefs.setString('phoneNumber', userData.phoneNumber);
-    await prefs.setString('country', userData.country);
-    await prefs.setString('fullName', userData.fullName);
   }
 
   @override
@@ -26,8 +24,6 @@ class UserRepositoryImpl implements UserRepository {
       surname: prefs.getString('surname') ?? '',
       email: prefs.getString('email') ?? '',
       phoneNumber: prefs.getString('phoneNumber') ?? '',
-      country: prefs.getString('country') ?? '',
-      fullName: prefs.getString('fullName') ?? '',
     );
   }
 }

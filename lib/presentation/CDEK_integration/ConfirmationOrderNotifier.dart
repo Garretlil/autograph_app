@@ -1,5 +1,6 @@
 import 'package:autograph_app/core/network/DataConverter.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../../core/exceptions/app_exception.dart';
 import '../../core/network/CdekApi.dart';
 import '../../core/network/CdekAuth.dart';
@@ -167,25 +168,25 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     }
   }
 
-  Future<void> updateItemQuantity(int productId, int change) async {
-    final currentQuantity = _localCart.countProductInCart(productId);
-    final newQuantity = currentQuantity! + change;
-
-    if (newQuantity > 0) {
-      if (change > 0) {
-        _localCart.addProductToCart(productId);
-      } else {
-        _localCart.removeProductFromCart(productId);
-      }
-      await recalculateCosts();
-    }
-  }
+  // Future<void> updateItemQuantity(int productId, int change) async {
+  //   final currentQuantity = _localCart.countProductInCart(productId);
+  //   final newQuantity = currentQuantity! + change;
+  //
+  //   if (newQuantity > 0) {
+  //     if (change > 0) {
+  //       _localCart.addProductToCart(productId);
+  //     } else {
+  //       _localCart.removeProductFromCart(productId);
+  //     }
+  //     await recalculateCosts();
+  //   }
+  // }
 
   Future<void> removeItem(int productId) async {
     await recalculateCosts();
   }
 
-  Future<void> placeOrder(BuildContext context,void Function(bool) toggle) async {
+  Future<void> placeOrder(BuildContext context,void Function(bool) toggle,String fullName,String phoneNumber) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -207,6 +208,8 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
         }).toList();
 
         await _cdekApi.createCdekOrder(
+          fullName: fullName,
+          phoneNumber: phoneNumber,
           point: loadedData.pointData.code,
           items: orderItems,
           length: sizes[0],
@@ -219,9 +222,74 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
         await recalculateCosts();
       },
       onSuccess: (_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Заказ успешно оформлен")),
-        );
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => Dialog(
+              backgroundColor: Colors.blueGrey,
+              insetPadding: const EdgeInsets.all(20),
+              child: Container(
+                padding: const EdgeInsets.all(25),
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    )
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Lottie.asset(
+                      'assets/confetti.json',
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                      repeat: false,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Заказ оформлен!",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const SizedBox(height: 25),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Хорошо",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
         Navigator.popUntil(context, (route) => route.isFirst);
         toggle(true);
       },

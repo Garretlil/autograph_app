@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../Theme/SysTheme/Constants.dart';
-import '../../core/network/DataConverter.dart';
+import '../../AnimatedBackButton.dart';
 import '../../data/models/user_orders.dart';
 
 
@@ -50,10 +49,9 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
               forceMaterialTransparency: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
+              leading: FadedIconButton(
                 onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               centerTitle: true,
               title: Column(

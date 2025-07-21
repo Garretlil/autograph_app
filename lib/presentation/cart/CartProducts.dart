@@ -1,6 +1,8 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/SharedP.dart';
@@ -9,16 +11,15 @@ import '../../data/models/product.dart';
 import '../CDEK_integration/CDEKWindow.dart';
 
 class CartProductsScreen extends StatefulWidget {
-  const CartProductsScreen({super.key,required this.toggleBottomNavigationBar});
+  const CartProductsScreen({super.key,required this.toggleBottomNavigationBar,required this.toggleCart});
   final void Function(bool) toggleBottomNavigationBar;
+  final void Function(bool) toggleCart;
 
   @override
   State<CartProductsScreen> createState() => _CartProductsScreen();
 }
 
 class _CartProductsScreen extends State<CartProductsScreen> {
-
-  int totalCost=LocalCartProducts.instance.calcTotalCost().round();
 
   @override
   void initState() {
@@ -34,146 +35,155 @@ class _CartProductsScreen extends State<CartProductsScreen> {
 
     return Consumer<Products>(
       builder: (context, products, child) {
-        return Scaffold(
-          extendBodyBehindAppBar: true,
-          backgroundColor: Colors.transparent,
-          appBar: PreferredSize(
-            preferredSize: Size(screenWidth, kToolbarHeight - 20),
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-                child: AppBar(
-                  forceMaterialTransparency: true,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                    color: Colors.white,
-                    onPressed: () => {
-                      widget.toggleBottomNavigationBar(true),
-                      Navigator.of(context).pop()
-                    },
-                  ),
-                  title: Text(
-                    'AUTOGRAPH',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
+        return Consumer<LocalCartProducts>(
+          builder: (context, cart, _)
+        {
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            backgroundColor: Colors.transparent,
+            appBar: PreferredSize(
+              preferredSize: Size(screenWidth, kToolbarHeight - 20),
+              child: ClipRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                  child: AppBar(
+                    forceMaterialTransparency: true,
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    leading: FadedIconButton(
+                      onPressed: () => {
+                        widget.toggleBottomNavigationBar(true),
+                        Navigator.of(context).pop()
+                      },
+                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                     ),
+                    title: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
+                    ),
+                    centerTitle: true,
                   ),
-                  centerTitle: true,
                 ),
               ),
             ),
-          ),
-          body: Stack(
-            children: [
-              Positioned.fill(
-                child: Image.asset(
-                  'assets/image.png',
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Padding(padding: EdgeInsets.only(top: screenHeight*0.13),
-              child: LocalCartProducts.instance.calcTotalCost()!=0 ? ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/image.png',
+                    fit: BoxFit.cover,
                   ),
-                  child: Builder(
-                    builder: (_) {
-                      totalCost=LocalCartProducts.instance.calcTotalCost().round();
-                      final allProducts = products.products.products ?? [];
-                      final cartIds = LocalCartProducts.instance.getCart().keys.toSet();
-                      final filteredProducts = allProducts
-                          .where((p) => p.id != null && cartIds.contains(p.id))
-                          .toList();
-                      return GridView.builder(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: paddingFactor * 0.25),
-                        gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 1,
-                          crossAxisSpacing: 3.0,
-                          mainAxisSpacing: 3.0,
-                          childAspectRatio: 11 / 5,
-                        ),
-                        itemCount: filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final product = filteredProducts[index];
-                          return _CardCatalog(
-                            product: product,
-                            screenWidth: screenWidth,
-                            screenHeight: screenHeight,
-                            autoRotate: false,
-                            disableZoom: true,
-                            isEnglish: AppPrefs.prefs.getBool('LangParams') ?? false,
-                            onQuantityChanged: () {
-                              setState(() {
-                                totalCost = LocalCartProducts.instance.calcTotalCost().round();
-                              });
+                ),
+                Padding(padding: EdgeInsets.only(top: screenHeight * 0.12),
+                    child: cart.calcTotalCost() != 0
+                        ? ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                      ),
+                      child: Builder(
+                        builder: (_) {
+                          final allProducts = products.products.products ?? [];
+                          final cartIds = cart
+                              .getCart()
+                              .keys
+                              .toSet();
+                          final filteredProducts = allProducts
+                              .where((p) =>
+                          p.id != null && cartIds.contains(p.id))
+                              .toList();
+                          return GridView.builder(
+                            padding: EdgeInsets.only(
+                              left: 8,
+                              right: 8,
+                              bottom: screenHeight * 0.1,
+                            ),
+                            gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 1,
+                              crossAxisSpacing: 3.0,
+                              mainAxisSpacing: 3.0,
+                              childAspectRatio: 11 / 5,
+                            ),
+                            itemCount: filteredProducts.length,
+                            itemBuilder: (context, index) {
+                              final product = filteredProducts[index];
+                              return _CardCatalog(
+                                product: product,
+                                screenWidth: screenWidth,
+                                screenHeight: screenHeight,
+                                autoRotate: false,
+                                disableZoom: true,
+                                isEnglish: AppPrefs.prefs.getBool(
+                                    'LangParams') ?? false,
+                                toggleCart: widget.toggleCart,
+                                onQuantityChanged: () {
+                                  setState(() {
+                                  });
+                                },
+                              );
                             },
                           );
                         },
-                      );
-                    },
-                  ),
-                )
-                : Center(
-                child: Text(
-                  AppPrefs.prefs.getBool('LangParams') == true
-                      ? 'Your cart is empty :('
-                      : 'Корзина пуста :(',
-                  style: TextStyle(
-                    fontSize: titleSizeFactor * 1.05,
-                    color: Colors.white,
-                    fontFamily: AppPrefs.prefs.getBool('LangParams') == true
-                        ? 'Inria Serif'
-                        : 'ChUR',
-                  ),
-                ),
-              )
-              ),
-              totalCost!=0 ?
-              Positioned(
-                bottom: 32,
-                right: 40,
-                width: 100,
-                height: 50,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(30),
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
+                    )
+                        : Center(
+                      child: Text(
+                        'Корзина пуста :(',
+                        style: TextStyle(
+                          fontSize: titleSizeFactor * 1.05,
+                          color: Colors.white,
+                          fontFamily: 'Inria Serif'
+                        ),
+                      ),
+                    )
+                ),
+                cart.calcTotalCost() != 0 ?
+                Positioned(
+                  bottom: 32,
+                  right: 40,
+                  width: 100,
+                  height: 50,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
                           borderRadius: BorderRadius.circular(30),
-                          onTap: () => _showBottomSheet(widget.toggleBottomNavigationBar),
-                          child:  Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('${totalCost==0 ? '0' : totalCost} ₽',
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 19)),
-                              ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(30),
+                            onTap: () => _showBottomSheet(
+                                widget.toggleBottomNavigationBar),
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('${cart.calcTotalCost() == 0 ? '0' : cart.calcTotalCost().round()} ₽',
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 19)),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ) : const SizedBox()
-            ],
-          ),
+                ) : const SizedBox()
+              ],
+            ),
+          );
+        }
         );
       },
     );
@@ -239,6 +249,7 @@ class _CardCatalog extends StatefulWidget {
   final bool disableZoom;
   final bool isEnglish;
   final VoidCallback onQuantityChanged;
+  final void Function(bool) toggleCart;
 
   const _CardCatalog({
     required this.product,
@@ -248,6 +259,7 @@ class _CardCatalog extends StatefulWidget {
     required this.disableZoom,
     required this.isEnglish,
     required this.onQuantityChanged,
+    required this.toggleCart
   });
 
   @override
@@ -257,14 +269,14 @@ class _CardCatalog extends StatefulWidget {
 class _CardCatalogState extends State<_CardCatalog> {
   bool isAddedToCart = false;
   void _increment() {
-    LocalCartProducts.instance.addProductToCart(widget.product.id!);
+    LocalCartProducts.instance.addProductToCart(widget.product.id!,widget.toggleCart);
     widget.onQuantityChanged();
     setState(() {});
   }
 
   void _decrement() {
     if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
-      LocalCartProducts.instance.removeProductFromCart(widget.product.id!);
+      LocalCartProducts.instance.removeProductFromCart(widget.product.id!,widget.toggleCart);
       widget.onQuantityChanged();
     }
     else {isAddedToCart=false;}
@@ -276,9 +288,9 @@ class _CardCatalogState extends State<_CardCatalog> {
     final productId = widget.product.id;
     print(widget.product);
     if (!isAddedToCart) {
-      LocalCartProducts.instance.addProductToCart(productId!);
+      LocalCartProducts.instance.addProductToCart(productId!,widget.toggleCart);
     } else {
-      LocalCartProducts.instance.removeProductFromCart(productId!);
+      LocalCartProducts.instance.removeProductFromCart(productId!,widget.toggleCart);
     }
 
     setState(() {
@@ -299,7 +311,6 @@ class _CardCatalogState extends State<_CardCatalog> {
 
     final productTitle = product.name ?? 'Название будет попозже(';
     final productPrice = product.price ?? 0;
-
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
@@ -326,7 +337,7 @@ class _CardCatalogState extends State<_CardCatalog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                height: screenHeight * 0.15,
+                height: screenHeight * 0.19,
                 width: screenWidth * 0.4,
                 margin: EdgeInsets.only(right: paddingFactor * 0.2),
                 decoration: BoxDecoration(
@@ -336,17 +347,22 @@ class _CardCatalogState extends State<_CardCatalog> {
                   ],
                 ),
                 clipBehavior: Clip.hardEdge,
-                  child: Image.network(
-                    '$baseUrlFinal/static${product.photo_url!}',
+                  child: CachedNetworkImage(
+                    imageUrl: '$baseUrlFinal/static${product.photo_url!}',
                     fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return const Center(child: CircularProgressIndicator.adaptive());
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Center(child: Text('Не удалось загрузить'));
-                    },
-                  )
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator.adaptive(),
+                    ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Text(
+                        'Ошибка загрузки',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: titleSizeFactor * 0.6,
+                        ),
+                      ),
+                    ),
+                  ),
               ),
               Expanded(
                 child: Column(
@@ -372,16 +388,16 @@ class _CardCatalogState extends State<_CardCatalog> {
                       ),
                     ),
                     const Spacer(),
-                    Padding(padding: EdgeInsets.only(left:screenWidth*0.05),child:
+                    Padding(padding: EdgeInsets.only(left:screenWidth*0.02),child:
                     Row(children:
                         [
                           GestureDetector(
-                            onTap:()=> t(),
+                            onTap:()=> {LocalCartProducts.instance.removeObjectFromCart(product.id!,widget.toggleCart)},
                             child: const Icon(Icons.delete_rounded,color: Colors.red,),
                           ),
                          SizedBox(width: screenWidth*0.02,),
                           Container(
-                              width: paddingFactor * 6,
+                              width: paddingFactor * 6.6,
                               height: screenHeight * 0.045,
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
@@ -397,15 +413,27 @@ class _CardCatalogState extends State<_CardCatalog> {
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   GestureDetector(
-                                      onTap: _decrement,
-                                      child: const Icon(Icons.remove,color: Colors.white,size: 22,),
+                                    onTap: _decrement,
+                                    behavior: HitTestBehavior.translucent,
+                                    child: Container(
+                                      width: screenWidth * 0.16,
+                                      height: screenWidth * 0.16,
+                                      alignment: Alignment.center,
+                                      child: const Icon(Icons.remove, color: Colors.white, size: 22),
+                                    ),
                                   ),
                                   Text('${LocalCartProducts.instance.countProductInCart(product.id!)}',
-                                    style: const TextStyle(fontSize: 13,color: Colors.white),
+                                    style: const TextStyle(fontSize: 15,color: Colors.white),
                                   ),
                                   GestureDetector(
-                                      onTap: _increment,
-                                      child: const Icon(Icons.add,color: Colors.white,size: 22,)
+                                    onTap: _increment,
+                                    behavior: HitTestBehavior.translucent,
+                                    child: Container(
+                                      width: screenWidth * 0.16,
+                                      height: screenWidth * 0.16,
+                                      alignment: Alignment.center,
+                                      child: const Icon(Icons.add, color: Colors.white, size: 22),
+                                    ),
                                   ),
                                 ],
                               )

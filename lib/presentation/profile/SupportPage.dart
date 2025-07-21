@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../AnimatedBackButton.dart';
+
 
 class SupportPageScreen extends StatefulWidget {
   const SupportPageScreen({super.key});
@@ -50,10 +52,9 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
                 forceMaterialTransparency: true,
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                  color: Colors.white,
+                leading: FadedIconButton(
                   onPressed: () => Navigator.of(context).pop(),
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                 ),
                 title: Column(
                   mainAxisAlignment: MainAxisAlignment.end,

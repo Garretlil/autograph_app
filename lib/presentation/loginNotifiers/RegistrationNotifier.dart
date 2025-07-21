@@ -71,24 +71,14 @@ class RegistrationNotifier extends ChangeNotifier {
     if (isRegistration) {
       buttonActive = isNameValid && isSurnameValid && isEmailValid && isPhoneValid;
     } else {
-      buttonActive = isEmailValid && isPhoneValid;
+      buttonActive = isEmailValid;
     }
 
     notifyListeners();
   }
 
-
-
   Future<void> registerUser(Function() onSuccess) async {
     final isReg = isRegistration;
-
-    if (isReg) {
-
-      // nameController.text = 'Кирилл';
-      // surnameController.text = 'Бобрович';
-      // emailController.text = 'kirasgod@gmail.com';
-      // phoneController.text = '+79853156267';
-    }
 
     final name = nameController.text;
     final surname = surnameController.text;
@@ -98,7 +88,7 @@ class RegistrationNotifier extends ChangeNotifier {
     final langEn = prefs?.getBool('LangParams') == true;
 
     if ((isReg && (name.isEmpty || surname.isEmpty || email.isEmpty || phone.isEmpty)) ||
-        (!isReg && (phone.isEmpty || email.isEmpty))) {
+        (!isReg && (email.isEmpty))) {
       _snackBarMessage = isLangEn ? 'Please fill all fields' : 'Заполните все поля';
       notifyListeners();
       return;
@@ -142,7 +132,6 @@ class RegistrationNotifier extends ChangeNotifier {
             ? (isReg ? 'Session expired during registration' : 'Session expired')
             : (isReg ? 'Сессия истекла во время регистрации' : 'Сессия истекла');
         notifyListeners();
-        //Navigator.pushReplacementNamed(context, '/login');
       },
     );
   }

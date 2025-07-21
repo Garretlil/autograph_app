@@ -9,6 +9,7 @@ import 'package:sbp/data/c2bmembers_data.dart';
 import 'package:sbp/models/c2bmembers_model.dart';
 import 'package:sbp/sbp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../AnimatedBackButton.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/SharedP.dart';
 import 'OrderStatus.dart';
@@ -46,10 +47,9 @@ class CartEvents extends StatelessWidget {
               forceMaterialTransparency: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
-                onPressed: () => Navigator.pop(context),
+              leading: FadedIconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               title: Text(
                 'AUTOGRAPH',
@@ -115,55 +115,60 @@ class CartEvents extends StatelessWidget {
       double subtitleSizeFactor,
       ) {
     final selectedCourses = cart.getSelectedCourses();
-    return Column(
+
+    return Stack(
       children: [
-        Expanded(
+        Positioned.fill(
           child: ListView.builder(
-            padding: EdgeInsets.only(bottom: spacingFactor * 6),
+            padding: EdgeInsets.only(bottom: spacingFactor * 2),
             itemCount: selectedCourses.length,
             itemBuilder: (context, index) {
               final courseName = selectedCourses[index];
               final webinars = cart.getSelectedWebinars(courseName);
 
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: webinars.map((webinar) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(
-                          vertical: spacingFactor * 0.1,
-                          horizontal: screenWidth * 0.06,
+              return Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: screenWidth * 0.05,
+                  vertical: spacingFactor * 0.3,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: webinars.map((webinar) {
+                    return Card(
+                      color: Colors.grey[900],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16.0,
+                          vertical: 12.0,
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    cart.removeWebinarFromCourse(courseName, webinar);
-                                    toggleCircleCart(cart.isProductsInCart);
-                                  },
-                                  child: const Icon(
-                                    Icons.delete_rounded,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                const SizedBox(width: 10.0),
-                                Text(
-                                  webinar['title'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: subtitleSizeFactor * 0.7,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.white,
-                                    fontFamily: 'Inria Serif',
-                                  ),
-                                ),
-                              ],
+                            GestureDetector(
+                              onTap: () {
+                                cart.removeWebinarFromCourse(courseName, webinar,toggleCircleCart);
+                                toggleCircleCart(cart.isProductsInCart);
+                              },
+                              child: const Icon(Icons.delete_rounded, color: Colors.red),
                             ),
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Text(
+                                webinar['title'] ?? '',
+                                style: TextStyle(
+                                  fontSize: subtitleSizeFactor * 0.75,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                  fontFamily: 'Inria Serif',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12.0),
                             Text(
-                              '${webinar['cost'] ?? 0} ₽',
+                              '${webinar['price'].toString()} ₽',
                               style: TextStyle(
                                 fontSize: subtitleSizeFactor * 0.8,
                                 color: Colors.white,
@@ -172,18 +177,24 @@ class CartEvents extends StatelessWidget {
                             ),
                           ],
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ],
+                      ),
+                    );
+                  }).toList(),
+                ),
               );
             },
           ),
         ),
-        _buildTotalAndPayment(cart, spacingFactor, subtitleSizeFactor),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: -2,
+          child: _buildTotalAndPayment(cart, spacingFactor, subtitleSizeFactor),
+          ),
       ],
     );
   }
+
 
   Widget _buildTotalAndPayment(LocalCartVideo cart, double spacingFactor, double subtitleSizeFactor) {
     return Container(
@@ -196,7 +207,7 @@ class CartEvents extends StatelessWidget {
           SizedBox(height: spacingFactor * 0.5),
           Padding(
             padding: EdgeInsets.only(bottom: spacingFactor * 1.5,left: subtitleSizeFactor*8),
-            child: PaymentButton(toggleBottomNavigationBar: toggleBottomNavigationBar),
+            child: PaymentButton(toggleBottomNavigationBar: toggleBottomNavigationBar,toggleCart: toggleCircleCart,),
           ),
         ],
       ),
@@ -206,8 +217,9 @@ class CartEvents extends StatelessWidget {
 
 class PaymentButton extends StatelessWidget {
   final void Function(bool) toggleBottomNavigationBar;
+  final Function(bool) toggleCart;
 
-  const PaymentButton({super.key, required this.toggleBottomNavigationBar});
+  const PaymentButton({super.key, required this.toggleBottomNavigationBar,required this.toggleCart});
 
   @override
   Widget build(BuildContext context) {
@@ -226,6 +238,7 @@ class PaymentButton extends StatelessWidget {
               ? () => cart.handlePayment(
             context: context,
             toggleBottomNavigationBar: toggleBottomNavigationBar,
+            toggleCart: toggleCart
           )
               : null,
           child: Material(
@@ -238,6 +251,7 @@ class PaymentButton extends StatelessWidget {
                   ? () => cart.handlePayment(
                 context: context,
                 toggleBottomNavigationBar: toggleBottomNavigationBar,
+                toggleCart: toggleCart
               )
                   : null,
               borderRadius: BorderRadius.circular(23),

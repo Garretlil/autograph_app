@@ -177,139 +177,116 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
         },
         child:Center(
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: SizedBox(
                 height: screenHeight * 0.345,
                 width: screenWidth*1.2,
-              child:Card(
-              elevation: widget.isDarkMode ? 8.0 : 8.0,
-              shadowColor: widget.isDarkMode
-                  ? Colors.blue.withOpacity(0.4)
-                  : Colors.orange.withOpacity(0.2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-                side: BorderSide(
-                  color: widget.isDarkMode
-                      ? Colors.blue.withOpacity(0.2)
+                child:Card(
+                  elevation: widget.isDarkMode ? 8.0 : 8.0,
+                  shadowColor: widget.isDarkMode
+                      ? Colors.blue.withOpacity(0.4)
                       : Colors.orange.withOpacity(0.2),
-                  width: 2,
-                ),
-              ),
-              child: Container(
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: widget.isDarkMode
-                            ? Colors.blue.withOpacity(0.1)
-                            : Colors.orange.withOpacity(0.1),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: widget.isDarkMode
+                          ? Colors.blue.withOpacity(0.2)
+                          : Colors.orange.withOpacity(0.2),
+                      width: 2,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: widget.isDarkMode
+                              ? Colors.blue.withOpacity(0.1)
+                              : Colors.orange.withOpacity(0.1),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
+                          ),
+                        ),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: widget.isDarkMode
+                                        ? Colors.blue.withOpacity(0.2)
+                                        : Colors.orange.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Icon(
+                                widget.icon,
+                                size: 24,
+                                color: widget.isDarkMode ? Colors.blue : Colors.orange,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.sectionTitle,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: widget.isDarkMode
+                                          ? Colors.blue
+                                          : Colors.orange,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    widget.description,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.copyWith(
+                                      fontSize: 15,
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surface,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: widget.isDarkMode
-                                      ? Colors.blue.withOpacity(0.2)
-                                      : Colors.orange.withOpacity(0.2),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                             child: Icon(
-                              widget.icon,
-                              size: 24,
-                              color: widget.isDarkMode ? Colors.blue : Colors.orange,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  widget.sectionTitle,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: widget.isDarkMode
-                                        ? Colors.blue
-                                        : Colors.orange,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  widget.description,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                    fontSize: 15,
-                                    color: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.color,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Stack(
-                        children: [
-                          Container(
-                            height: screenHeight*0.23,
-                            width: screenWidth*0.9,
-                            decoration: BoxDecoration(
-                              borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(22),
-                                  topLeft: Radius.circular(22),
-                                bottomLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20)
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
+                      Expanded(
+                        child: FractionallySizedBox(
+                          widthFactor: 1,
+                          child: AspectRatio(
+                            aspectRatio: 18 / 9,
                             child: ClipRRect(
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(0),
-                                  topLeft: Radius.circular(0),
-                                  bottomLeft: Radius.circular(20),
-                                  bottomRight: Radius.circular(20)
+                              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(25), bottomRight: Radius.circular(25)),
+                              child: Image.asset(
+                                widget.image,
+                                fit: BoxFit.cover,
                               ),
-                              child: Image.asset(widget.image),
                             ),
                           ),
-                        ],
-                      ),
-                    )
-                  ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            )
+              )
           ),
         )
     );

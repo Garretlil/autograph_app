@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/local_cart_video.dart';
 import '../../../data/models/course.dart';
+import '../../AnimatedBackButton.dart';
 
 class ListOfVebinars extends StatefulWidget {
   final String section;
@@ -41,9 +42,9 @@ class _ListOfVebinars extends State<ListOfVebinars> {
     if (webinarTitle == null) return;
     CourseWebinars.instance.updateWebinarStatus(widget.section, webinarTitle, value);
     if (value) {
-      LocalCartVideo.instance.addWebinarToCourse(widget.section, item);
+      LocalCartVideo.instance.addWebinarToCourse(widget.section, item,widget.toggleCircleCart);
     } else {
-      LocalCartVideo.instance.removeWebinarFromCourse(widget.section, item);
+      LocalCartVideo.instance.removeWebinarFromCourse(widget.section, item,widget.toggleCircleCart);
     }
     widget.toggleCircleCart(LocalCartVideo.instance.isProductsInCart);
   }
@@ -82,13 +83,9 @@ class _ListOfVebinars extends State<ListOfVebinars> {
               forceMaterialTransparency: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
-                onPressed: () => {
-                  widget.toggle(false),
-                  Navigator.of(context).pop()
-                },
+              leading: FadedIconButton(
+                onPressed: () => {Navigator.of(context).pop(),widget.toggle(false)},
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               title: Text(
                 'AUTOGRAPH',
@@ -140,6 +137,11 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                               fontFamily: 'Inria Serif',
                             ),
                           ),
+                          subtitle: Text(item['price'].toString(),style: TextStyle(
+                            fontSize: titleSizeFactor * 0.7,
+                            color: Colors.white,
+                            fontFamily: 'Inria Serif',
+                          ),),
                           trailing: Switch(
                             activeColor: Colors.white,
                             activeTrackColor: Colors.orange,

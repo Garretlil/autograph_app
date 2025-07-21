@@ -18,6 +18,7 @@ class PointPlaceMark{
   final String metro;
   final String workTime;
   final String code;
+  final String cityCode;
 
   PointPlaceMark({
     required this.latitude,
@@ -27,7 +28,8 @@ class PointPlaceMark{
     required this.type,
     required this.metro,
     required this.workTime,
-    required this.code
+    required this.code,
+    required this.cityCode,
   });
 }
 class CDEKWindowNotifier extends ChangeNotifier {
@@ -80,7 +82,8 @@ class CDEKWindowNotifier extends ChangeNotifier {
               type: point.type,
               metro: point.nearestMetro ?? '',
               workTime: point.workTime,
-              code: point.code
+              code: point.code,
+              cityCode: point.cityCode ?? '',
             );
             onPlacemarkTap?.call(pointData);
           },

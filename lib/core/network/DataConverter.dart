@@ -370,6 +370,7 @@ class DeliveryPoint {
   final String type;
   final List<String> phones;
   final List<String> images;
+  final String cityCode;
 
 
   DeliveryPoint( {
@@ -383,28 +384,33 @@ class DeliveryPoint {
     required this.type,
     required this.phones,
     required this.images,
+    required this.cityCode,
 
   });
 
   factory DeliveryPoint.fromJson(Map<String, dynamic> json) {
+    final loc = json['location'] as Map<String, dynamic>?;
+
     return DeliveryPoint(
-      code: json['code'] ?? 'Неизвестный код',
+      code: json['code']?.toString() ?? 'Неизвестный код',
       name: json['name'] ?? 'Без названия',
       address: json['address_comment'] ?? 'Адрес не указан',
       nearestMetro: json['nearest_metro_station'] ?? 'Метро не указано',
       workTime: json['work_time'] ?? 'Режим работы не указан',
-      latitude: (json['location']?['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (json['location']?['longitude'] as num?)?.toDouble() ?? 0.0,
-      type: json['type'] ?? 'Тип пвз не указан',
+      latitude: (loc?['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (loc?['longitude'] as num?)?.toDouble() ?? 0.0,
+      type: json['type'] ?? 'Тип ПВЗ не указан',
       phones: (json['phones'] as List<dynamic>?)
           ?.map((p) => p['number'].toString())
           .toList() ?? [],
       images: (json['office_image_list'] as List<dynamic>?)
           ?.map((img) => img['url'].toString())
           .toList() ?? [],
+      cityCode: (loc?['city_code'] != null)
+          ? loc!['city_code'].toString()
+          : '',
     );
   }
-
 }
 
 class Address {

@@ -74,13 +74,11 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   onTap: () {
                     Navigator.pushNamed(context, '/CartEvents');
                   },
-                  child: Text(AppPrefs.prefs.getBool('LangParams') == true
-                      ? 'Events'
-                      : 'Мероприятия',
+                  child: Text(
+                       'Events',
                       style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                      AppPrefs.prefs.getBool('LangParams') == true
-                          ? 'Inria Serif'
-                          : 'ChUR',)
+                          'Inria Serif'
+                          )
                   ),
                 ),
                 SizedBox(
@@ -89,14 +87,12 @@ class _CartChooseScreen extends State<CartChooseScreen> {
                   onTap: () {
                     Navigator.pushNamed(context, '/CartProducts');
                   },
-                child: Text(AppPrefs.prefs.getBool('LangParams') == true
-                    ? 'Products'
-                    : 'Продукция',
-                    style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                    AppPrefs.prefs.getBool('LangParams') == true
-                        ? 'Inria Serif'
-                        : 'ChUR',)
-                ),
+                  child: Text(
+                      'Products',
+                      style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                      'Inria Serif'
+                      )
+                  ),
                 )
               ],
             ),

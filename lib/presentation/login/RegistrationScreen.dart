@@ -129,7 +129,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                           Container(
                                             decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(20),
-                                                gradient: const LinearGradient(colors: [Colors.brown,Colors.brown])
+                                                gradient: LinearGradient(colors: [Colors.orange.shade700,Colors.orange.shade600])
                                             ),
                                             child: Text(
                                               '  AUTOGRAPH  ',
@@ -187,15 +187,17 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                       TextInputType.emailAddress,
                                       registration.emailIsOk
                                     ),
-                                    SizedBox(height: spacingFactor * 0.4),
-                                    _buildTextField(
-                                      registration.prefs?.getBool('LangParams') == true ?
-                                      'Enter your Phone' : 'Введите свой номер телефона',
-                                      registration.phoneController,
-                                      snapshot.data!,
-                                      TextInputType.phone,
-                                      registration.phoneIsOk
-                                    ),
+                                    if (registration.isRegistration) ...[
+                                      SizedBox(height: spacingFactor * 0.4),
+                                      _buildTextField(
+                                        registration.prefs?.getBool('LangParams') == true ?
+                                        'Enter your Phone' : 'Введите свой номер телефона',
+                                        registration.phoneController,
+                                        snapshot.data!,
+                                        TextInputType.phone,
+                                        registration.phoneIsOk
+                                      ),
+                                    ],
                                     SizedBox(height: spacingFactor * 0.4),
                                     Center(
                                       child: Text(
@@ -257,15 +259,6 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                     );
                   },
                 ),
-                bottomNavigationBar: registration.snackBarMessage != null
-                    ? SnackBar(
-                  content: Text(registration.snackBarMessage!),
-                  action: SnackBarAction(
-                    label: 'OK',
-                    onPressed: registration.clearSnackBarMessage,
-                  ),
-                )
-                    : null,
               ),
             ),
           );

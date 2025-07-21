@@ -1,16 +1,21 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../core/services/SharedP.dart';
 
 class CourseViewScreen extends StatefulWidget {
   final void Function(bool) toggle;
+  final String description;
+  final String coursePreview;
   const CourseViewScreen({
     super.key,
     required this.courseName,
-    required this.toggle
+    required this.toggle,
+    required this.description,
+    required this.coursePreview
   });
 
   final String courseName;
-
   @override
   State<CourseViewScreen> createState() => _CourseViewScreenState();
 }
@@ -47,11 +52,14 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                SizedBox(height: screenHeight*0.05,),
                 SizedBox(
                   height: screenHeight * 0.3,
                   child: Container(
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20)),
                       boxShadow: [
@@ -59,13 +67,27 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                       ],
                     ),
                     clipBehavior: Clip.hardEdge,
-                    child: Image.asset('assets/Anterior.jpg',fit: BoxFit.cover,),
+                    child: CachedNetworkImage(
+                      imageUrl: '$baseUrlFinal/static${widget.coursePreview}',
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          'Ошибка загрузки',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: titleSizeFactor * 0.6,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(height: spacingFactor * 0.1),
                 _buildInfoCard(
-                  title: 'Масштабный онлайн-интенсив по фронтальной реставрации в прямой технике. Наша цель заключалась не только в классическом разборе методик, которые встречаются в практике, но в первую очередь - в фундаментальном погружении в природу возникновения необъятного количества эффектов, скрывшихся за тончайшим слоем поверхностной эмали. Autograph ANTERIOR - это целый мир, в котором каждый откроет для себя что-то новое и ранее не изведанное, кого-то, авторы надеятся, натолкнет на мысль о недооцененном величии оптических структур, их непостижимом разнообразии, в ком-то возродит ничем не потопляемое желание повторить природу и все кропотливо созданные ею детали. При просмотре не заскучает никто: от начинающих постигать жанр реставрации до состоявшихся специалистов в данной области - каждому будет о чем задуматься и что нового привнести в свою практику'
-                      ' AUTOGRAPH на app bar ',
+                  title: widget.description,
                   titleSizeFactor: titleSizeFactor,
                   height: screenHeight
                 ),
@@ -109,7 +131,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SizedBox(
-          height: height * 0.5,
+          height: height * 0.45,
           child: SingleChildScrollView(
             child: Text(
               title,

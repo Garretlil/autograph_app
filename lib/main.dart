@@ -1,3 +1,4 @@
+import 'package:autograph_app/Theme/SysTheme/Constants.dart';
 import 'package:autograph_app/core/network/network_layer.dart';
 import 'package:autograph_app/data/models/product.dart';
 import 'package:autograph_app/presentation/CDEK_integration/ConfirmationOrderNotifier.dart';
@@ -10,7 +11,6 @@ import 'core/services/local_cart_products.dart';
 import 'core/services/local_cart_video.dart';
 import 'data/models/course.dart';
 
-
 Future<void> main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,8 +19,8 @@ Future<void> main() async {
   final products = Products();
   await products.initialize();
   final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+  print('isLoggedIn from prefs: $isLoggedIn');
   final tabNotifier = ValueNotifier<int>(0);
-
   runApp(
       MultiProvider(
         providers: [
@@ -40,7 +40,7 @@ Future<void> main() async {
             value: LocalCartProducts.instance,
           ),
         ],
-        child:  MyApp(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier),
+        child: MyApp(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier),
       )
   );
 }
@@ -53,10 +53,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home:  ScreensWithNavigationBar(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier,),
+      debugShowCheckedModeBanner: false,
+      home:  ScreensWithNavigationBar(isLoggedIn: isLoggedIn,tabNotifier: tabNotifier,),
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
+        scaffoldBackgroundColor: background,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.deepPurple,
           brightness: Brightness.dark,

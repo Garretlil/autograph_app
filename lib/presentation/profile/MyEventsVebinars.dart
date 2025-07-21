@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:autograph_app/core/services/SharedP.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../data/models/purchased_course.dart';
 
@@ -19,7 +21,6 @@ class MyEventsWebinarsScreens extends StatefulWidget {
 }
 
 class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
-  final String code = '2453';
 
   Map<String, List<Map<String, dynamic>>> videos = {};
 
@@ -68,10 +69,9 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
               forceMaterialTransparency: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                color: Colors.white,
+              leading: FadedIconButton(
                 onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -105,13 +105,14 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
           ),
           Padding(padding: EdgeInsets.only(
               left: screenWidth*0.04,
-              right: screenWidth*0.04
+              right: screenWidth*0.04,
           ),
           child:
           Column(children: [
-            SizedBox(height: screenHeight * 0.03),
+            SizedBox(height: screenHeight * 0.00),
             Expanded(
               child: ListView.builder(
+                padding: EdgeInsets.only(bottom: screenHeight * 0.08,top: screenHeight * 0.12),
                 itemCount: videos[widget.courseName]?.length ?? 0,
                 itemBuilder: (context, index) {
                   final item = videos[widget.courseName];
@@ -120,7 +121,7 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                   }
                   print('$baseUrlFinal/video/${item[index]['id']}');
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 5.0),
+                    padding: const EdgeInsets.only(bottom: 8.0),
                     child: Column(
                       children: [
                         Row(
@@ -130,7 +131,7 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                               child: VideoPlayerView(
                                 toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
                                 url: '$baseUrlFinal/courses/video/${item[index]['id']}',
-                                thumbnailUrl: 'assets/fon2.png',
+                                thumbnailUrl: '$baseUrlFinal/static${item[index]['thumbnailUrl']}',
                                 dataSourceType: DataSourceType.network,
                                 duration: item[index]['duration'].toString(),
                                 id: int.parse(item[index]['id']),
@@ -138,21 +139,21 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                             ),
                             const SizedBox(width: 8),
                             SizedBox(
-                              width: screenWidth * 0.4,
+                              width: screenWidth * 0.43,
                               child: Text(
                                 item[index]['word'],
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontFamily: 'Inria Serif',
-                                  fontSize: spacingFactor * 0.3,
+                                  fontSize: spacingFactor * 0.27,
                                 ),
-                                maxLines: 2,
+                                maxLines: 6,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height:8),
                         index != item.length - 1
                             ? const Divider()
                             : const SizedBox(height: 10),
@@ -259,23 +260,25 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
     await _loadWatchMoment();
   }
 
-  String convertToTime(int time){
-    hours=time~/3600;
-    minutes=(time%3600)~/60;
-    seconds=((time%3600)%60)%60;
-    String str='';
-    if(hours>0){
-      str='$hours:';
-    }
-    str+='$minutes:';
-    str+='$seconds';
-    return str;
+  String convertToTime(int time) {
+    final hours = time ~/ 3600;
+    final minutes = (time % 3600) ~/ 60;
+    final seconds = time % 60;
+    twoDigits(int n) => n.toString().padLeft(2, '0');
 
+    if (hours > 0) {
+      return '$hours:${twoDigits(minutes)}:${twoDigits(seconds)}';
+    } else {
+      return '$minutes:${twoDigits(seconds)}';
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
     final double totalDuration = double.tryParse(widget.duration) ?? 0.0;
+    double screenWidth = MediaQuery.of(context).size.width;
+    double titleSizeFactor = screenWidth * 0.06;
     print(totalDuration);
     return GestureDetector(
       onTap: () => _openFullScreenPlayer(context),
@@ -286,15 +289,20 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Image.asset(
-                widget.thumbnailUrl,
+              CachedNetworkImage(
+                imageUrl: widget.thumbnailUrl,
                 fit: BoxFit.cover,
-              ),
-              Center(
-                child: Icon(
-                  Icons.play_circle_filled_sharp,
-                  size: 40,
-                  color: Colors.grey.withOpacity(0.88),
+                placeholder: (context, url) => const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+                errorWidget: (context, url, error) => Center(
+                  child: Text(
+                    'Ошибка загрузки',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: titleSizeFactor * 0.6,
+                    ),
+                  ),
                 ),
               ),
               Positioned(
@@ -302,10 +310,10 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
                 right: 10,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.white54.withOpacity(0.8),
                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                   ),
-                  child: Center(child: Text(' ${convertToTime(totalDuration.toInt())} ')),
+                  child: Center(child: Text(' ${convertToTime(totalDuration.toInt())} ',style: TextStyle(color: Colors.black),)),
                 ),
               ),
               Positioned(
@@ -387,7 +395,7 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
       case DataSourceType.network:
         _videoPlayerController = VideoPlayerController.network(
           widget.url,
-          httpHeaders: {'x-session-key': 'd6841575-36d1-4dda-804a-8b5c0c8206b5'},
+          httpHeaders: {'x-session-key': AppPrefs.prefs.getString('session_key')!},
         );
         break;
       case DataSourceType.file:
@@ -445,6 +453,8 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenH = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -457,13 +467,17 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
           child: Icon(Icons.close_sharp, size: screenWidth * 0.08, color: Colors.white70),
         ),
       ),
-      body: Center(
-        child: _isInitialized && _chewieController != null
-            ? Chewie(controller: _chewieController!)
-            : const CircularProgressIndicator.adaptive(backgroundColor: Colors.white),
+      body: Padding(
+        padding:  EdgeInsets.only(bottom:screenH*0.14 ),
+        child: Center(
+          child: _isInitialized && _chewieController != null
+              ? Chewie(controller: _chewieController!)
+              : const CircularProgressIndicator.adaptive(backgroundColor: Colors.white),
+        ),
       ),
     );
   }
+
 }
 
 class TimeLinePainter extends CustomPainter {
@@ -509,4 +523,6 @@ class TimeLinePainter extends CustomPainter {
     return watchMoment != oldDelegate.watchMoment || totalDuration != oldDelegate.totalDuration;
   }
 }
+
+
 

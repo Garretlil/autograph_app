@@ -1,8 +1,10 @@
 import 'dart:ui';
 import 'package:autograph_app/core/services/local_cart_products.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/SharedP.dart';
@@ -16,7 +18,8 @@ class CatalogViewScreen extends StatefulWidget {
     this.src = '',
     this.screenWidth = 5,
     this.screenHeight = 5,
-    required this.section
+    required this.section,
+    required this.toggleCart
   });
   final String src;
   final bool autoRotate;
@@ -24,6 +27,7 @@ class CatalogViewScreen extends StatefulWidget {
   final double screenWidth;
   final double screenHeight;
   final String section;
+  final void Function(bool) toggleCart;
 
   @override
   State<CatalogViewScreen> createState() => _CatalogViewScreen();
@@ -44,7 +48,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
     super.initState();
     setPref();
     _searchController.addListener(_onSearchChanged);
-    selectedCategory = widget.section=='POSTERIOR' ?'Одиночные' : 'Standart';
+    selectedCategory = widget.section=='POSTERIOR' ? 'Одиночные' : 'Standart';
   }
 
   @override
@@ -61,28 +65,45 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
     }
   }
   Widget buildChoiceChip(String category, bool isSelected) {
-    return ChipTheme(
-      data: ChipTheme.of(context).copyWith(
-        selectedColor: Colors.white.withOpacity(0.4),
-        secondarySelectedColor: Colors.white.withOpacity(0.4),
-        labelStyle: const TextStyle(color: Colors.white),
-        showCheckmark: false,
-      ),
-      child: ChoiceChip(
-        label: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (isSelected) ...[
-              const SizedBox(width: 4),
-            ],
-            Text(category),
-          ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          splashFactory: NoSplash.splashFactory,
+          highlightColor: Colors.transparent,
+          splashColor: Colors.transparent,
         ),
-        selected: isSelected,
-        onSelected: (_) => setState(() => selectedCategory = category),
+        child: ChipTheme(
+          data: ChipTheme.of(context).copyWith(
+            selectedColor: Colors.white.withOpacity(0.4),
+            secondarySelectedColor: Colors.white.withOpacity(0.4),
+            labelStyle: const TextStyle(color: Colors.white),
+            showCheckmark: false,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
+          child: ChoiceChip(
+            backgroundColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            label: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(width: 6),
+                Text(category),
+                const SizedBox(width: 6),
+              ],
+            ),
+            selected: isSelected,
+            onSelected: (_) => setState(() => selectedCategory = category),
+          ),
+        ),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -100,17 +121,23 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
             product.subSection == selectedCategory
         ).toList() ?? [];
         List<Widget> listWidget=[];
+        final categories = productsData.categories[widget.section] ?? [];
+
+        final firstRowCategories = categories.take(3).toList();
+        final secondRowCategories = categories.skip(3).toList();
+
         for (var item in filteredProducts){
           listWidget.add(_CardCatalog(
+            k: ValueKey(item.id),
             product: item,
             screenWidth: screenWidth,
             screenHeight: screenHeight,
             autoRotate: widget.autoRotate,
             disableZoom: widget.disableZoom,
+            toggleCart: widget.toggleCart,
             isEnglish: AppPrefs.prefs.getBool('LangParams') ?? false,
           ));
         }
-        final categories = productsData.categories[widget.section]!;
         return Consumer<LocalCartProducts>(
           builder: (context, cart, _) {
         return Scaffold(
@@ -124,15 +151,9 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                   forceMaterialTransparency:true,
                   backgroundColor: Colors.black.withOpacity(0.25),
                   elevation: 0,
-                  leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back_ios_new,
-                      size: iconSizeFactor,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  leading: FadedIconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                   ),
                   title: ShaderMask(
                     shaderCallback: (bounds) => createGradient(bounds),
@@ -171,26 +192,28 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            children: List.generate(3, (i) {
-                              final cat = categories[i];
+                            children: firstRowCategories.map((cat) {
                               return Padding(
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 child: buildChoiceChip(cat, selectedCategory == cat),
                               );
-                            }),
+                            }).toList(),
                           ),
-                          const SizedBox(height: 1),
-                          if(widget.section!='ANTERIOR')
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                child: buildChoiceChip(categories[3], selectedCategory == categories[3]),
+                          if (secondRowCategories.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Row(
+                                children: secondRowCategories.map((cat) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                                    child: buildChoiceChip(cat, selectedCategory == cat),
+                                  );
+                                }).toList(),
                               ),
-                            ],
-                          ),
+                            ),
                         ],
-                      ),
+                      )
+
                     ),
                     Expanded(
                       child: GridAnimatedDemo(children: listWidget),
@@ -206,7 +229,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
   }
 }
 
-
 class _CardCatalog extends StatelessWidget {
   final Product product;
   final double screenWidth;
@@ -214,14 +236,18 @@ class _CardCatalog extends StatelessWidget {
   final bool autoRotate;
   final bool disableZoom;
   final bool isEnglish;
+  final ValueKey k;
+  final void Function(bool) toggleCart;
 
   const _CardCatalog({
+    required this.k,
     required this.product,
     required this.screenWidth,
     required this.screenHeight,
     required this.autoRotate,
     required this.disableZoom,
     required this.isEnglish,
+    required this.toggleCart
   });
 
   void toggleCartStatus(BuildContext context, bool isInCart) {
@@ -229,9 +255,9 @@ class _CardCatalog extends StatelessWidget {
 
     final productId = product.id!;
     if (!isInCart) {
-      cart.addProductToCart(productId);
+      cart.addProductToCart(productId,toggleCart);
     } else {
-      cart.removeProductFromCart(productId);
+      cart.removeProductFromCart(productId,toggleCart);
     }
 
     HapticFeedback.lightImpact();
@@ -282,21 +308,21 @@ class _CardCatalog extends StatelessWidget {
                     boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
                   ),
                   clipBehavior: Clip.hardEdge,
-                  child: Image.network(
-                    '$baseUrlFinal/static${product.photo_url!}',
+                  child: CachedNetworkImage(
+                    imageUrl:  '$baseUrlFinal/static${product.photo_url!}',
                     fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return const Center(child: CircularProgressIndicator.adaptive());
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Text(
-                          'Ошибка загрузки',
-                          style: TextStyle(color: Colors.white, fontSize: titleSizeFactor * 0.6),
+                    // placeholder: (context, url) => const Center(
+                    //   child: CircularProgressIndicator.adaptive(),
+                    // ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Text(
+                        'Ошибка загрузки',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: titleSizeFactor * 0.6,
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -338,7 +364,7 @@ class _CardCatalog extends StatelessWidget {
                     icon: const Icon(Icons.remove, color: Colors.white),
                     onPressed: () {
                       final cart = context.read<LocalCartProducts>();
-                      cart.removeProductFromCart(productId);
+                      cart.removeProductFromCart(productId,toggleCart);
                       HapticFeedback.lightImpact();
                     },
                   ),
@@ -348,7 +374,7 @@ class _CardCatalog extends StatelessWidget {
                     icon: const Icon(Icons.add, color: Colors.white),
                     onPressed: () {
                       final cart = context.read<LocalCartProducts>();
-                      cart.addProductToCart(productId);
+                      cart.addProductToCart(productId,toggleCart);
                       HapticFeedback.lightImpact();
                     },
                   ),
@@ -416,7 +442,7 @@ class _AnimatedGridState extends State<AnimatedGrid> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) {
         setState(() {
           _isReadyToAnimate = true;
@@ -429,13 +455,20 @@ class _AnimatedGridState extends State<AnimatedGrid> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return GridView.count(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.only(
+        left: 8,
+        right: 8,
+        top: 8,
+        bottom: screenHeight * 0.1,
+      ),
       crossAxisCount: widget.crossAxisCount,
       mainAxisSpacing: widget.spacing,
       controller: _scrollController,
       crossAxisSpacing: widget.spacing,
       childAspectRatio: 0.63,
+      physics: const BouncingScrollPhysics(),
       children: List.generate(widget.children.length, (index) {
         Widget child = widget.children[index];
         return _AnimatedGridItem(
@@ -469,62 +502,46 @@ class _AnimatedGridItem extends StatefulWidget {
 
 class _AnimatedGridItemState extends State<_AnimatedGridItem>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
-  late AnimationController _controller;
-  late Animation<double> _slideAnimation;
-  late Animation<double> _opacityAnimation;
-  late Animation<double> _blurAnimation;
-  bool _hasAnimated = false;
+  late final AnimationController _controller;
+  late final Animation<double> _slideAnimation;
+  late final Animation<double> _opacityAnimation;
+  late final Animation<double> _blurAnimation;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
-  }
 
-  void _setupAnimations() {
     _controller = AnimationController(
       duration: widget.duration,
       vsync: this,
     );
 
-    _slideAnimation = Tween<double>(
-      begin: 50.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation = Tween<double>(begin: 50.0, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
 
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
-    ));
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: Curves.easeOut)),
+    );
 
-    _blurAnimation = Tween<double>(
-      begin: 10.0,
-      end: 0.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.4, 1.0, curve: Curves.easeOut),
-    ));
-  }
+    _blurAnimation = Tween<double>(begin: 10.0, end: 0.0).animate(
+      CurvedAnimation(parent: _controller, curve: const Interval(0.4, 1.0, curve: Curves.easeOut)),
+    );
 
-  @override
-  void didUpdateWidget(_AnimatedGridItem oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isReadyToAnimate && !_hasAnimated) {
-      _hasAnimated = true;
-      Future.delayed(widget.delay, () {
-        if (mounted) {
-          _controller.forward();
-        }
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      if (widget.isReadyToAnimate) {
+        Future.delayed(widget.delay, () {
+          if (mounted) _controller.forward();
+        });
+      } else {
+        _controller.value = 1.0;
+      }
+    });
   }
 
   @override
@@ -535,6 +552,8 @@ class _AnimatedGridItemState extends State<_AnimatedGridItem>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -547,29 +566,16 @@ class _AnimatedGridItemState extends State<_AnimatedGridItem>
                 sigmaX: _blurAnimation.value,
                 sigmaY: _blurAnimation.value,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.black,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: widget.child,
-              ),
+              child: widget.child,
             ),
           ),
         );
       },
     );
   }
-
 }
+
+
 
 class GridAnimatedDemo extends StatelessWidget {
   final List<Widget> children;

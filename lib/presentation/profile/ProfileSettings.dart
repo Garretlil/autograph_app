@@ -1,6 +1,8 @@
 import 'dart:ui';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import '../../AnimatedBackButton.dart';
+import '../../core/network/network_layer.dart';
 import '../../core/services/SharedP.dart';
 
 
@@ -19,6 +21,28 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   void initState() {
     super.initState();
   }
+  void _resetAuthState() {
+    AppPrefs.prefs.setBool('isLoggedIn', false);
+    AppPrefs.prefs.setBool('accepted_policy', false);
+    AppPrefs.prefs.setString('session_key', '');
+    widget.tabNotifier.value = 0;
+  }
+  void _showError(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ошибка'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Ок"),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -40,10 +64,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                   forceMaterialTransparency: true,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  leading: IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_outlined),
-                    color: Colors.white,
+                  leading: FadedIconButton(
                     onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
                   ),
                   title: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -74,7 +97,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07,
-                    vertical: screenHeight * 0.15),
+                    vertical: screenHeight * 0.13),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -92,9 +115,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     SizedBox(height: spacingFactor * 0.1),
                     _buildInfoSection("EMAIL:", AppPrefs.prefs.getString('email')!),
                     const Divider(),
-                    SizedBox(height: spacingFactor * 0.1),
-                    _buildInfoSection("COUNTRY:", AppPrefs.prefs.getString('country')!),
-                    const Divider(),
+
                     SizedBox(height: spacingFactor * 0.5),
                     Center(
                       child: Row(
@@ -115,23 +136,81 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                       ),
                     ),
                     SizedBox(height: spacingFactorW),
-                    GestureDetector(
-                      onTap: openTelegram,
-                      child: const Row(
-                        children: [
-                          Text('Telegram'),
-                          SizedBox(width: 5,),
-                          Icon(Icons.telegram, color: Colors.blue,)
-                        ],
-                      ),
-                    ),
                     SizedBox(height: spacingFactor * 0.8,),
                     Center(
                         child: InkWell(
                           onTap: () {},
                           borderRadius: BorderRadius.circular(15),
                           child: Container(
-                            width: spacingFactor * 5,
+                            width: spacingFactor * 3,
+                            height: spacingFactor * 1,
+                            alignment: Alignment.center,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                                topRight: Radius.circular(20),
+                                bottomLeft: Radius.circular(20),
+                              ),
+                              gradient: LinearGradient(
+                                colors: [Colors.orange, Colors.red]),
+                            ),
+                            child: InkWell(
+                              onTap: () async {
+                                try {
+                                  final sessionKey = AppPrefs.prefs.getString('session_key');
+                                  if (sessionKey == null || sessionKey.isEmpty) {
+                                    _resetAuthState();
+                                    return;
+                                  }
+                                  final response = await AuthService(Dio()).logout(sessionKey);
+                                  if (response.message == "Вышли из системы") {
+                                    _resetAuthState();
+                                  } else {
+                                    _showError(context, "Не удалось выйти. Повторите позже.");
+                                  }
+                                } catch (e) {
+                                  _showError(context, "Ошибка при выходе: $e");
+                                }
+                              },
+                              child: Ink(
+                                decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15),
+                                      bottomRight: Radius.circular(15),
+                                      topRight: Radius.circular(15),
+                                      bottomLeft: Radius.circular(15),
+                                    ),
+                                    gradient: LinearGradient(
+                                        colors: [Colors.orange, Colors.red]),
+                                    boxShadow: [BoxShadow(color: Colors.orange)]
+                                ),
+                                child: Container(
+                                  width: spacingFactor * 5,
+                                  height: spacingFactor * 1,
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    AppPrefs.prefs.getBool('LangParams') == false
+                                        ? 'Выйти'
+                                        : 'Logout',
+                                    style: TextStyle(
+                                      fontSize: titleSizeFactor * 0.9,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                    ),
+                    SizedBox(height: screenHeight*0.05,),
+                    Center(
+                        child: InkWell(
+                          onTap: () {},
+                          borderRadius: BorderRadius.circular(15),
+                          child: Container(
+                            width: spacingFactor * 4,
                             height: spacingFactor * 1,
                             alignment: Alignment.center,
                             decoration: BoxDecoration(
@@ -144,13 +223,23 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                               ),
                             ),
                             child: InkWell(
-                              onTap: () async {
-                                 AppPrefs.prefs.setBool('isLoggedIn', false);
-                                 AppPrefs.prefs.setBool('accepted_policy', false);
-                                 // final sessionKey=prefs.getString('session_key');
-                                 // await AuthService(Dio()).deleteAccount(sessionKey!);
-                                 AppPrefs.prefs.setString('session_key', '');
-                                 widget.tabNotifier.value = 0;
+                               onTap: () async {
+                                  try {
+                                    final sessionKey = AppPrefs.prefs.getString('session_key');
+                                    if (sessionKey == null || sessionKey.isEmpty) {
+                                      _resetAuthState();
+                                      return;
+                                    }
+                                    final response = await AuthService(Dio()).deleteAccount(sessionKey);
+                                    if (response.message == "Удалено") {
+                                      _resetAuthState();
+                                      print('juj');
+                                    } else {
+                                      _showError(context, "Не удалось удалить аккаунт. Повторите позже.");
+                                    }
+                                } catch (e) {
+                                  _showError(context, "Ошибка при удалении аккаунта: $e");
+                                 }
                               },
                               child: Ink(
                                 decoration: const BoxDecoration(
@@ -191,21 +280,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
           )
       );
     }
-
-
-  void openTelegram() async {
-    final tgUrl = Uri.parse('tg://resolve?domain=bobrovich_dent');
-    final webUrl = Uri.parse('https://t.me/bobrovich_dent');
-    if (await canLaunchUrl(tgUrl)) {
-      await launchUrl(tgUrl);
-    } else if (await canLaunchUrl(webUrl)) {
-      await launchUrl(webUrl, mode: LaunchMode.externalApplication);
-    } else {
-      throw 'Не удалось открыть Telegram';
-    }
-  }
-
-
 
   Widget _buildInfoSection(String title, String value) {
     double screenWidth = MediaQuery.of(context).size.width;

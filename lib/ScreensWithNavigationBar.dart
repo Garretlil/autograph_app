@@ -16,14 +16,15 @@ import 'package:autograph_app/presentation/profile/ProfilePage.dart';
 import 'package:autograph_app/presentation/profile/SupportPage.dart';
 import 'package:autograph_app/presentation/shop/PreCatalog.dart';
 import 'package:autograph_app/presentation/shop/ProductScreen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/services/SharedP.dart';
 import 'presentation/profile/ProfileMyEventsScreen.dart';
 import 'presentation/profile/ProfileOrders.dart';
 import 'presentation/profile/ProfileSettings.dart';
 import 'presentation/shop/CatalogScreen.dart';
+
 
 class ScreensWithNavigationBar extends StatefulWidget {
   final bool isLoggedIn;
@@ -57,18 +58,15 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
   }
 
   Future<void> setPref() async {
-    final storedIsLoggedIn = AppPrefs.prefs.getBool('isLoggedIn');
+    final storedIsLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+    print(storedIsLoggedIn);
     if (mounted) {
       setState(() {
-        if (storedIsLoggedIn != null) {
-          isLog = storedIsLoggedIn;
-        } else {
-          AppPrefs.prefs.setBool('isLoggedIn', widget.isLoggedIn);
-          isLog = widget.isLoggedIn;
-        }
+        isLog = storedIsLoggedIn;
         prefsLoaded = true;
       });
     }
+    print(storedIsLoggedIn);
   }
 
   void _onTabChange() {
@@ -93,8 +91,30 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
       });
     }
   }
+  Widget _buildCartIcon() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+         Icon(Icons.shopping_cart,color: _selectedIndex ==1 ? Colors.white : Colors.blueGrey.shade400),
+        if (isCircleVisible)
+          Positioned(
+            right: -1,
+            top: 0,
+            child: Container(
+              width: 9,
+              height: 9,
+              decoration: const  BoxDecoration(
+                color: Colors.orange,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 
   void _toggleBottomNavigationBar(bool isVisible) {
+    print('toggle: $isVisible');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && isBottomNavVisible != isVisible) {
         setState(() {
@@ -109,12 +129,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     GlobalKey<NavigatorState>(),
     GlobalKey<NavigatorState>(),
   ];
-
-  Future<bool> _onWillPop() async {
-    final isFirstRouteInCurrentTab =
-    !await _navigatorKeys[_selectedIndex].currentState!.maybePop();
-    return isFirstRouteInCurrentTab;
-  }
 
   void _toggleCircleCart(bool isVisible) {
     setState(() {
@@ -147,6 +161,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
             switch (settings.name) {
               case '/':
                 if (isLog) {
+                  print('00');
                   _toggleBottomNavigationBar(true);
                   return customPageRoute(const HomePage());
                 } else {
@@ -157,9 +172,9 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
               case '/CheckCodeScreen':
                 final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute(CheckCodeScreen(
-                    toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                    email: args['email'],
-                    phone: args['phone'],
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  email: args['email'],
+                  phone: args['phone'],
                 ));
               case '/HomePage':
                 _toggleBottomNavigationBar(true);
@@ -170,48 +185,50 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                 return customPageRoute(const PreCatalogScreen());
               case '/Catalog':
                 final args = settings.arguments as Map<String, dynamic>;
-                return customPageRoute( CatalogViewScreen(
-                  screenHeight:args['screenHeight'],
+                return customPageRoute(CatalogViewScreen(
+                  screenHeight: args['screenHeight'],
                   screenWidth: args['screenWidth'],
                   autoRotate: args['autoRotate'],
                   disableZoom: args['disableZoom'],
                   src: args['src'],
                   section: args['section'],
+                  toggleCart: _toggleCircleCart,
                 ));
               case '/Product':
                 final args = settings.arguments as Map<String, dynamic>;
-                return customPageRoute( ProductViewScreen(
-                  screenHeight:args['screenHeight'],
+                return customPageRoute(ProductViewScreen(
+                  screenHeight: args['screenHeight'],
                   screenWidth: args['screenWidth'],
                   autoRotate: args['autoRotate'],
                   disableZoom: args['disableZoom'],
                   product: args['product'],
+                  toggleCart: _toggleCircleCart,
                 ));
               case '/EventsOnline':
                 _toggleBottomNavigationBar(true);
                 return customPageRoute(const EventsOnline());
               case '/DetailsScreenForSection':
                 final args = settings.arguments as Map<String, dynamic>;
-                return customPageRoute( DetailsScreenForSection(
+                return customPageRoute(DetailsScreenForSection(
                   section: args['section'],
-                ),
-                );
+                ));
               case '/ListOfVebinars':
                 final args = settings.arguments as Map<String, dynamic>;
                 _toggleBottomNavigationBar(true);
-                return customPageRoute( ListOfVebinars(
-                  section: args['courseName'], toggleCircleCart: _toggleCircleCart,
+                return customPageRoute(ListOfVebinars(
+                  section: args['courseName'],
+                  toggleCircleCart: _toggleCircleCart,
                   toggle: _toggleBottomNavigationBar,
-                ),
-                );
+                ));
               case '/CourseDetail':
                 final args = settings.arguments as Map<String, dynamic>;
                 _toggleBottomNavigationBar(false);
                 return customPageRoute(CourseViewScreen(
-                    courseName: args['courseName'],
-                    toggle: _toggleBottomNavigationBar,
-                  ),
-                );
+                  courseName: args['courseName'],
+                  description: args['description'],
+                  coursePreview: args['coursePreview'],
+                  toggle: _toggleBottomNavigationBar,
+                ));
               default:
                 return customPageRoute(RegistrationScreen(
                     toggleBottomNavigationBar: _toggleBottomNavigationBar));
@@ -219,17 +236,23 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
           case 1:
             switch (settings.name) {
               case '/':
-                _toggleBottomNavigationBar(true);
                 return customPageRoute(const CartChooseScreen());
               case '/CartEvents':
-                return customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                  toggleCircleCart: _toggleCircleCart,));
+                return customPageRoute(CartEvents(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCircleCart: _toggleCircleCart,
+                ));
               case '/CartProducts':
                 _toggleBottomNavigationBar(false);
-                return customPageRoute( CartProductsScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar));
+                return customPageRoute(CartProductsScreen(
+                    toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                    toggleCart: _toggleCircleCart,
+                ));
               case '/Cart2':
-                return  customPageRoute(CartEvents(toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                  toggleCircleCart: _toggleCircleCart,));
+                return customPageRoute(CartEvents(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCircleCart: _toggleCircleCart,
+                ));
               default:
                 throw Exception('Unknown route: ${settings.name}');
             }
@@ -245,14 +268,13 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                 return customPageRoute(const ProfileMyEventsScreen());
               case '/MyEventsVebinars':
                 final args = settings.arguments as Map<String, dynamic>;
-                return customPageRoute( MyEventsWebinarsScreens(
+                return customPageRoute(MyEventsWebinarsScreens(
                   courseName: args['courseName'],
                   toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                ),
-                );
+                ));
               case '/Orders':
-                _toggleBottomNavigationBar(false);
-                return customPageRoute(ProfileOrdersScreen(toggleBottomNavigationBar: _toggleBottomNavigationBar,));
+                return customPageRoute(ProfileOrdersScreen(
+                    toggleBottomNavigationBar: _toggleBottomNavigationBar));
               case '/Support':
                 return customPageRoute(const SupportPageScreen());
               default:
@@ -271,8 +293,16 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     double screenWidth = MediaQuery.of(context).size.width;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW = screenWidth * 0.06;
-    return WillPopScope(
-      onWillPop: _onWillPop,
+
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) return;
+        final isFirstRouteInCurrentTab =
+        !await _navigatorKeys[_selectedIndex].currentState!.maybePop();
+        if (isFirstRouteInCurrentTab) {
+        }
+      },
       child: Scaffold(
         body: Stack(
           children: [
@@ -283,7 +313,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                     (index) => _buildNavigator(index),
               ),
             ),
-
             if (isBottomNavVisible)
               Positioned(
                 left: 50,
@@ -318,24 +347,26 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                             rippleColor: Colors.transparent,
                             gap: 2,
                             padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: spacingFactor * 0.25
+                              horizontal: 20,
+                              vertical: spacingFactor * 0.25,
                             ),
                             selectedIndex: _selectedIndex,
                             onTabChange: (index) {
                               widget.tabNotifier.value = index;
                             },
-                            tabs: const [
-                              GButton(
+                            tabs:  [
+                              const GButton(
                                 icon: Icons.home_max,
                                 text: 'Home',
                                 haptic: true,
                               ),
                               GButton(
                                 icon: Icons.shopping_cart,
+                                leading: _buildCartIcon(),
                                 text: 'Cart',
                                 haptic: true,
                               ),
-                              GButton(
+                              const GButton(
                                 icon: Icons.account_circle_sharp,
                                 text: 'Profile',
                                 haptic: true,
