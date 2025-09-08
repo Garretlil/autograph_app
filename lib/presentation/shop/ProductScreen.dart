@@ -51,7 +51,6 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   void toggleCartStatus(BuildContext context) {
 
     final productId = widget.product.id;
-    print(widget.product);
 
     if (!isAddedToCart) {
       LocalCartProducts.instance.addProductToCart(productId!,widget.toggleCart);
@@ -73,13 +72,10 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     double titleSizeFactor = screenWidth * 0.06;
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.04;
-    double iconSizeFactor = screenWidth * 0.06;
 
     return Consumer<Products>(builder: (context, products, child) {
       final currentProduct = products.products.products!
           .firstWhere((product) => product.id == widget.product.id);
-      print(baseUrlFinal+currentProduct.model_url!);
-
       return Scaffold(
         body: Stack(
           children: [
@@ -113,7 +109,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                       backgroundColor: Colors.grey.shade800,
                       src: '$baseUrlFinal/static${currentProduct.model_url!}',
                       alt: '',
-                      ar: false,
+                      ar: true,
                       autoRotate: widget.autoRotate,
                       disableZoom: widget.disableZoom,
                         orientation: "1 0 0 -90deg"
@@ -204,7 +200,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
               left: 15,
               child: FadedIconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
               ),
             ),
           ],

@@ -17,7 +17,7 @@ abstract class AuthService {
   @POST("/users/email_confirm")
   Future<ConfirmationResponse> verifyEmail(@Body() Map<String, dynamic> body);
 
-  @GET("/me")
+  @GET("/users/me")
   Future<MeResponse> getMe(@Header('x-session-key') String sessionKey);
 
   @GET("/users/delete")

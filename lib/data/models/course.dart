@@ -35,7 +35,6 @@ class CourseWebinars extends ChangeNotifier{
       _initialized = true;
     } catch (error) {
       webinarsByCourse = _fallbackWebinars();
-      print(error);
     }
     _isLoading = false;
     notifyListeners();
@@ -93,8 +92,6 @@ class CourseWebinars extends ChangeNotifier{
               'bought': webinar.bought,
               'preview_url': webinar.preview_url ?? 'ttt',
             });
-            print(price);
-            print('проверка');
           }
         }
         result[course.title!] = webinarsList;
@@ -105,22 +102,7 @@ class CourseWebinars extends ChangeNotifier{
   }
 
   Map<String, List<Map<String, dynamic>>> _fallbackWebinars() {
-    return {
-      'Anterior': [
-        {'description': 'Масштабный онлайн-интенсив по фронтальной реставрации в прямой технике. Наша цель заключалась не только в классическом разборе методик, которые встречаются в практике, но в первую очередь - в фундаментальном погружении в природу возникновения необъятного количества эффектов, скрывшихся за тончайшим слоем поверхностной эмали. Autograph ANTERIOR - это целый мир, в котором каждый откроет для себя что-то новое и ранее не изведанное, кого-то, авторы надеятся, натолкнет на мысль о недооцененном величии оптических структур, их непостижимом разнообразии, в ком-то возродит ничем не потопляемое желание повторить природу и все кропотливо созданные ею детали. При просмотре не заскучает никто: от начинающих постигать жанр реставрации до состоявшихся специалистов в данной области - каждому будет о чем задуматься и что нового привнести в свою практику.'},
-        {"preview_url": 'assets/preview1'},
-        {'id':1},
-        {'title': 'Color Correction Mastery', 'description':'somthing','isOn': false, 'cost': 5, 'id': '1'},
-        {'word': 'Creating a Brand Logo', 'isOn': false, 'cost': 6, 'id': '2'},
-        {'word': 'Digital Signature Basics', 'isOn': false, 'cost': 3, 'id': '3'},
-      ],
-      'Posterior': [
-        {'description': 'Full demonstration of photo editing, including color correction, defects removal, creating own brand logo, digital signature and etc.'},
-        {'word': 'Top Camera Reviews', 'isOn': false, 'cost': 7, 'id': '5'},
-        {'word': 'Budget-Friendly Photosets', 'isOn': false, 'cost': 6, 'id': '6'},
-        {'word': 'Dental Photography Essentials', 'isOn': false, 'cost': 5, 'id': '7'},
-      ],
-    };
+    return {};
   }
 
   void setWebinars(String courseName, List<Map<String, dynamic>> webinars) {
@@ -154,8 +136,6 @@ class CourseWebinars extends ChangeNotifier{
       );
       webinarToUpdate['isOn'] = isOn;
       notifyListeners();
-    } catch (e) {
-      print('Вебинар с названием "$webinarTitle" не найден в курсе "$courseName".');
-    }
+    } catch (e) {}
   }
 }

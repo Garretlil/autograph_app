@@ -70,17 +70,17 @@ class _CartChooseScreen extends State<CartChooseScreen> {
           Center(
             child: Column(
               children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, '/CartEvents');
-                  },
-                  child: Text(
-                       'Events',
-                      style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
-                          'Inria Serif'
-                          )
-                  ),
-                ),
+                // GestureDetector(
+                //   onTap: () {
+                //     Navigator.pushNamed(context, '/CartEvents');
+                //   },
+                //   child: Text(
+                //        'Events',
+                //       style: TextStyle(fontSize:titleSizeFactor,color:Colors.white,fontFamily:
+                //           'Inria Serif'
+                //           )
+                //   ),
+                // ),
                 SizedBox(
                     height: spacingFactor*3.5),
                 GestureDetector(

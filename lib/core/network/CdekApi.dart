@@ -25,7 +25,6 @@ class CDEKApi {
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
     if (response.statusCode == 200) {
-      print('Data loaded');
       if (response.data is! List) {
         throw Exception('Ответ API не список');
       }
@@ -112,7 +111,6 @@ class CDEKApi {
         "width": width.toInt(),
       }
     };
-    print(data);
     final sessionKey = AppPrefs.prefs.getString('session_key');
     if (sessionKey == null || sessionKey.isEmpty) {
       throw UnauthorizedException();
@@ -120,7 +118,6 @@ class CDEKApi {
     CreateOrderProductResponse response = await safeRequest(() {
       return client.createOrder(sessionKey, data);
     });
-    print('Заказ оформлен: ${response.message}');
   }
 
 }

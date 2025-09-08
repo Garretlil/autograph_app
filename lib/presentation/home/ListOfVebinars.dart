@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/services/local_cart_video.dart';
@@ -117,6 +118,25 @@ class _ListOfVebinars extends State<ListOfVebinars> {
             ),
             child: Column(
               children: [
+                if(webinars.isEmpty) ...[
+                    Padding(padding:EdgeInsets.only(
+                      top: screenHeight * 0.4,
+                    ), child:  Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text('Вы уже приобрели весь курс!',style: TextStyle(fontSize: 20,color: Colors.orange),),
+                        Lottie.asset(
+                            'assets/Sleeping.json',
+                            width: 130,
+                            height: 130,
+                            fit: BoxFit.contain,
+                            repeat: true
+                        ),
+                      ],
+                    )
+                    )
+                ],
+                if (webinars.isNotEmpty)
                 Expanded(
                   child: ListView.builder(
                     itemCount: webinars.length,
@@ -137,9 +157,9 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                               fontFamily: 'Inria Serif',
                             ),
                           ),
-                          subtitle: Text(item['price'].toString(),style: TextStyle(
-                            fontSize: titleSizeFactor * 0.7,
-                            color: Colors.white,
+                          subtitle: Text('${item['price']} ₽',style: TextStyle(
+                            fontSize: titleSizeFactor * 0.8,
+                            color: Colors.blueGrey.shade200,
                             fontFamily: 'Inria Serif',
                           ),),
                           trailing: Switch(
@@ -169,9 +189,8 @@ class _ListOfVebinars extends State<ListOfVebinars> {
                     child: ShaderMask(
                       shaderCallback: (bounds) => createGradient(bounds),
                       child: Text(
-                        prefs?.getBool('LangParams') == true
-                            ? 'TOTAL: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)} ₽'
-                            : 'Сумма: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)} ₽',
+                            webinars.isNotEmpty ?
+                            'Сумма: ${LocalCartVideo.instance.getCourseTotalPrice(widget.section)} ₽' : '',
                         style: TextStyle(
                           fontSize: titleSizeFactor * 1.05,
                           color: Colors.white,

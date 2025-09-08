@@ -135,16 +135,18 @@ Map<String, dynamic> _$CreateOrderProductResponseToJson(
     };
 
 MeResponse _$MeResponseFromJson(Map<String, dynamic> json) => MeResponse(
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
-      sessions: (json['sessions'] as List<dynamic>)
-          .map((e) => Session.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      name: json['name'] as String?,
+      surname: json['surname'] as String?,
+      email: json['email'] as String?,
+      phone: json['phone'] as String?,
     );
 
 Map<String, dynamic> _$MeResponseToJson(MeResponse instance) =>
     <String, dynamic>{
-      'user': instance.user,
-      'sessions': instance.sessions,
+      'name': instance.name,
+      'surname': instance.surname,
+      'email': instance.email,
+      'phone': instance.phone,
     };
 
 DeleteAccountResponse _$DeleteAccountResponseFromJson(
@@ -171,16 +173,14 @@ Map<String, dynamic> _$PolicyAgreeResponseToJson(
     };
 
 User _$UserFromJson(Map<String, dynamic> json) => User(
-      name: json['name'] as String,
-      id: (json['id'] as num).toInt(),
-      surname: json['surname'] as String,
-      email: json['email'] as String,
+      name: json['name'] as String?,
+      surname: json['surname'] as String?,
+      email: json['email'] as String?,
       phone: json['phone'] as String?,
     );
 
 Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'name': instance.name,
-      'id': instance.id,
       'surname': instance.surname,
       'email': instance.email,
       'phone': instance.phone,

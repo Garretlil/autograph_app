@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class FadedIconButton extends StatefulWidget {
   final VoidCallback onPressed;
@@ -39,7 +40,7 @@ class _FadedIconButtonState extends State<FadedIconButton> {
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 100),
         opacity: _opacity,
-        child: widget.icon,
+        child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.grey.shade400),
       ),
     );
   }

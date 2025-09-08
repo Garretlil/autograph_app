@@ -90,10 +90,8 @@ class CDEKWindowNotifier extends ChangeNotifier {
         );
       }).toList();
 
-      print(points.length);
       notifyListeners();
     } catch (e) {
-      print('Ошибка загрузки ПВЗ: $e');
     }
   }
   void _clusterizePoints() {
@@ -129,7 +127,6 @@ class CDEKWindowNotifier extends ChangeNotifier {
             ),
           );
         });
-    print('new cluster');
     notifyListeners();
   }
 
@@ -138,7 +135,6 @@ class CDEKWindowNotifier extends ChangeNotifier {
     await _loadPoints();
     zoom = 10;
     _clusterizePoints();
-    print("Кластеры добавлены");
     stations = await fetchMetroStations();
     notifyListeners();
   }

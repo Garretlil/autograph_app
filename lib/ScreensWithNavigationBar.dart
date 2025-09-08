@@ -59,14 +59,12 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
 
   Future<void> setPref() async {
     final storedIsLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
-    print(storedIsLoggedIn);
     if (mounted) {
       setState(() {
         isLog = storedIsLoggedIn;
         prefsLoaded = true;
       });
     }
-    print(storedIsLoggedIn);
   }
 
   void _onTabChange() {
@@ -95,7 +93,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     return Stack(
       clipBehavior: Clip.none,
       children: [
-         Icon(Icons.shopping_cart,color: _selectedIndex ==1 ? Colors.white : Colors.blueGrey.shade400),
+         Icon(Icons.shopping_cart,color: _selectedIndex ==1 ? Colors.white : Colors.grey.shade600),
         if (isCircleVisible)
           Positioned(
             right: -1,
@@ -114,7 +112,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
   }
 
   void _toggleBottomNavigationBar(bool isVisible) {
-    print('toggle: $isVisible');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && isBottomNavVisible != isVisible) {
         setState(() {
@@ -161,7 +158,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
             switch (settings.name) {
               case '/':
                 if (isLog) {
-                  print('00');
                   _toggleBottomNavigationBar(true);
                   return customPageRoute(const HomePage());
                 } else {
@@ -245,8 +241,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
               case '/CartProducts':
                 _toggleBottomNavigationBar(false);
                 return customPageRoute(CartProductsScreen(
-                    toggleBottomNavigationBar: _toggleBottomNavigationBar,
-                    toggleCart: _toggleCircleCart,
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCart: _toggleCircleCart,
                 ));
               case '/Cart2':
                 return customPageRoute(CartEvents(
@@ -340,7 +336,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                           child: GNav(
                             iconSize: spacingFactor * 0.5,
                             backgroundColor: Colors.grey.shade600.withOpacity(0.6),
-                            color: Colors.blueGrey.shade400,
+                            color: Colors.grey.shade600,
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             activeColor: Colors.white,
                             tabBackgroundColor: Colors.transparent,
@@ -356,7 +352,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                             },
                             tabs:  [
                               const GButton(
-                                icon: Icons.home_max,
+                                icon: Icons.home_max_rounded,
                                 text: 'Home',
                                 haptic: true,
                               ),

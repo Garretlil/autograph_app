@@ -20,7 +20,6 @@ class UserOrders with ChangeNotifier{
     try {
       await getOrders();
     } catch (error) {
-      print(error);
     }
     notifyListeners();
   }
@@ -38,7 +37,6 @@ class UserOrders with ChangeNotifier{
       productOrder = await client.getOrders(sessionKey!);
       productOrder.product_orders.reverse();
     } catch (error) {
-        print('Ошибка при загрузке товаров: $error');
         productOrder = ProductOrderResponse(product_orders: []);
     }
     notifyListeners();

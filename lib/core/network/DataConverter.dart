@@ -156,10 +156,11 @@ class CreateOrderProductResponse {
 
 @JsonSerializable()
 class MeResponse {
-  final User user;
-  final List<Session> sessions;
-
-  MeResponse({required this.user, required this.sessions});
+  final String? name;
+  final String? surname;
+  final String? email;
+  final String? phone;
+  MeResponse({required this.name,required this.surname,required this.email,required this.phone});
 
   factory MeResponse.fromJson(Map<String, dynamic> json) => _$MeResponseFromJson(json);
 
@@ -189,15 +190,13 @@ class PolicyAgreeResponse {
 
 @JsonSerializable()
 class User {
-  final String name;
-  final int id;
-  final String surname;
-  final String email;
+  final String? name;
+  final String? surname;
+  final String? email;
   final String? phone;
 
   User({
     required this.name,
-    required this.id,
     required this.surname,
     required this.email,
     this.phone,

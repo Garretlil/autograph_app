@@ -34,7 +34,6 @@ class Products with ChangeNotifier{
     try {
        await getCatalog();
     } catch (error) {
-      print('Ошибка инициализации Products: $error');
       products = Catalog(products: [
         Product(
         name: 'Forward teeth',
@@ -61,10 +60,8 @@ class Products with ChangeNotifier{
     try {
       final catalog = await client.getProducts();
       products = catalog;
-      print('Товары загружены успешно');
     } catch (error) {
       if (kDebugMode) {
-        print('Ошибка при загрузке товаров: $error');
       }
     }
     notifyListeners();

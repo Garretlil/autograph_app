@@ -175,7 +175,6 @@ class LocalCartVideo extends ChangeNotifier {
             throw Exception('Payment failed: ${payResponse.message}');
          }
       } catch (e) {
-         print('Ошибка при оформлении: $e');
          _errorMessage = 'Ошибка при оформлении заказа';
          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(_errorMessage!)),
@@ -194,7 +193,6 @@ class LocalCartVideo extends ChangeNotifier {
             useAndroidLocalNames: false,
          );
       } catch (e) {
-         print('Ошибка при получении банков: $e');
          return [];
       }
    }
@@ -204,14 +202,10 @@ class LocalCartVideo extends ChangeNotifier {
       for (var webinars in _selectedWebinarsByCourse.values) {
          for (var webinar in webinars) {
             if (webinar.containsKey('id')) {
-               print(webinar['id']);
                webinarIds.add(int.parse(webinar['id']));
             }
          }
       }
-      print({
-         'webinar_items': webinarIds.map((id) => {'webinar_id': id}).toList(),
-      });
       return {
          'webinar_items': webinarIds.map((id) => {'webinar_id': id}).toList(),
       };

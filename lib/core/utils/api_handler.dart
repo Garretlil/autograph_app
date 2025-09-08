@@ -23,7 +23,6 @@ Future<T?> handleApiCall<T>({
       Navigator.pushReplacementNamed(context, '/login');
     }
   } on AppException catch (e) {
-    print(e);
     showErrorDialog(context, e.message);
   }
   return null;
@@ -38,12 +37,9 @@ Future<T> safeRequest<T>(Future<T> Function() request) async {
     throw AppException("Нет подключения к интернету.");
   } on DioError catch (e) {
     final status = e.response?.statusCode;
-    print(status);
-    print(e.message);
     if (e.message!.contains("Connection reset by peer")) {
       throw AppException("Сервер разорвал соединение. Повторите позже.");
     }
-    print(status);
     if (status == 401) {
       throw UnauthorizedException();
     }

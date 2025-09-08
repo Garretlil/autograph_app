@@ -10,7 +10,7 @@ part of 'network_layer.dart';
 
 class _AuthService implements AuthService {
   _AuthService(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'https://autograph-dentistry.com';
+    baseUrl ??= 'https://autograph-dentistry.com/api/';
   }
 
   final Dio _dio;
@@ -114,7 +114,7 @@ class _AuthService implements AuthService {
       Options(method: 'GET', headers: _headers, extra: _extra)
           .compose(
             _dio.options,
-            '/me',
+            '/users/me',
             queryParameters: queryParameters,
             data: _data,
           )
@@ -247,7 +247,7 @@ class _AuthService implements AuthService {
 
 class _CourseVideoService implements CourseVideoService {
   _CourseVideoService(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'https://autograph-dentistry.com';
+    baseUrl ??= 'https://autograph-dentistry.com/api/';
   }
 
   final Dio _dio;
@@ -406,7 +406,7 @@ class _CourseVideoService implements CourseVideoService {
 
 class _ProductService implements ProductService {
   _ProductService(this._dio, {this.baseUrl, this.errorLogger}) {
-    baseUrl ??= 'https://autograph-dentistry.com';
+    baseUrl ??= 'https://autograph-dentistry.com/api/';
   }
 
   final Dio _dio;

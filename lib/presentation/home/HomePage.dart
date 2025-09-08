@@ -10,9 +10,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
-  Future<void> setPref() async {
-    print(AppPrefs.prefs.getString('session_key'));
-  }
+  Future<void> setPref() async {}
 
   @override
   void initState() {
@@ -65,12 +63,12 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
       ),
       body: Stack(
         children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/image.png',
-              fit: BoxFit.cover,
-            ),
-          ),
+          // Positioned.fill(
+          //   child: Image.asset(
+          //     'assets/image.png',
+          //     fit: BoxFit.cover,
+          //   ),
+          // ),
           LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
@@ -83,7 +81,7 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
                         Padding(
                           padding: EdgeInsets.fromLTRB(
                             paddingFactor * 0.4,
-                            paddingFactor * 2.5 + kToolbarHeight,
+                            paddingFactor * 1.5 + kToolbarHeight,
                             paddingFactor*0.4,
                             0,
                           ),
@@ -94,27 +92,42 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                     ThemeShowcaseCard(
-                                        isDarkMode: false,
-                                        isPhantoms: true,
-                                        sectionTitle: 'Фантомы',
-                                        icon: Icons.shopping_bag,
-                                        description: 'Лучшие модели зубов',
-                                        nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',),
-                                       image: 'assets/homepage2.jpg',
+                                    GestureDetector(
+                                      onTap: () => Navigator.pushNamed(context, '/PreCatalog',),
+                                      child: Image.asset(
+                                        'assets/homepage2.png',
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                    SizedBox(height: spacingFactor * 0.01),
-                                     ThemeShowcaseCard(
-                                        isDarkMode: true,
-                                        sectionTitle: 'Мероприятия',
-                                        icon: Icons.ondemand_video,
-                                        description: 'Курсы по реставрации',
-                                        isPhantoms: false,
-                                        nextScreen: (ctx) => Navigator.pushNamed(
-                                          ctx, '/EventsOnline',
-                                        ),
-                                         image: 'assets/homepage.jpg',
+                                    GestureDetector(
+                                      onTap: () => Navigator.pushNamed(context, '/EventsOnline',),
+                                      child: Image.asset(
+                                        'assets/courses.jpeg',
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
+                                    //  ThemeShowcaseCard(
+                                    //     isDarkMode: false,
+                                    //     isPhantoms: true,
+                                    //     sectionTitle: 'Фантомы',
+                                    //     icon: Icons.shopping_bag,
+                                    //     description: 'Лучшие модели зубов',
+                                    //     nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',),
+                                    //    image: 'assets/homepage2.jpg',
+                                    // ),
+                                    // SizedBox(height: spacingFactor * 0.01),
+                                    //  ThemeShowcaseCard(
+                                    //     isDarkMode: true,
+                                    //     sectionTitle: 'Мероприятия',
+                                    //     icon: Icons.ondemand_video,
+                                    //     description: 'Курсы по реставрации',
+                                    //     isPhantoms: false,
+                                    //     nextScreen: (ctx) => Navigator.pushNamed(
+                                    //       ctx, '/EventsOnline',
+                                    //     ),
+                                    //      image: 'assets/homepage.jpg',
+                                    // ),
+
                                     SizedBox(height: spacingFactor * 0.02),
                                   ],
                                 ),
@@ -289,6 +302,146 @@ class _ThemeShowcaseCard extends State<ThemeShowcaseCard> with SingleTickerProvi
               )
           ),
         )
+    );
+  }
+}
+
+class ProductsScreen extends StatelessWidget {
+  const ProductsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1A1A1A),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          width: MediaQuery.of(context).size.width * 0.9,
+          child: Stack(
+            children: [
+              // Заголовок AUTOGRAPH
+              Positioned(
+                top: 0,
+                left: 0,
+                child: Text(
+                  "AUTOGRAPH",
+                  style: TextStyle(
+                    color: Colors.orange[700],
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+              ),
+
+              // Модель (слева)
+              Positioned(
+                top: 100,
+                left: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/model.png", // твой 3D зуб
+                      height: 120,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "models",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Phantom sets (справа)
+              Positioned(
+                top: 100,
+                right: 0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/phantom_sets.png", // кучка зубов
+                      height: 120,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      "phantom\nsets",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Brushes (по центру сверху)
+              Positioned(
+                top: 40,
+                left: 0,
+                right: 0,
+                child: Column(
+                  children: [
+                    const Text(
+                      "brushes",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "soon",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Инструменты (внизу)
+              Positioned(
+                bottom: 80,
+                left: 0,
+                right: 0,
+                child: Image.asset(
+                  "assets/images/tools.png", // инструменты
+                  height: 40,
+                ),
+              ),
+
+              // PRODUCTS (внизу)
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Text(
+                  "PRODUCTS",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.orange[700],
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

@@ -110,20 +110,25 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> with SingleTicker
                                     ),
                                     onPressed: () {
                                       FocusScope.of(context).unfocus();
-                                      if (createOrder.phoneIsOk && createOrder.fullNameIsOk) {
-                                        UserData.instance.pointData = widget.pointData;
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => ConfirmationOrderScreen(
-                                              toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
-                                              fullName: createOrder.fullNameController.text,
-                                              phoneNumber: createOrder.phoneController.text,
-                                              point: widget.pointData,
+                                      WidgetsBinding.instance.addPostFrameCallback((_) async {
+                                        await Future.delayed(const Duration(milliseconds: 500));
+
+                                        if (createOrder.phoneIsOk && createOrder.fullNameIsOk) {
+                                          UserData.instance.pointData = widget.pointData;
+
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => ConfirmationOrderScreen(
+                                                toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
+                                                fullName: createOrder.fullNameController.text,
+                                                phoneNumber: createOrder.phoneController.text,
+                                                point: widget.pointData,
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      }
+                                          );
+                                        }
+                                      });
                                     },
                                     child:  Text(
                                       "Продолжить",

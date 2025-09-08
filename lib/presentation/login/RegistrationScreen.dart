@@ -304,6 +304,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
 
 class GradientButton extends StatefulWidget {
   final VoidCallback onTap;
+
   final String text;
 
   const GradientButton({super.key, required this.onTap,required this.text});
@@ -349,7 +350,10 @@ class _GradientButtonState extends State<GradientButton>
                   : [],
             ),
             child: Center(
-              child: Text(
+                child : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                 Text(
                 AppPrefs.prefs.getBool('LangParams') == true
                     ? 'Continue'
                     : widget.text,
@@ -358,6 +362,10 @@ class _GradientButtonState extends State<GradientButton>
                   color: Colors.white,
                 ),
               ),
+              SizedBox(width: spacingFactor * 0.15),
+              if (registration.isLoading) const CircularProgressIndicator.adaptive(backgroundColor: Colors.white,),
+            ]
+          )
             ),
           ),
         );

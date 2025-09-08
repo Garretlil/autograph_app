@@ -19,7 +19,6 @@ Future<void> main() async {
   final products = Products();
   await products.initialize();
   final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
-  print('isLoggedIn from prefs: $isLoggedIn');
   final tabNotifier = ValueNotifier<int>(0);
   runApp(
       MultiProvider(

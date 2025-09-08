@@ -233,7 +233,6 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                                     final response = await AuthService(Dio()).deleteAccount(sessionKey);
                                     if (response.message == "Удалено") {
                                       _resetAuthState();
-                                      print('juj');
                                     } else {
                                       _showError(context, "Не удалось удалить аккаунт. Повторите позже.");
                                     }

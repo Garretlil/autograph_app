@@ -286,7 +286,6 @@ class _CardCatalogState extends State<_CardCatalog> {
   void toggleCartStatus(BuildContext context) {
 
     final productId = widget.product.id;
-    print(widget.product);
     if (!isAddedToCart) {
       LocalCartProducts.instance.addProductToCart(productId!,widget.toggleCart);
     } else {

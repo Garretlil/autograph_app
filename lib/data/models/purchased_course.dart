@@ -76,7 +76,6 @@ class PurchasedCourses {
       }
       return result;
     } catch (e) {
-      print('Ошибка загрузки купленных: $e');
       return purchasedWebinarsByCourse;
     }
   }

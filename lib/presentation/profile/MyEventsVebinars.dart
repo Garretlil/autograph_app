@@ -10,6 +10,8 @@ import 'package:video_player/video_player.dart';
 import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../data/models/purchased_course.dart';
+import 'package:screen_protector/screen_protector.dart';
+
 
 class MyEventsWebinarsScreens extends StatefulWidget {
   final String courseName;
@@ -119,7 +121,6 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                   if (item == null) {
                     return const SizedBox.shrink();
                   }
-                  print('$baseUrlFinal/video/${item[index]['id']}');
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Column(
@@ -220,7 +221,6 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       watchMoment = prefs?.getInt('video${widget.id}') ?? 0;
-      print(watchMoment);
     });
   }
 
@@ -279,7 +279,6 @@ class _VideoPlayerViewState extends State<VideoPlayerView> {
     final double totalDuration = double.tryParse(widget.duration) ?? 0.0;
     double screenWidth = MediaQuery.of(context).size.width;
     double titleSizeFactor = screenWidth * 0.06;
-    print(totalDuration);
     return GestureDetector(
       onTap: () => _openFullScreenPlayer(context),
       child: ClipRRect(
@@ -375,12 +374,28 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
   ChewieController? _chewieController;
   bool _isInitialized = false;
   SharedPreferences? prefs;
+  bool _isScreenCaptured = false;
 
   @override
   void initState() {
     super.initState();
     _initialize();
+    ScreenProtector.preventScreenshotOn();
+    ScreenProtector.addListener(
+          () {
+      },
+          (isScreenCaptured) {
+        if (mounted) {
+          _chewieController?.setVolume(isScreenCaptured ? 0.0 : 1.0);
+          setState(() {
+            _isScreenCaptured = isScreenCaptured;
+          });
+        }
+      },
+    );
   }
+
+
 
   Future<void> _initialize() async {
     prefs = await SharedPreferences.getInstance();
@@ -447,6 +462,7 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
   void dispose() {
     _chewieController?.dispose();
     _videoPlayerController.dispose();
+    ScreenProtector.preventScreenshotOff();
     super.dispose();
   }
 
@@ -470,9 +486,18 @@ class _FullScreenVideoPlayerState extends State<FullScreenVideoPlayer> {
       body: Padding(
         padding:  EdgeInsets.only(bottom:screenH*0.14 ),
         child: Center(
-          child: _isInitialized && _chewieController != null
-              ? Chewie(controller: _chewieController!)
-              : const CircularProgressIndicator.adaptive(backgroundColor: Colors.white),
+          child: _isScreenCaptured
+              ? const Center(
+            child: Text(
+              'Запись экрана активна. Видео скрыто.',
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          )
+              : !_isInitialized || _chewieController == null
+              ? const CircularProgressIndicator.adaptive(backgroundColor: Colors.white)
+              : Chewie(controller: _chewieController!),
+
         ),
       ),
     );

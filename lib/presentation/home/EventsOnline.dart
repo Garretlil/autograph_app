@@ -104,7 +104,6 @@ class _EventsOnline extends State<EventsOnline> {
             itemBuilder: (context, index) {
               final courseName = CourseWebinars.instance.webinarsByCourse.keys
                   .elementAt(index);
-              print(courseName);
               final webinars = CourseWebinars.instance
                   .webinarsByCourse[courseName];
               final courseDescription = webinars?.firstWhere(
@@ -115,11 +114,9 @@ class _EventsOnline extends State<EventsOnline> {
                     (webinar) => webinar.containsKey('preview_url'),
                 orElse: () => {'preview_url': 'No description available'},
               )['preview_url'] ?? 'No description available';
-
               return GestureDetector(
                   onTap: () =>
                   {
-                    print(coursePreview),
                     Navigator.pushNamed(
                       context,
                       '/CourseDetail',
@@ -128,7 +125,8 @@ class _EventsOnline extends State<EventsOnline> {
                         'description': courseDescription,
                         'coursePreview' : coursePreview
                       },
-                    ),},
+                    ),
+                  },
                   child: CourseShowcaseCard(courseName: courseName,
                       isDarkMode: true,
                       coursePreview: coursePreview)
@@ -175,7 +173,7 @@ class _CourseShowcaseCard extends State<CourseShowcaseCard> with SingleTickerPro
                 child:Card(
                   elevation: widget.isDarkMode ? 8.0 : 8.0,
                   shadowColor: widget.isDarkMode
-                      ? Colors.blue.withOpacity(0.4)
+                      ? Colors.white.withOpacity(0.4)
                       : Colors.orange.withOpacity(0.2),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

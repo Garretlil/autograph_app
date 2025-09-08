@@ -29,7 +29,7 @@ class _PreCatalogState extends State<PreCatalogScreen> {
       return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
     }
     return const LinearGradient(
-      colors: [Colors.orange, Colors.white],
+      colors: [Colors.orange, Colors.red],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     ).createShader(bounds);
@@ -79,14 +79,6 @@ class _PreCatalogState extends State<PreCatalogScreen> {
       ),
       body: Stack(
         children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/image.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
           LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
@@ -95,19 +87,34 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                     paddingFactor * 0.4,
                     paddingFactor * 2.5 + kToolbarHeight,
                     paddingFactor * 0.4,
-                    paddingFactor,
+                    paddingFactor*2,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      ThemeShowcaseCard(
-                        isDarkMode: false,
-                        isPhantoms: true,
-                        sectionTitle: 'POSTERIOR',
-                        icon: Icons.shopping_bag,
-                        description: 'The best teeth models',
-                        nextScreen: (ctx) => Navigator.pushNamed(
-                          ctx,
+                      // ThemeShowcaseCard(
+                      //   isDarkMode: false,
+                      //   isPhantoms: true,
+                      //   sectionTitle: 'POSTERIOR',
+                      //   icon: Icons.shopping_bag,
+                      //   description: 'The best teeth models',
+                      //   nextScreen: (ctx) => Navigator.pushNamed(
+                      //     ctx,
+                      //     '/Catalog',
+                      //     arguments: {
+                      //       'screenHeight': screenHeight,
+                      //       'screenWidth': screenWidth,
+                      //       'src': 'assets/teeth.glb',
+                      //       'autoRotate': false,
+                      //       'disableZoom': true,
+                      //       'section': 'POSTERIOR',
+                      //     },
+                      //   ),
+                      //   image:'assets/Posterior.jpg',
+                      // ),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(
+                          context,
                           '/Catalog',
                           arguments: {
                             'screenHeight': screenHeight,
@@ -118,17 +125,14 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'POSTERIOR',
                           },
                         ),
-                        image:'assets/Posterior.jpg',
+                        child: Image.asset(
+                          'assets/Posterior.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      SizedBox(height: spacingFactor * 0.01),
-                      ThemeShowcaseCard(
-                        isDarkMode: false,
-                        isPhantoms: false,
-                        sectionTitle: 'ANTERIOR',
-                        icon: Icons.shopping_bag,
-                        description: 'Advanced restoration courses',
-                        nextScreen: (ctx) => Navigator.pushNamed(
-                          ctx,
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(
+                          context,
                           '/Catalog',
                           arguments: {
                             'screenHeight': screenHeight,
@@ -139,17 +143,36 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'ANTERIOR',
                           },
                         ),
-                        image:'assets/Anterior.jpg',
+                        child: Image.asset(
+                          'assets/Anterior.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       SizedBox(height: spacingFactor * 0.01),
-                      ThemeShowcaseCard(
-                        isDarkMode: false,
-                        isPhantoms: false,
-                        sectionTitle: 'НАБОРЫ',
-                        icon: Icons.shopping_bag,
-                        description: 'Advanced restoration courses',
-                        nextScreen: (ctx) => Navigator.pushNamed(
-                          ctx,
+                      // ThemeShowcaseCard(
+                      //   isDarkMode: false,
+                      //   isPhantoms: false,
+                      //   sectionTitle: 'ANTERIOR',
+                      //   icon: Icons.shopping_bag,
+                      //   description: 'Advanced restoration courses',
+                      //   nextScreen: (ctx) => Navigator.pushNamed(
+                      //     ctx,
+                      //     '/Catalog',
+                      //     arguments: {
+                      //       'screenHeight': screenHeight,
+                      //       'screenWidth': screenWidth,
+                      //       'src': 'assets/teeth.glb',
+                      //       'autoRotate': false,
+                      //       'disableZoom': true,
+                      //       'section': 'ANTERIOR',
+                      //     },
+                      //   ),
+                      //   image:'assets/Anterior.jpg',
+                      // ),
+                      SizedBox(height: spacingFactor * 0.01),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(
+                          context,
                           '/Catalog',
                           arguments: {
                             'screenHeight': screenHeight,
@@ -160,8 +183,32 @@ class _PreCatalogState extends State<PreCatalogScreen> {
                             'section': 'НАБОРЫ',
                           },
                         ),
-                        image:'assets/Anterior.jpg',
+                        child: Image.asset(
+                          'assets/sests.jpeg',
+                          fit: BoxFit.cover,
+                        ),
                       ),
+                      // ThemeShowcaseCard(
+                      //   isDarkMode: false,
+                      //   isPhantoms: false,
+                      //   sectionTitle: 'НАБОРЫ',
+                      //   icon: Icons.shopping_bag,
+                      //   description: 'Advanced restoration courses',
+                      //   nextScreen: (ctx) => Navigator.pushNamed(
+                      //     ctx,
+                      //     '/Catalog',
+                      //     arguments: {
+                      //       'screenHeight': screenHeight,
+                      //       'screenWidth': screenWidth,
+                      //       'src': 'assets/teeth.glb',
+                      //       'autoRotate': false,
+                      //       'disableZoom': true,
+                      //       'section': 'НАБОРЫ',
+                      //     },
+                      //   ),
+                      //   image:'assets/Anterior.jpg',
+                      // ),
+                      SizedBox(height: spacingFactor * 0.3),
                     ],
                   ),
                 ),

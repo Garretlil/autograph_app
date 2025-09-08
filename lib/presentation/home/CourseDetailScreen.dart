@@ -2,6 +2,29 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/services/SharedP.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+Future<void> openWebsiteWithParams({
+  required String baseUrl,
+  required String sessionId,
+  required String email,
+}) async {
+  final uri = Uri.parse(baseUrl).replace(
+    queryParameters: {
+      'session_id': sessionId,
+      'email': email,
+    },
+  );
+
+  if (await canLaunchUrl(uri)) {
+    await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+  } else {
+    throw 'Could not launch $uri';
+  }
+}
 
 class CourseViewScreen extends StatefulWidget {
   final void Function(bool) toggle;
@@ -94,12 +117,15 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                 SizedBox(height: spacingFactor*0.7),
                 Center(
                   child: GradientButton(
-                    onTap: () {Navigator.pushNamed(
-                      context, '/ListOfVebinars',
-                      arguments: {
-                        'courseName': widget.courseName,
+                     onTap: () {
+                    // Navigator.pushNamed(
+                    //   context, '/ListOfVebinars',
+                    //   arguments: {
+                    //     'courseName': widget.courseName,
+                    //   },
+                    // );
+                       openWebsiteWithParams(sessionId: AppPrefs.prefs.getString('session_key')!, baseUrl: 'https://autograph-dentistry.com', email: 'test@test.com');
                       },
-                    );},
                     text: 'К вебинарам →',
                   ),
                 ),

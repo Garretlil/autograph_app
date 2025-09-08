@@ -27,6 +27,7 @@ class RegistrationNotifier extends ChangeNotifier {
   final emailRegExp = RegExp(r"^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
   final phoneRegExp = RegExp(r"^$|^(\+7|8)\d{10}$");
   bool buttonActive=false;
+  bool isLoading=false;
 
   void acceptPolicy() {
     isPolicyAccepted = true;
@@ -100,18 +101,19 @@ class RegistrationNotifier extends ChangeNotifier {
       if (isReg) 'name': name,
       if(isReg) 'surname': surname,
     };
+    isLoading=true;
+    notifyListeners();
 
     await handleApiCall(
       context: context,
       request: () async {
+        isLoading=true;
         final dio = createInsecureDio();
         final client = AuthService(dio);
         if (isReg) {
           final response = await client.registerUser(requestData);
-          print(response.message);
         } else {
           final response = await client.loginUser(requestData);
-          print(response.message);
         }
 
         final userRepository = UserRepositoryImpl();
@@ -125,6 +127,8 @@ class RegistrationNotifier extends ChangeNotifier {
         await userRepository.saveUserData(UserData.instance);
       },
       onSuccess: (_) {
+        isLoading=false;
+        notifyListeners();
         onSuccess();
       },
       onUnauthorized: () {

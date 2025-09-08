@@ -1,3 +1,6 @@
+import 'package:autograph_app/core/network/network_layer.dart';
+import 'package:autograph_app/core/services/SharedP.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../data/repositories/UserRepository.dart';
 
@@ -26,9 +29,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadName();
   }
   Future<void> _loadName() async {
-    final userData = await UserRepositoryImpl().loadUserData();
+    final sessionKey = AppPrefs.prefs.getString('session_key');
+    final response = await AuthService(Dio()).getMe(sessionKey ?? '');
     setState(() {
-      name = userData.name;
+      name = response.name ?? '';
     });
   }
 

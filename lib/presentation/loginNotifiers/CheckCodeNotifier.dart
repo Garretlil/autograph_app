@@ -86,11 +86,9 @@ class CheckCodeNotifier extends ChangeNotifier{
         if (e.response?.statusCode == 401) {
           showErrorDialog(context, 'Неверный код подтверждения.');
         } else if (e.response?.statusCode == 400){
-          print(e);
           clearNodes();
           showErrorDialog(context, '"Неправильный проверочный код, повторите попытку"');
         } else {
-          print(e);
           showErrorDialog(context, 'Ошибка сервера. Повторите позже.');
         }
       } catch (e) {

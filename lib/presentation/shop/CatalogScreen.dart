@@ -213,8 +213,12 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                             ),
                         ],
                       )
-
                     ),
+                    if (filteredProducts.isEmpty)
+                      const Padding(padding:EdgeInsets.only(top: 260) ,child:Center(
+                        child:
+                        Text("Продукция будет скоро!",style: TextStyle(color: Colors.white,fontSize: 17),),))
+                    else
                     Expanded(
                       child: GridAnimatedDemo(children: listWidget),
                     ),
@@ -275,7 +279,7 @@ class _CardCatalog extends StatelessWidget {
     double descriptionSizeFactor = screenWidth * 0.06;
 
     final productTitle = product.name ?? 'Название будет попозже(';
-    final productPrice = product.price ?? 0;
+    final int productPrice = (double.parse(product.price.toString()).round());
 
     return GestureDetector(
       onTap: () {
