@@ -118,6 +118,8 @@ class CDEKApi {
     CreateOrderProductResponse response = await safeRequest(() {
       return client.createOrder(sessionKey, data);
     });
+    print(response.message);
+
   }
 
 }

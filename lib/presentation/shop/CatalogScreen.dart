@@ -214,11 +214,11 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                         ],
                       )
                     ),
-                    if (filteredProducts.isEmpty)
-                      const Padding(padding:EdgeInsets.only(top: 260) ,child:Center(
-                        child:
-                        Text("Продукция будет скоро!",style: TextStyle(color: Colors.white,fontSize: 17),),))
-                    else
+                    // if (filteredProducts.isEmpty)
+                    //   const Padding(padding:EdgeInsets.only(top: 260) ,child:Center(
+                    //     child:
+                    //     Text("Продукция будет скоро!",style: TextStyle(color: Colors.white,fontSize: 17),),))
+                    // else
                     Expanded(
                       child: GridAnimatedDemo(children: listWidget),
                     ),

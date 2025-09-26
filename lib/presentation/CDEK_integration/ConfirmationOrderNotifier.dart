@@ -207,7 +207,7 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
           };
         }).toList();
 
-        await _cdekApi.createCdekOrder(
+        var t =await _cdekApi.createCdekOrder(
           fullName: fullName,
           phoneNumber: phoneNumber,
           point: loadedData.pointData.code,

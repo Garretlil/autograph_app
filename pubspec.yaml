@@ -24,7 +24,6 @@ dependencies:
   retrofit: ^4.4.0
   logger: ^2.4.0
   json_annotation: ^4.9.0
-  flame: ^1.25.0
   dio: any
   google_nav_bar: any
   gradient_borders: ^1.0.1
@@ -40,8 +39,8 @@ dependencies:
       git:
         url: https://github.com/Garretlil/chewie.git
         ref: master
-  hive_flutter: ^ 1.1.0
   flutter_launcher_icons: ^0.13.1
+  flame: ^1.30.1
 
 dev_dependencies:
   flutter_test:
