@@ -9,6 +9,7 @@ import '../../core/services/SharedP.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
 import '../CDEK_integration/CDEKWindow.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CartProductsScreen extends StatefulWidget {
   const CartProductsScreen({super.key,required this.toggleBottomNavigationBar,required this.toggleCart});
@@ -50,13 +51,13 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                     forceMaterialTransparency: true,
                     backgroundColor: Colors.transparent,
                     elevation: 0,
-                    leading: FadedIconButton(
-                      onPressed: () => {
-                        widget.toggleBottomNavigationBar(true),
-                        Navigator.of(context).pop()
-                      },
-                      icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                    ),
+                    // leading: FadedIconButton(
+                    //   onPressed: () => {
+                    //     widget.toggleBottomNavigationBar(true),
+                    //     Navigator.of(context).pop()
+                    //   },
+                    //   icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+                    // ),
                     title: Text(
                       'AUTOGRAPH',
                       style: TextStyle(
@@ -101,7 +102,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                             padding: EdgeInsets.only(
                               left: 8,
                               right: 8,
-                              bottom: screenHeight * 0.1,
+                              bottom: screenHeight * 0.16,
                             ),
                             gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -134,7 +135,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                     )
                         : Center(
                       child: Text(
-                        'Корзина пуста :(',
+                        AppLocalizations.of(context)!.emptycart,
                         style: TextStyle(
                           fontSize: titleSizeFactor * 1.05,
                           color: Colors.white,
@@ -145,7 +146,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                 ),
                 cart.calcTotalCost() != 0 ?
                 Positioned(
-                  bottom: 32,
+                  bottom: 90,
                   right: 40,
                   width: 100,
                   height: 50,
@@ -162,8 +163,8 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                           color: Colors.transparent,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(30),
-                            onTap: () => _showBottomSheet(
-                                widget.toggleBottomNavigationBar),
+                            onTap: () => {widget.toggleBottomNavigationBar(false),_showBottomSheet(
+                                widget.toggleBottomNavigationBar),},
                             child: Center(
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -190,6 +191,7 @@ class _CartProductsScreen extends State<CartProductsScreen> {
   }
 
   void _showBottomSheet(toggle) {
+
     showModalBottomSheet(
       enableDrag: false,
       isScrollControlled: true,
@@ -236,7 +238,9 @@ class _CartProductsScreen extends State<CartProductsScreen> {
           ),
         );
       },
-    );
+    ).then((value) {
+    toggle(true);
+    });
   }
 }
 

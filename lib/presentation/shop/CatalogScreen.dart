@@ -9,6 +9,8 @@ import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/SharedP.dart';
 import '../../data/models/product.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
 
 class CatalogViewScreen extends StatefulWidget {
   const CatalogViewScreen({
@@ -104,7 +106,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -114,7 +115,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
 
     return Consumer<Products>(
       builder: (context, productsData, child) {
-
         final filteredProducts = productsData.products.products
             ?.where((product) =>
         product.section!.contains(widget.section) &&
@@ -401,7 +401,7 @@ class _CardCatalog extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      'Добавить в корзину',
+                      AppLocalizations.of(context)!.addtocart,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: titleSizeFactor * 0.6,

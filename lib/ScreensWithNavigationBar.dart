@@ -29,10 +29,12 @@ import 'presentation/shop/CatalogScreen.dart';
 class ScreensWithNavigationBar extends StatefulWidget {
   final bool isLoggedIn;
   final ValueNotifier<int> tabNotifier;
+  final ValueNotifier<Locale> localeNotifier;
   const ScreensWithNavigationBar({
     super.key,
     required this.isLoggedIn,
     required this.tabNotifier,
+    required this.localeNotifier
   });
 
   @override
@@ -232,7 +234,12 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
           case 1:
             switch (settings.name) {
               case '/':
-                return customPageRoute(const CartChooseScreen());
+                // return customPageRoute(const CartChooseScreen());
+                _toggleBottomNavigationBar(true);
+                return customPageRoute(CartProductsScreen(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCart: _toggleCircleCart,
+                ));
               case '/CartEvents':
                 return customPageRoute(CartEvents(
                   toggleBottomNavigationBar: _toggleBottomNavigationBar,
@@ -259,6 +266,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
               case '/ProfileSettings':
                 return customPageRoute(ProfileSettingsScreen(
                   tabNotifier: widget.tabNotifier,
+                  localeNotifier: widget.localeNotifier,
                 ));
               case '/MY_EVENTS':
                 return customPageRoute(const ProfileMyEventsScreen());

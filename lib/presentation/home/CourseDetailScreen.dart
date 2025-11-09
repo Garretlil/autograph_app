@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/services/SharedP.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> openWebsiteWithParams({
   required String baseUrl,
@@ -214,9 +215,7 @@ class _GradientButtonState extends State<GradientButton>
         ),
         alignment: Alignment.center,
         child: Text(
-          AppPrefs.prefs.getBool('LangParams') == true
-              ? 'Continue'
-              : widget.text,
+          AppLocalizations.of(context)!.get,
           style: TextStyle(
             fontSize: titleSizeFactor * 0.9,
             color: Colors.white,

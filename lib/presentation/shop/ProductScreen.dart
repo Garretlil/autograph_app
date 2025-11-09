@@ -7,6 +7,7 @@ import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ProductViewScreen extends StatefulWidget {
   const ProductViewScreen({
@@ -140,9 +141,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        isAddedToCart
-                            ? 'Удалить из корзины'
-                            : 'Добавить в корзину',
+                        AppLocalizations.of(context)!.addtocart,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: titleSizeFactor * 0.6,

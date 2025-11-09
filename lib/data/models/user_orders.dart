@@ -10,6 +10,7 @@ class UserOrders with ChangeNotifier{
   factory UserOrders() => instance;
   late ProductOrderResponse productOrder;
   late final Map<String,List<String>> categories;
+  final totalSum=0;
 
   UserOrders._internal()  {
     productOrder=ProductOrderResponse(product_orders: []);
@@ -20,17 +21,13 @@ class UserOrders with ChangeNotifier{
     try {
       await getOrders();
     } catch (error) {
+      productOrder=ProductOrderResponse(product_orders: []);
     }
     notifyListeners();
   }
 
-  Dio createInsecureDio() {
-    final dio = Dio();
-    return dio;
-  }
-
   Future<void> getOrders() async {
-    final dio = createInsecureDio();
+    final dio = Dio();
     final client = ProductService(dio);
     try {
       final sessionKey=AppPrefs.prefs.getString('session_key');
