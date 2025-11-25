@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
@@ -51,20 +52,16 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                     forceMaterialTransparency: true,
                     backgroundColor: Colors.transparent,
                     elevation: 0,
-                    // leading: FadedIconButton(
-                    //   onPressed: () => {
-                    //     widget.toggleBottomNavigationBar(true),
-                    //     Navigator.of(context).pop()
-                    //   },
-                    //   icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                    // ),
-                    title: Text(
-                      'AUTOGRAPH',
-                      style: TextStyle(
-                        fontSize: titleSizeFactor * 0.85,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inria Serif',
-                        color: Colors.white,
+                    title: ShaderMask(
+                      shaderCallback: (bounds) => createGradient(bounds),
+                      child: Text(
+                        'AUTOGRAPH',
+                        style: TextStyle(
+                          fontSize: titleSizeFactor * 0.85,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inria Serif',
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     centerTitle: true,
@@ -80,7 +77,9 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                Padding(padding: EdgeInsets.only(top: screenHeight * 0.12),
+                Padding(padding: EdgeInsets.only(
+                    top: (products.products.products==null || products.products.products!.isEmpty) ? screenHeight * 0.00 : screenHeight * 0.11,
+                ),
                     child: cart.calcTotalCost() != 0
                         ? ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -134,16 +133,22 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                       ),
                     )
                         : Center(
-                      child: Text(
-                        AppLocalizations.of(context)!.emptycart,
-                        style: TextStyle(
-                          fontSize: titleSizeFactor * 1.05,
-                          color: Colors.white,
-                          fontFamily: 'Inria Serif'
-                        ),
-                      ),
-                    )
-                ),
+                      // child: Text(
+                      //   AppLocalizations.of(context)!.emptycart,
+                      //   style: TextStyle(
+                      //     fontSize: titleSizeFactor * 1.05,
+                      //     color: Colors.white,
+                      //     fontFamily: 'Inria Serif'
+                      //   ),
+                    child:Lottie.asset(
+                                  'assets/empty ghost.json',
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.contain,
+                                  repeat: true
+                                  ),
+                                  ),
+                    ),
                 cart.calcTotalCost() != 0 ?
                 Positioned(
                   bottom: 90,
@@ -383,7 +388,7 @@ class _CardCatalogState extends State<_CardCatalog> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      '$productPrice ₽',
+                      '${(double.parse(product.price.toString()).round())} ₽',
                       style: TextStyle(
                         color: Colors.orange,
                         fontFamily: 'Inria Serif',

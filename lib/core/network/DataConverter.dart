@@ -240,6 +240,16 @@ class RegisterResponse {
   Map<String, dynamic> toJson() => _$RegisterResponseToJson(this);
 }
 @JsonSerializable()
+class TgResponse {
+  final String message;
+  TgResponse({required this.message});
+
+  factory TgResponse.fromJson(Map<String, dynamic> json) =>
+      _$TgResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TgResponseToJson(this);
+}
+@JsonSerializable()
 class PurchasedWebinarsResponse {
   final List<PurchasedWebinar> webinars;
 

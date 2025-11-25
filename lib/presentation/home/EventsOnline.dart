@@ -34,17 +34,6 @@ class _EventsOnline extends State<EventsOnline> {
       }
     });
   }
-  Shader createGradient(Rect bounds) {
-
-    if (bounds.isEmpty) {
-      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
-    }
-    return const LinearGradient(
-      colors: [Colors.blue, Colors.white],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ).createShader(bounds);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +89,12 @@ class _EventsOnline extends State<EventsOnline> {
             ),
           ),
           child: ListView.builder(
+            padding: EdgeInsets.fromLTRB(
+                screenWidth*0.08,
+                screenHeight*0.14,
+                screenWidth*0.08,
+                screenHeight*0.1
+            ),
             itemCount: CourseWebinars.instance.webinarsByCourse.length,
             itemBuilder: (context, index) {
               final courseName = CourseWebinars.instance.webinarsByCourse.keys
@@ -127,9 +122,35 @@ class _EventsOnline extends State<EventsOnline> {
                       },
                     ),
                   },
-                  child: CourseShowcaseCard(courseName: courseName,
-                      isDarkMode: true,
-                      coursePreview: coursePreview)
+                child:Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueGrey.withOpacity(0.7),
+                        blurRadius: 17,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                    color: Colors.black,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    child: CachedNetworkImage(
+                      imageUrl: '$baseUrlFinal/static$coursePreview',
+                      fit: BoxFit.cover,
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          'Ошибка загрузки',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: titleSizeFactor * 0.6,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               );
             },
           ),
@@ -184,66 +205,64 @@ class _CourseShowcaseCard extends State<CourseShowcaseCard> with SingleTickerPro
                       width: 2,
                     ),
                   ),
-                  child: Container(
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: widget.isDarkMode
-                                ? Colors.blue.withOpacity(0.1)
-                                : Colors.orange.withOpacity(0.1),
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(20),
-                              topRight: Radius.circular(20),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(16.0),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      widget.courseName,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleLarge
-                                          ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: widget.isDarkMode
-                                            ? Colors.blue
-                                            : Colors.orange,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                  ],
-                                ),
-                              ),
-                            ],
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: widget.isDarkMode
+                              ? Colors.blue.withOpacity(0.1)
+                              : Colors.orange.withOpacity(0.1),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            topRight: Radius.circular(20),
                           ),
                         ),
-                        Expanded(
-                          child: FractionallySizedBox(
-                            widthFactor: 0.98,
-                            child: AspectRatio(
-                              aspectRatio: 18 / 9,
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
-                                child: CachedNetworkImage(
-                                  imageUrl: '$baseUrlFinal/static${widget.coursePreview}',
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => const Center(
-                                    child: CircularProgressIndicator.adaptive(),
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.courseName,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: widget.isDarkMode
+                                          ? Colors.blue
+                                          : Colors.orange,
+                                    ),
                                   ),
-                                  errorWidget: (context, url, error) => Center(
-                                    child: Text(
-                                      'Ошибка загрузки',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: titleSizeFactor * 0.6,
-                                      ),
+                                  const SizedBox(height: 4),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: FractionallySizedBox(
+                          widthFactor: 0.98,
+                          child: AspectRatio(
+                            aspectRatio: 18 / 9,
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(20), bottomRight: Radius.circular(20)),
+                              child: CachedNetworkImage(
+                                imageUrl: '$baseUrlFinal/static${widget.coursePreview}',
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator.adaptive(),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text(
+                                    'Ошибка загрузки',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: titleSizeFactor * 0.6,
                                     ),
                                   ),
                                 ),
@@ -251,8 +270,8 @@ class _CourseShowcaseCard extends State<CourseShowcaseCard> with SingleTickerPro
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               )

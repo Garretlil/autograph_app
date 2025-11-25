@@ -17,6 +17,16 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
     super.initState();
     setPref();
   }
+  Shader createGradient(Rect bounds) {
+    if (bounds.isEmpty) {
+      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
+    }
+    return const LinearGradient(
+      colors: [Colors.orange, Colors.red],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(bounds);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +55,16 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'AUTOGRAPH',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
+                  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],

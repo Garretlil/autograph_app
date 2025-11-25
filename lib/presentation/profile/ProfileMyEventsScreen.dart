@@ -57,13 +57,16 @@ class _ProfileMyEventsScreen extends State<ProfileMyEventsScreen> {
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'AUTOGRAPH',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
+                  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],

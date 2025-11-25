@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:autograph_app/core/network/network_layer.dart';
 import 'package:autograph_app/core/services/SharedP.dart';
 import 'package:dio/dio.dart';
@@ -85,34 +87,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
     double spacingFactorW=screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
     return Scaffold(
-      body:
-      Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/image.png'),
-            fit: BoxFit.cover,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: PreferredSize(
+        preferredSize: Size(
+          screenWidth,
+          kToolbarHeight-20,
+        ),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+            child: AppBar(
+              forceMaterialTransparency: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: const Text(''),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              centerTitle: true,
+            ),
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-              paddingFactor*1.2,
-              paddingFactor*2.4,
-              paddingFactor,
-              0
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'AUTOGRAPH ',
-                style: TextStyle(
-                  fontSize: titleSizeFactor * 0.8,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Inria Serif',
-                  color: Colors.white,
-                ),
-              ),
-              SizedBox(height: spacingFactor*0.2,),
+      ),
+      body: Column(children: [
+              SizedBox(height: spacingFactor*1.8,),
               SizedBox(height: paddingFactor),
               Center(
                 child: Container(
@@ -148,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontSize: titleSizeFactor,
                     fontWeight: FontWeight.normal,
                     color: Colors.white,
-                    fontFamily: 'Inria Serif',
+                    fontFamily: 'Times New Roman',
                   ),
                 ),
               ),
@@ -164,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.white,
                       fontSize:titleSizeFactor,
                       fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
+                      fontFamily: 'Times New Roman',
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -181,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.white,
                       fontSize: titleSizeFactor,
                       fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
+                      fontFamily: 'Times New Roman',
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -198,7 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: Colors.white,
                       fontSize: titleSizeFactor,
                       fontWeight: FontWeight.normal,
-                      fontFamily: 'Inria Serif',
+                      fontFamily: 'Times New Roman',
                       letterSpacing: 1.5,
                     ),
                   ),
@@ -221,10 +234,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const Spacer(),
               SizedBox(height: spacingFactor),
-            ],
-          ),
-        ),
-      ),
+      ]
+      )
     );
   }
 }
@@ -268,7 +279,6 @@ class CustomStripesContainer extends StatelessWidget {
               "$progress %",
               style: const TextStyle(
                 fontSize: 15,
-                //fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
@@ -332,7 +342,6 @@ class _StripesPainter extends CustomPainter {
       Radius.circular(radius),
     );
 
-    // Оранжевая полоса (прогресс) - с закруглениями
     final orangeRect = RRect.fromLTRBR(
       leftPadding,
       centerY - halfThickness,
@@ -343,7 +352,6 @@ class _StripesPainter extends CustomPainter {
 
     canvas.drawRRect(grayRect, firstPaint);
 
-    // Рисуем оранжевую полосу только если прогресс > 0
     if (progress > 0) {
       canvas.drawRRect(orangeRect, secondPaint);
     }

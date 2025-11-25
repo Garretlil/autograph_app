@@ -5,7 +5,6 @@ const String baseUrl="https://998e-2-56-127-47.ngrok-free.app";
 const String base="http://192.168.190.4:8000";
 Color buttonCard=const Color(0xFFFF7F1F);
 Color background=const Color(0xFF111111);
-//0xFF171717
 
 Shader createGradient(Rect bounds) {
 

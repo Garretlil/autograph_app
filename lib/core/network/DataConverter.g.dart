@@ -210,6 +210,15 @@ Map<String, dynamic> _$RegisterResponseToJson(RegisterResponse instance) =>
       'message': instance.message,
     };
 
+TgResponse _$TgResponseFromJson(Map<String, dynamic> json) => TgResponse(
+      message: json['message'] as String,
+    );
+
+Map<String, dynamic> _$TgResponseToJson(TgResponse instance) =>
+    <String, dynamic>{
+      'message': instance.message,
+    };
+
 PurchasedWebinarsResponse _$PurchasedWebinarsResponseFromJson(
         Map<String, dynamic> json) =>
     PurchasedWebinarsResponse(

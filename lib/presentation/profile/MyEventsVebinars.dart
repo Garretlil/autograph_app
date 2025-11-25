@@ -83,10 +83,10 @@ class _MyEventsWebinarsScreens extends State<MyEventsWebinarsScreens> {
                     child: Text(
                       'AUTOGRAPH',
                       style: TextStyle(
-                        fontSize: titleSizeFactor*0.9,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
                         fontFamily: 'Inria Serif',
+                        color: Colors.white,
                       ),
                     ),
                   ),

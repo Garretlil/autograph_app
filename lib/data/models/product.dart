@@ -16,7 +16,6 @@ class Products with ChangeNotifier{
         'Одиночные',
         'Тройные',
         'Четверные',
-        'В окклюзии',
         ],
       'ANTERIOR':[
         'Standart',

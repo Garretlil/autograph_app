@@ -122,7 +122,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                   title: currentProduct.description!,
                   titleSizeFactor: titleSizeFactor,
                 ),
-                SizedBox(height: spacingFactor),
+                SizedBox(height: spacingFactor*2.7),
                 !isAddedToCart? GestureDetector(
                   onTap: () => toggleCartStatus(context),
                   child: Container(

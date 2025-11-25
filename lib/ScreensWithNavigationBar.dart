@@ -14,6 +14,7 @@ import 'package:autograph_app/presentation/login/RegistrationScreen.dart';
 import 'package:autograph_app/presentation/profile/MyEventsVebinars.dart';
 import 'package:autograph_app/presentation/profile/ProfilePage.dart';
 import 'package:autograph_app/presentation/profile/SupportPage.dart';
+import 'package:autograph_app/presentation/shop/PartnersScreen.dart';
 import 'package:autograph_app/presentation/shop/PreCatalog.dart';
 import 'package:autograph_app/presentation/shop/ProductScreen.dart';
 import 'package:flutter/cupertino.dart';
@@ -192,6 +193,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                   section: args['section'],
                   toggleCart: _toggleCircleCart,
                 ));
+              case '/PartnerScreen':
+                return customPageRoute(PartnerScreen(toggleCart: _toggleCircleCart));
               case '/Product':
                 final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute(ProductViewScreen(
