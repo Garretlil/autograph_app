@@ -9,7 +9,9 @@ import 'createOrderScreen.dart';
 
 class CDEKWindow extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar ;
-  const CDEKWindow({super.key,required this.toggleBottomNavigationBar});
+
+  final void Function(bool) toggleCart;
+  const CDEKWindow({super.key,required this.toggleBottomNavigationBar,required this.toggleCart});
 
   @override
   State<CDEKWindow> createState() => _CDEKWindowState();
@@ -156,7 +158,7 @@ class _CDEKWindowState extends State<CDEKWindow> {
                     onTap: ()=>
                       {UserData.instance.pointData=pointData,
                         Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => CreateOrderScreen( toggleBottomNavigationBar: toggle, pointData: pointData,)),
+                        MaterialPageRoute(builder: (context) => CreateOrderScreen( toggleBottomNavigationBar: toggle, pointData: pointData,toggleCart:widget.toggleCart)),
                         ),
                       },
                     child: Container(

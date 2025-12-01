@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../AnimatedBackButton.dart';
+import '../../Theme/SysTheme/Constants.dart';
 import '../../data/models/user_orders.dart';
 
 
@@ -57,13 +58,16 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'Все заказы',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.9,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
+                  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],

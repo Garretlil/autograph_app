@@ -17,6 +17,16 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
     super.initState();
     setPref();
   }
+  Shader createGradient(Rect bounds) {
+    if (bounds.isEmpty) {
+      return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
+    }
+    return const LinearGradient(
+      colors: [Colors.orange, Colors.red],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    ).createShader(bounds);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +55,16 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Text(
-                    'AUTOGRAPH',
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.85,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Inria Serif',
-                      color: Colors.white,
+                  ShaderMask(
+                    shaderCallback: (bounds) => createGradient(bounds),
+                    child: Text(
+                      'AUTOGRAPH',
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.85,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inria Serif',
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -78,62 +91,62 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
                   ),
                   child: IntrinsicHeight(
                     child:
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            paddingFactor * 0.4,
-                            paddingFactor * 1.5 + kToolbarHeight,
-                            paddingFactor*0.4,
-                            0,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () => Navigator.pushNamed(context, '/PreCatalog',),
-                                      child: Image.asset(
-                                        'assets/homepage2.png',
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () => Navigator.pushNamed(context, '/EventsOnline',),
-                                      child: Image.asset(
-                                        'assets/courses.jpeg',
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                    //  ThemeShowcaseCard(
-                                    //     isDarkMode: false,
-                                    //     isPhantoms: true,
-                                    //     sectionTitle: 'Фантомы',
-                                    //     icon: Icons.shopping_bag,
-                                    //     description: 'Лучшие модели зубов',
-                                    //     nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',),
-                                    //    image: 'assets/homepage2.jpg',
-                                    // ),
-                                    // SizedBox(height: spacingFactor * 0.01),
-                                    //  ThemeShowcaseCard(
-                                    //     isDarkMode: true,
-                                    //     sectionTitle: 'Мероприятия',
-                                    //     icon: Icons.ondemand_video,
-                                    //     description: 'Курсы по реставрации',
-                                    //     isPhantoms: false,
-                                    //     nextScreen: (ctx) => Navigator.pushNamed(
-                                    //       ctx, '/EventsOnline',
-                                    //     ),
-                                    //      image: 'assets/homepage.jpg',
-                                    // ),
-
-                                    SizedBox(height: spacingFactor * 0.02),
-                                  ],
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        paddingFactor * 0.4,
+                        paddingFactor * 1.8 + kToolbarHeight,
+                        paddingFactor*0.4,
+                        0,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => Navigator.pushNamed(context, '/PreCatalog',),
+                                  child: Image.asset(
+                                    'assets/homepage2.png',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
-                            ],
+                                GestureDetector(
+                                  onTap: () => Navigator.pushNamed(context, '/EventsOnline',),
+                                  child: Image.asset(
+                                    'assets/courses.jpeg',
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                //  ThemeShowcaseCard(
+                                //     isDarkMode: false,
+                                //     isPhantoms: true,
+                                //     sectionTitle: 'Фантомы',
+                                //     icon: Icons.shopping_bag,
+                                //     description: 'Лучшие модели зубов',
+                                //     nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',),
+                                //    image: 'assets/homepage2.jpg',
+                                // ),
+                                // SizedBox(height: spacingFactor * 0.01),
+                                //  ThemeShowcaseCard(
+                                //     isDarkMode: true,
+                                //     sectionTitle: 'Мероприятия',
+                                //     icon: Icons.ondemand_video,
+                                //     description: 'Курсы по реставрации',
+                                //     isPhantoms: false,
+                                //     nextScreen: (ctx) => Navigator.pushNamed(
+                                //       ctx, '/EventsOnline',
+                                //     ),
+                                //      image: 'assets/homepage.jpg',
+                                // ),
+
+                                SizedBox(height: spacingFactor * 0.02),
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

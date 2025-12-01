@@ -1,6 +1,19 @@
 import 'package:json_annotation/json_annotation.dart';
 part 'DataConverter.g.dart';
 
+
+@JsonSerializable()
+class TgResponse {
+  final String message;
+  TgResponse({required this.message});
+
+  factory TgResponse.fromJson(Map<String, dynamic> json) =>
+      _$TgResponseFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TgResponseToJson(this);
+}
+
+
 @JsonSerializable()
 class Catalog {
   final List<Product>? products;

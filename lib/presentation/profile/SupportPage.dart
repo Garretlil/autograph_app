@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../AnimatedBackButton.dart';
+import '../../Theme/SysTheme/Constants.dart';
+import '../../l10n/app_localizations.dart';
 
 
 class SupportPageScreen extends StatefulWidget {
@@ -59,13 +61,16 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
                 title: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      'AUTOGRAPH',
-                      style: TextStyle(
-                        fontSize: titleSizeFactor * 0.85,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inria Serif',
-                        color: Colors.white,
+                    ShaderMask(
+                      shaderCallback: (bounds) => createGradient(bounds),
+                      child: Text(
+                        'AUTOGRAPH',
+                        style: TextStyle(
+                          fontSize: titleSizeFactor * 0.85,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inria Serif',
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -88,8 +93,7 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Вы можете описать '
-                      'проблему и отправить ее по указанной почте',
+                  Text(AppLocalizations.of(context)!.supportEmail,
                       style: TextStyle(fontSize: screenWidth*0.06),
                   ),
                   SizedBox(height: spacingFactorW),
@@ -100,15 +104,14 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
                        ),
                        SizedBox(width: spacingFactorW*0.5),
                        GestureDetector(
-                           onTap: ()  {
-                             Clipboard.setData(const ClipboardData(text: 'ed763135@gmail.com'));
-                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Почта скопирована в буфер обмена',style: TextStyle(fontSize: screenWidth*0.04,color: Colors.white),),backgroundColor: Colors.grey,),
-                             );
-                           },
-                           child:
-                         const Icon(Icons.copy_outlined,color: Colors.grey,size: 20,)
-                       )
+                         onTap: () {
+                           Clipboard.setData(
+                             const ClipboardData(text: 'ed763135@gmail.com'),
+                           );
+                           showCopyToast(context, AppLocalizations.of(context)!.copyMail);
+                         },
+                         child: const Icon(Icons.copy_outlined, color: Colors.grey, size: 20),
+                       ),
                      ]
                    ),
                 ],
@@ -195,4 +198,51 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
       ),
     );
   }
+  void showCopyToast(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    if (overlay == null) return;
+
+    final overlayEntry = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          top: 100,
+          left: 0,
+          right: 0,
+          child: Material(
+            color: Colors.transparent,
+            child: Center(
+              child: AnimatedOpacity(
+                opacity: 1,
+                duration: const Duration(milliseconds: 200),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.75),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(const Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
+  }
+
 }

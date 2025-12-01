@@ -29,6 +29,9 @@ abstract class AuthService {
   @POST("/policyAgree/")
   Future<PolicyAgreeResponse> policyAgree(@Header('x-session-key') String sessionKey);
 
+  @GET("/getTgChannel")
+  Future<TgResponse> getTgChannel();
+
 }
 
 @RestApi(baseUrl: baseUrlFinal)

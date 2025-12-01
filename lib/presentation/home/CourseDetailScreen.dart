@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../Theme/SysTheme/Constants.dart';
+import '../../core/network/network_layer.dart';
 import '../../core/services/SharedP.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../l10n/app_localizations.dart';
 
 Future<void> openWebsiteWithParams({
   required String baseUrl,
@@ -45,6 +49,24 @@ class CourseViewScreen extends StatefulWidget {
 
 class _CourseViewScreenState extends State<CourseViewScreen> {
 
+  bool isLoadingUser = false;
+  String? userEmail;
+
+  Future<void> loadUser() async {
+    setState(() => isLoadingUser = true);
+
+    try {
+      final sessionKey = AppPrefs.prefs.getString('session_key')!;
+      final me = await AuthService(Dio()).getMe(sessionKey);
+      userEmail = me.email;
+    } catch (_) {
+      userEmail = null;
+    }
+
+    setState(() => isLoadingUser = false);
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -58,90 +80,95 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
     double spacingFactor = screenHeight * 0.04;
     double iconSizeFactor = screenWidth * 0.06;
 
-      return Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              width: screenWidth,
-              height: screenHeight,
-              decoration: const BoxDecoration(
-                color: Colors.black,
-                image: DecorationImage(
-                  image: AssetImage('assets/image.png'),
-                  fit: BoxFit.cover,
-                ),
+    return Scaffold(
+      body: Stack(
+        children: [
+          Container(
+            width: screenWidth,
+            height: screenHeight,
+            decoration: const BoxDecoration(
+              color: Colors.black,
+              image: DecorationImage(
+                image: AssetImage('assets/image.png'),
+                fit: BoxFit.cover,
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: screenHeight*0.05,),
-                SizedBox(
-                  height: screenHeight * 0.3,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20),
-                          topRight: Radius.circular(20),
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20)),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black26, blurRadius: 5),
-                      ],
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(height: screenHeight*0.05,),
+              SizedBox(
+                height: screenHeight * 0.3,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20)),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black26, blurRadius: 5),
+                    ],
+                  ),
+                  clipBehavior: Clip.hardEdge,
+                  child: CachedNetworkImage(
+                    imageUrl: '$baseUrlFinal/static${widget.coursePreview}',
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const Center(
+                      child: CircularProgressIndicator.adaptive(),
                     ),
-                    clipBehavior: Clip.hardEdge,
-                    child: CachedNetworkImage(
-                      imageUrl: '$baseUrlFinal/static${widget.coursePreview}',
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const Center(
-                        child: CircularProgressIndicator.adaptive(),
-                      ),
-                      errorWidget: (context, url, error) => Center(
-                        child: Text(
-                          'Ошибка загрузки',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: titleSizeFactor * 0.6,
-                          ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Text(
+                        'Ошибка загрузки',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: titleSizeFactor * 0.6,
                         ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: spacingFactor * 0.1),
-                _buildInfoCard(
+              ),
+              SizedBox(height: spacingFactor * 0.1),
+              _buildInfoCard(
                   title: widget.description,
                   titleSizeFactor: titleSizeFactor,
                   height: screenHeight
-                ),
-                SizedBox(height: spacingFactor*0.7),
-                Center(
-                  child: GradientButton(
-                     onTap: () {
-                    // Navigator.pushNamed(
-                    //   context, '/ListOfVebinars',
-                    //   arguments: {
-                    //     'courseName': widget.courseName,
-                    //   },
-                    // );
-                       openWebsiteWithParams(sessionId: AppPrefs.prefs.getString('session_key')!, baseUrl: 'https://autograph-dentistry.com', email: 'test@test.com');
-                      },
-                    text: 'К вебинарам →',
-                  ),
-                ),
-              ],
-            ),
-            Positioned(
-              top: 62,
-              left: 15,
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios_new, color: Colors.white,size: iconSizeFactor,),
-                onPressed: () => {widget.toggle(true),Navigator.pop(context)},
               ),
+              SizedBox(height: spacingFactor*0.7),
+              Center(
+                child:GradientButton(
+                  onTap: () async {
+                    if (isLoadingUser) return;
+
+                    await loadUser();
+
+                    if (userEmail == null) return;
+
+                    openWebsiteWithParams(
+                      sessionId: AppPrefs.prefs.getString('session_key')!,
+                      baseUrl: 'https://autograph-dentistry.com/shop',
+                      email: userEmail!,
+                    );
+                  },
+                  text: 'К вебинарам →',
+                  isLoading: isLoadingUser,
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            top: 62,
+            left: 15,
+            child: IconButton(
+              icon: Icon(Icons.arrow_back_ios_new, color: Colors.white,size: iconSizeFactor,),
+              onPressed: () => {widget.toggle(true),Navigator.pop(context)},
             ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildInfoCard({
@@ -173,23 +200,27 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
     );
   }
 }
-class GradientButton extends StatefulWidget {
+// class GradientButton extends StatefulWidget {
+//   final VoidCallback onTap;
+//   final String text;
+//
+//   const GradientButton({super.key, required this.onTap,required this.text});
+//
+//   @override
+//   State<GradientButton> createState() => _GradientButtonState();
+// }
+
+class GradientButton extends StatelessWidget {
   final VoidCallback onTap;
   final String text;
+  final bool isLoading;
 
-  const GradientButton({super.key, required this.onTap,required this.text});
-
-  @override
-  State<GradientButton> createState() => _GradientButtonState();
-}
-
-class _GradientButtonState extends State<GradientButton>
-    with SingleTickerProviderStateMixin {
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  const GradientButton({
+    super.key,
+    required this.onTap,
+    required this.text,
+    required this.isLoading,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -199,31 +230,46 @@ class _GradientButtonState extends State<GradientButton>
     final spacingFactor = screenHeight * 0.06;
 
     return GestureDetector(
-      onTap: widget.onTap,
-      child: Container(
-        width: spacingFactor * 5,
-        height: spacingFactor * 1,
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Colors.orange, Colors.red],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+      onTap: isLoading ? null : onTap,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: isLoading ? 0.7 : 1,
+        child: Container(
+          width: spacingFactor * 5,
+          height: spacingFactor * 1,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Colors.orange, Colors.red],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(15),
+            boxShadow: const [BoxShadow(color: Colors.orange)],
           ),
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: const [BoxShadow(color: Colors.orange)],
-        ),
-        alignment: Alignment.center,
-        child: Text(
-          AppPrefs.prefs.getBool('LangParams') == true
-              ? 'Continue'
-              : widget.text,
-          style: TextStyle(
-            fontSize: titleSizeFactor * 0.9,
-            color: Colors.white,
+          alignment: Alignment.center,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLoading)
+                SizedBox(
+                  width: titleSizeFactor * 0.7,
+                  height: titleSizeFactor * 0.7,
+                  child: const CircularProgressIndicator.adaptive(
+                    strokeWidth: 2,
+                  ),
+                ),
+              if (isLoading) const SizedBox(width: 8),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: titleSizeFactor * 0.9,
+                  color: Colors.white,
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
-
 }

@@ -13,10 +13,13 @@ class CreateOrderScreen extends StatefulWidget {
   final PointPlaceMark pointData;
   final void Function(bool) toggleBottomNavigationBar;
 
+  final void Function(bool) toggleCart;
+
   const CreateOrderScreen({
     super.key,
     required this.pointData,
     required this.toggleBottomNavigationBar,
+    required this.toggleCart
   });
 
   @override
@@ -124,6 +127,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> with SingleTicker
                                                 fullName: createOrder.fullNameController.text,
                                                 phoneNumber: createOrder.phoneController.text,
                                                 point: widget.pointData,
+                                                toggleCart:widget.toggleCart
                                               ),
                                             ),
                                           );

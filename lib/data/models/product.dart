@@ -16,8 +16,7 @@ class Products with ChangeNotifier{
         'Одиночные',
         'Тройные',
         'Четверные',
-        'В окклюзии',
-        ],
+      ],
       'ANTERIOR':[
         'Standart',
         'Advanced',
@@ -32,23 +31,23 @@ class Products with ChangeNotifier{
   }
   Future<void> initialize() async {
     try {
-       await getCatalog();
+      await getCatalog();
     } catch (error) {
       products = Catalog(products: [
         Product(
-        name: 'Forward teeth',
-        description: 'Its a newest our 3d model',
-        photo_url: 'assets/teeth1.png',
-        price: '70',
-        model_url: 'assets/teeth.glb',
-        height:1.6,
-        width: 1.6,
-        length:1.6,
-        weight:50,
-        section:"POSTERIOR",
-        subSection: "Одиночные",
-        id: 1,
-      ),]);
+          name: 'Forward teeth',
+          description: 'Its a newest our 3d model',
+          photo_url: 'assets/teeth1.png',
+          price: '70',
+          model_url: 'assets/teeth.glb',
+          height:1.6,
+          width: 1.6,
+          length:1.6,
+          weight:50,
+          section:"POSTERIOR",
+          subSection: "Одиночные",
+          id: 1,
+        ),]);
     }
     notifyListeners();
   }

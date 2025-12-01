@@ -1,0 +1,24 @@
+{
+  "helloWorld": "Hello World!",
+  "welcome": "Welcome {name}",
+  "settings": "Settings",
+  "language": "Language",
+  "logout": "Logout",
+  "deleteAccount": "Delete account",
+  "error": "Error",
+  "ok": "OK",
+  "name":"Name",
+  "surname" : "Surname",
+  "phone" : "Phone number",
+  "events" : "My events",
+  "orders" : "Orders",
+  "settings" :"Settings",
+  "support": "Support",
+  "personal":"Personal Information",
+  "emptycart":"Your cart is empty:(",
+  "addtocart" :"Add to cart",
+  "get" : "To get",
+  "supportEmail": "If you ran into a problem, please define  it and send to the email",
+  "copyMail":"Email Copied"
+
+}

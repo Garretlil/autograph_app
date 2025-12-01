@@ -6,6 +6,15 @@ part of 'DataConverter.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+TgResponse _$TgResponseFromJson(Map<String, dynamic> json) => TgResponse(
+      message: json['message'] as String,
+    );
+
+Map<String, dynamic> _$TgResponseToJson(TgResponse instance) =>
+    <String, dynamic>{
+      'message': instance.message,
+    };
+
 Catalog _$CatalogFromJson(Map<String, dynamic> json) => Catalog(
       products: (json['products'] as List<dynamic>?)
           ?.map((e) => Product.fromJson(e as Map<String, dynamic>))

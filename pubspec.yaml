@@ -35,13 +35,14 @@ dependencies:
   modal_bottom_sheet: ^3.0.0
   lottie: ^3.3.1
   url_launcher: ^6.2.4
-  intl: ^0.18.1
+  intl: ^0.20.2
   chewie:
       git:
         url: https://github.com/Garretlil/chewie.git
         ref: master
   hive_flutter: ^ 1.1.0
   flutter_launcher_icons: ^0.13.1
+  flutter_localization: ^0.3.3
 
 dev_dependencies:
   flutter_test:
@@ -70,7 +71,8 @@ flutter_native_splash:
 flutter:
   assets:
     - assets/
-
+    - lib/l10n/
+  generate: true
   uses-material-design: true
   fonts:
     - family: Inria Serif

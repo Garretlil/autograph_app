@@ -14,6 +14,8 @@ import 'package:autograph_app/presentation/login/RegistrationScreen.dart';
 import 'package:autograph_app/presentation/profile/MyEventsVebinars.dart';
 import 'package:autograph_app/presentation/profile/ProfilePage.dart';
 import 'package:autograph_app/presentation/profile/SupportPage.dart';
+import 'package:autograph_app/presentation/shop/BrushScreen.dart';
+import 'package:autograph_app/presentation/shop/PartnersScreen.dart';
 import 'package:autograph_app/presentation/shop/PreCatalog.dart';
 import 'package:autograph_app/presentation/shop/ProductScreen.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,10 +31,12 @@ import 'presentation/shop/CatalogScreen.dart';
 class ScreensWithNavigationBar extends StatefulWidget {
   final bool isLoggedIn;
   final ValueNotifier<int> tabNotifier;
+  final ValueNotifier<Locale> localeNotifier;
   const ScreensWithNavigationBar({
     super.key,
     required this.isLoggedIn,
     required this.tabNotifier,
+    required this.localeNotifier
   });
 
   @override
@@ -93,7 +97,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     return Stack(
       clipBehavior: Clip.none,
       children: [
-         Icon(Icons.shopping_cart,color: _selectedIndex ==1 ? Colors.white : Colors.grey.shade600),
+        Icon(Icons.shopping_cart,color: _selectedIndex ==1 ? Colors.white : Colors.grey.shade600),
         if (isCircleVisible)
           Positioned(
             right: -1,
@@ -113,11 +117,15 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
 
   void _toggleBottomNavigationBar(bool isVisible) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && isBottomNavVisible != isVisible) {
-        setState(() {
-          isBottomNavVisible = isVisible;
-        });
-      }
+      if (!mounted) return;
+      final loggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+      final needsUpdate =
+          isBottomNavVisible != isVisible || isLog != loggedIn;
+      if (!needsUpdate) return;
+      setState(() {
+        isBottomNavVisible = isVisible;
+        isLog = loggedIn;
+      });
     });
   }
 
@@ -179,6 +187,17 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                 return customPageRoute(const EventsOnlineOffline());
               case '/PreCatalog':
                 return customPageRoute(const PreCatalogScreen());
+              case '/Brushes':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute(BrushScreen(
+                  screenHeight: args['screenHeight'],
+                  screenWidth: args['screenWidth'],
+                  autoRotate: args['autoRotate'],
+                  disableZoom: args['disableZoom'],
+                  src: args['src'],
+                  section: args['section'],
+                  toggleCart: _toggleCircleCart,
+                ));
               case '/Catalog':
                 final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute(CatalogViewScreen(
@@ -190,6 +209,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                   section: args['section'],
                   toggleCart: _toggleCircleCart,
                 ));
+              case '/PartnerScreen':
+                return customPageRoute(PartnerScreen(toggleCart: _toggleCircleCart));
               case '/Product':
                 final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute(ProductViewScreen(
@@ -232,7 +253,12 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
           case 1:
             switch (settings.name) {
               case '/':
-                return customPageRoute(const CartChooseScreen());
+              // return customPageRoute(const CartChooseScreen());
+                _toggleBottomNavigationBar(true);
+                return customPageRoute(CartProductsScreen(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  toggleCart: _toggleCircleCart,
+                ));
               case '/CartEvents':
                 return customPageRoute(CartEvents(
                   toggleBottomNavigationBar: _toggleBottomNavigationBar,
@@ -259,6 +285,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
               case '/ProfileSettings':
                 return customPageRoute(ProfileSettingsScreen(
                   tabNotifier: widget.tabNotifier,
+                  localeNotifier: widget.localeNotifier,
                 ));
               case '/MY_EVENTS':
                 return customPageRoute(const ProfileMyEventsScreen());
@@ -289,6 +316,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     double screenWidth = MediaQuery.of(context).size.width;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW = screenWidth * 0.06;
+    final bool shouldShowBottomNav = isBottomNavVisible && isLog;
 
     return PopScope(
       canPop: false,
@@ -309,7 +337,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                     (index) => _buildNavigator(index),
               ),
             ),
-            if (isBottomNavVisible)
+            if (shouldShowBottomNav)
               Positioned(
                 left: 50,
                 right: 50,

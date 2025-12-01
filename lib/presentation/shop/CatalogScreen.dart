@@ -390,7 +390,7 @@ class _CardCatalog extends StatelessWidget {
                 child: Container(
                   width: paddingFactor * 7,
                   height: screenHeight * 0.049,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,

@@ -186,7 +186,7 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
     await recalculateCosts();
   }
 
-  Future<void> placeOrder(BuildContext context,void Function(bool) toggle,String fullName,String phoneNumber) async {
+  Future<void> placeOrder(BuildContext context,void Function(bool) toggle,String fullName,String phoneNumber,void Function(bool) toggleCart ) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -292,6 +292,7 @@ class ConfirmationOrderNotifier extends ChangeNotifier {
           );
         Navigator.popUntil(context, (route) => route.isFirst);
         toggle(true);
+        toggleCart(false);
       },
       onUnauthorized: () {
         _error = "Сессия истекла. Повторите вход.";

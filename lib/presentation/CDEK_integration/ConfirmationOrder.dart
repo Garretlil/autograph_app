@@ -14,7 +14,9 @@ class ConfirmationOrderScreen extends StatelessWidget {
   final String fullName;
   final String phoneNumber;
   final PointPlaceMark point;
-  const ConfirmationOrderScreen({super.key,required this.toggleBottomNavigationBar,required this.fullName,required this.phoneNumber,required this.point});
+
+  final void Function(bool) toggleCart;
+  const ConfirmationOrderScreen({super.key,required this.toggleBottomNavigationBar,required this.fullName,required this.phoneNumber,required this.point,required this.toggleCart});
 
   Shader createGradient(Rect bounds) {
     return const LinearGradient(
@@ -182,7 +184,7 @@ class ConfirmationOrderScreen extends StatelessWidget {
                       notifier.isLoading || totalCost == null
                           ? null
                           : () async {
-                        final success= await notifier.placeOrder(context,toggleBottomNavigationBar,fullName,phoneNumber);
+                        final success= await notifier.placeOrder(context,toggleBottomNavigationBar,fullName,phoneNumber,toggleCart);
                         Future.delayed(const Duration(milliseconds: 1000));
                       },
                       child: Opacity(
