@@ -36,6 +36,7 @@ class CatalogViewScreen extends StatefulWidget {
 class _CatalogViewScreen extends State<CatalogViewScreen> {
   final TextEditingController _searchController = TextEditingController();
   String selectedCategory='';
+  bool showChoice=true;
 
   Future<void> setPref() async {
     if (mounted) {
@@ -48,7 +49,11 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
     super.initState();
     setPref();
     _searchController.addListener(_onSearchChanged);
+
     selectedCategory = widget.section=='POSTERIOR' ? 'Одиночные' : 'Standart';
+    if (widget.section=='НАБОРЫ'){
+      showChoice=false;
+    }
   }
 
   @override
@@ -73,7 +78,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
           highlightColor: Colors.transparent,
           splashColor: Colors.transparent,
         ),
-        child: ChipTheme(
+        child:  ChipTheme(
           data: ChipTheme.of(context).copyWith(
             selectedColor: Colors.white.withOpacity(0.4),
             secondarySelectedColor: Colors.white.withOpacity(0.4),
@@ -109,7 +114,6 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    double iconSizeFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
 
     return Consumer<Products>(
@@ -185,6 +189,7 @@ class _CatalogViewScreen extends State<CatalogViewScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 105,),
+                    if (showChoice)
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.only(top: 8,left: 8,right: 8,bottom: 4),
@@ -298,14 +303,17 @@ class _CardCatalog extends StatelessWidget {
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         color: Colors.black.withOpacity(0.2),
-        child: Padding(
-          padding: EdgeInsets.all(paddingFactor * 0.1),
+        child: SizedBox(
+            width: screenWidth*0.1,
+            height: screenHeight*0.1,
+    child: Padding(
+          padding: EdgeInsets.all(paddingFactor * 0.2),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: Container(
-                  height: screenHeight * 0.2,
+                  height: screenHeight * 0.195,
                   width: screenWidth * 0.36,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -315,9 +323,6 @@ class _CardCatalog extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl:  '$baseUrlFinal/static${product.photo_url!}',
                     fit: BoxFit.cover,
-                    // placeholder: (context, url) => const Center(
-                    //   child: CircularProgressIndicator.adaptive(),
-                    // ),
                     errorWidget: (context, url, error) => Center(
                       child: Text(
                         'Ошибка загрузки',
@@ -330,31 +335,26 @@ class _CardCatalog extends StatelessWidget {
                   ),
                 ),
               ),
+              Padding(padding: EdgeInsets.only(left: screenWidth*0.03),child:
               Text(
                 productTitle,
                 style: TextStyle(
                   fontSize: descriptionSizeFactor * 0.7,
-                  color: Colors.orange,
-                  fontFamily: 'Inria Serif',
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              Text(
-                '$productPrice ₽',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Inria Serif',
-                  fontSize: titleSizeFactor * 0.8,
-                ),
               ),
+              SizedBox(height: screenHeight*0.02,),
               isInCart
-                  ? Container(
+                  ? Center(child:Container(
                   width: paddingFactor * 7,
                   height: screenHeight * 0.049,
                   decoration: BoxDecoration(
                     color: Colors.orange,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(30),
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
@@ -385,11 +385,12 @@ class _CardCatalog extends StatelessWidget {
                 ],
               )
               )
-                  : GestureDetector(
+              )
+                  : Center(child: GestureDetector(
                 onTap: () => toggleCartStatus(context, isInCart),
                 child: Container(
-                  width: paddingFactor * 7,
-                  height: screenHeight * 0.049,
+                  width: paddingFactor * 5,
+                  height: screenHeight * 0.05,
                   padding: const EdgeInsets.symmetric(vertical: 9),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -397,23 +398,26 @@ class _CardCatalog extends StatelessWidget {
                       end: Alignment.bottomCenter,
                       colors: [buttonCard, buttonCard],
                     ),
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                   child: Center(
                     child: Text(
-                      'Добавить в корзину',
+                      "${double.parse(product.price.toString()).round()} ₽",
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: titleSizeFactor * 0.6,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                        fontSize: titleSizeFactor * 0.7,
                       ),
                     ),
                   ),
                 ),
               ),
+              )
             ],
           ),
         ),
       ),
+      )
     );
   }
 }

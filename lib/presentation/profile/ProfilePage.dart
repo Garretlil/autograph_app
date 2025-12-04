@@ -130,22 +130,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Center(
             child: Container(
               alignment: Alignment.center,
-              width: spacingFactorW*10,
-              padding: EdgeInsets.symmetric( horizontal: spacingFactorW),
+              width: spacingFactorW * 12,
+              padding: EdgeInsets.symmetric(horizontal: spacingFactorW),
               decoration: BoxDecoration(
                 color: Colors.grey.shade600.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(15),
               ),
-              child:  ShaderMask(
+              child: ShaderMask(
                 shaderCallback: (bounds) => createGradient(bounds),
                 child: Text(
                   name,
                   style: TextStyle(
-                    fontSize: titleSizeFactor*1.6,
-                    fontWeight: FontWeight.w500,
+                    fontSize: titleSizeFactor * 1.6,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
-                    fontFamily: 'Inria Serif',
+                    fontFamily: 'Cormorant',
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
@@ -156,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pushNamed(context, '/MY_EVENTS');
             },
             child: Text(
-              AppLocalizations.of(context)!.events,
+              AppLocalizations.of(context)!.events.toUpperCase(),
               style: TextStyle(
                 fontSize: titleSizeFactor,
                 fontWeight: FontWeight.normal,
@@ -172,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pushNamed(context, '/Orders');
               },
               child: Text(
-                AppLocalizations.of(context)!.orders,
+                AppLocalizations.of(context)!.orders.toUpperCase(),
                 style:  TextStyle(
                   color: Colors.white,
                   fontSize:titleSizeFactor,
@@ -189,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pushNamed(context, '/ProfileSettings');
               },
               child: Text(
-                AppLocalizations.of(context)!.settings,
+                AppLocalizations.of(context)!.settings.toUpperCase(),
                 style:  TextStyle(
                   color: Colors.white,
                   fontSize: titleSizeFactor,
@@ -206,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pushNamed(context, '/Support');
               },
               child: Text(
-                AppLocalizations.of(context)!.support,
+                AppLocalizations.of(context)!.support.toUpperCase(),
                 style:  TextStyle(
                   color: Colors.white,
                   fontSize: titleSizeFactor,
@@ -217,23 +218,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
-          Padding(padding:  EdgeInsets.only(top: paddingFactor*1.3),
-            child: GestureDetector(
-                onTap: () {
-                },
-                child: CustomStripesContainer(
-                  width: 250,
-                  height: 30,
-                  backgroundColor: Colors.grey.shade600.withOpacity(0.3),
-                  firstStripeColor: Colors.grey[600]!,
-                  secondStripeColor: Colors.orange,
-                  stripeThickness: 5,
-                  progress: percents,
-                )
-            ),
-          ),
-          const Spacer(),
-          SizedBox(height: spacingFactor),
+          // Padding(padding:  EdgeInsets.only(top: paddingFactor*1.3),
+          //   child: GestureDetector(
+          //       onTap: () {
+          //       },
+          //       child: CustomStripesContainer(
+          //         width: 250,
+          //         height: 30,
+          //         backgroundColor: Colors.grey.shade600.withOpacity(0.3),
+          //         firstStripeColor: Colors.grey[600]!,
+          //         secondStripeColor: Colors.orange,
+          //         stripeThickness: 5,
+          //         progress: percents,
+          //       )
+          //   ),
+          // ),
+          // const Spacer(),
+          // SizedBox(height: spacingFactor),
         ]
         )
     );

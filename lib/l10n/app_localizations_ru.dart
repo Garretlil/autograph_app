@@ -70,4 +70,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get copyMail => 'Почта скопирована';
+
+  @override
+  String get deliveryProgressOk => 'Доставлено';
+
+  @override
+  String get deliveryProgressNotOk => 'В процессе';
 }

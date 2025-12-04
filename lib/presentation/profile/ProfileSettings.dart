@@ -179,14 +179,15 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                 width: spacingFactor * 3,
                 height: spacingFactor * 1,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
+
+                decoration:  BoxDecoration(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
+                    topLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
                   ),
-                  gradient: LinearGradient(colors: [Colors.white54, Colors.grey]),
+                  color: Colors.grey.withOpacity(0.6),
                 ),
                 child: Container(
                   width: spacingFactor * 5,
@@ -197,6 +198,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     style: TextStyle(
                       fontSize: titleSizeFactor * 0.9,
                       color: Colors.white,
+                      fontWeight: FontWeight.bold
                     ),
                   ),
                 ),
@@ -225,16 +227,16 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
               },
               borderRadius: BorderRadius.circular(15),
               child: Container(
-                width: spacingFactor * 4,
+                width: spacingFactor * 5,
                 height: spacingFactor * 1,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: Colors.red.shade700,
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
+                    topLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
                   ),
                 ),
                 child: Container(
@@ -246,6 +248,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
                     style: TextStyle(
                       fontSize: titleSizeFactor * 0.9,
                       color: Colors.white,
+                        fontWeight: FontWeight.bold
                     ),
                   ),
                 ),
@@ -342,7 +345,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
               color: Colors.white,
               fontSize: titleSizeFactor * 0.72,
               fontFamily: 'Inria Serif',
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.bold,
             ),
           ),
           Text(

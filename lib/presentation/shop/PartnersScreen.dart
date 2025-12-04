@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:dio/dio.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -86,7 +87,11 @@ class _PartnerScreen extends State<PartnerScreen> {
           ),
         ),
       ),
-      body: Container(
+      body: Padding(padding: EdgeInsets.fromLTRB(
+           0, screenHeight*0.16,0,0
+    ) ,
+        child:
+      Container(
         width: screenWidth,
         height: screenHeight,
         decoration: const BoxDecoration(
@@ -98,24 +103,83 @@ class _PartnerScreen extends State<PartnerScreen> {
         child: Center(
           child: _isLoading
               ? const CircularProgressIndicator()
-              : GestureDetector(
-            onTap: () async {
-              if (_telegramUrl != null) {
-                if (await canLaunch(_telegramUrl!)) {
-                  await launch(_telegramUrl!);
-                }
-              }
-            },
-            child: Text(
-              'Перейти в Telegram канал',
-              style: TextStyle(
-                color: _telegramUrl != null ? Colors.blue : Colors.grey,
-                decoration: TextDecoration.underline,
+              : Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                child: Text(
+                  'Наши партнеры занимаются изготовлением хирургических шаблонов для имплантации и аутотрансплантации, индивидуальных ложек и диагностических ортодонтических моделей',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: titleSizeFactor * 0.8,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+              SizedBox(height: screenHeight*0.1),
+              Text.rich(
+                TextSpan(
+                  text: 'Вся информация и оформление заказов в ',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: titleSizeFactor * 0.7,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: 'телеграмм-боте',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: titleSizeFactor * 0.7,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () async {
+                          if (_telegramUrl != null && await canLaunch(_telegramUrl!)) {
+                            await launch(_telegramUrl!);
+                          }
+                        },
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: screenHeight*0.03),
+              GestureDetector(
+                onTap: () async {
+                  if (await canLaunch('https://t.me/kolyantch')) {
+                    await launch('https://t.me/kolyantch');
+                  }
+                },
+                child: Text.rich(
+                  TextSpan(
+                    text: 'Резервный аккаунт для связи ',
+                    style:  TextStyle(
+                      color: Colors.white,
+                      fontSize: titleSizeFactor * 0.7,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '@kolyantch',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: titleSizeFactor * 0.7,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
+      )
+      )
     );
   }
 }

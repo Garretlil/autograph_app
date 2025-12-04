@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../data/models/user_orders.dart';
+import '../../l10n/app_localizations.dart';
 
 
 class ProfileOrdersScreen extends StatefulWidget {
@@ -19,11 +20,13 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
   void initState() {
     super.initState();
   }
+
   String getStatusText(String? status) {
     if (status == 'delivered') return 'Доставлен';
     if (status == null || status.isEmpty) return 'Неизвестно';
     return 'В процессе';
   }
+
   String formatDate(String isoDate) {
     final date = DateTime.tryParse(isoDate);
     if (date == null) return '—';
@@ -34,8 +37,14 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double screenHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
     double titleSizeFactor = screenWidth * 0.06;
 
     return Scaffold(
@@ -94,39 +103,38 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
               future: UserOrders.instance.getOrders(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator.adaptive());
+                  return const Center(
+                      child: CircularProgressIndicator.adaptive());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Ошибка: ${snapshot.error}'));
                 } else {
-                  final orders = UserOrders.instance.productOrder.product_orders;
+                  final orders = UserOrders.instance.productOrder
+                      .product_orders;
                   return ListView.builder(
                     itemCount: orders.length,
                     itemBuilder: (context, index) {
                       final item = orders[index];
                       return GestureDetector(
-                        onTap: () {
-                          //widget.toggleBottomNavigationBar(false);
-                          //_openFullScreenPlayer(context, item);
-                        },
+                        onTap: () {},
                         child: Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Card(
                             elevation: 8.0,
-                            shadowColor: Colors.blue.withOpacity(0.4),
+                            shadowColor: Colors.grey.withOpacity(0.2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
                               side: BorderSide(
-                                color: Colors.blue.withOpacity(0.2),
+                                color: Colors.grey.withOpacity(0.2),
                                 width: 2,
                               ),
                             ),
-                            child: Container(
+                            child: SizedBox(
                               height: screenHeight * 0.18,
                               child: Column(
                                 children: [
                                   Container(
                                     decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.1),
+                                      color: Colors.black.withOpacity(1),
                                       borderRadius: const BorderRadius.only(
                                         topLeft: Radius.circular(20),
                                         topRight: Radius.circular(20),
@@ -142,27 +150,39 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
                                             shape: BoxShape.circle,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: item.cdek_status=='delivered' ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3),
+                                                color: item.cdek_status ==
+                                                    'delivered' ? Colors.green
+                                                    .withOpacity(0.3) : Colors
+                                                    .orange.withOpacity(0.3),
                                                 blurRadius: 8,
                                                 offset: const Offset(0, 1),
                                               ),
                                             ],
                                           ),
                                           child:
-                                              item.cdek_status=="delivered" ?
-                                               Icon(Icons.check_circle_outline,color: Colors.green,size: screenHeight*0.03,) :
-                                               const Icon(Icons.timelapse,color: Colors.orange,),
+                                          item.cdek_status == "delivered" ?
+                                          Icon(Icons.check_circle_outline,
+                                            color: Colors.green,
+                                            size: screenHeight * 0.03,) :
+                                          const Icon(Icons.timelapse,
+                                            color: Colors.orange,),
                                         ),
                                         const SizedBox(width: 10),
                                         Expanded(
                                           child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
                                             children: [
                                               Text(
-                                                'Заказ № ${item.cdek_tracknumber}',
-                                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                                'Заказ № ${item
+                                                    .cdek_tracknumber}',
+                                                style: Theme
+                                                    .of(context)
+                                                    .textTheme
+                                                    .titleLarge
+                                                    ?.copyWith(
                                                   fontWeight: FontWeight.w500,
-                                                  color: Colors.blue,
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                             ],
@@ -171,10 +191,10 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
                                       ],
                                     ),
                                   ),
-                                  ////
                                   Expanded(
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20.0, vertical: 20),
                                       decoration: const BoxDecoration(
                                         borderRadius: BorderRadius.only(
                                           bottomLeft: Radius.circular(20),
@@ -183,10 +203,12 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
                                         color: Colors.black87,
                                       ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment: MainAxisAlignment
+                                            .spaceBetween,
                                         children: [
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
                                             children: [
                                               Text(
                                                 'Сумма',
@@ -197,7 +219,7 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                '${item.total_cost} ₽',
+                                                '${double.parse(item.total_cost.toString()).round()} ₽',
                                                 style: const TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 16,
@@ -208,7 +230,8 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
                                           ),
 
                                           Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment: CrossAxisAlignment
+                                                .start,
                                             children: [
                                               Text(
                                                 'Дата',
@@ -229,17 +252,25 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
                                             ],
                                           ),
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 6),
                                             decoration: BoxDecoration(
-                                              color: item.cdek_status == 'delivered'
-                                                  ? Colors.green.withOpacity(0.2)
-                                                  : Colors.orange.withOpacity(0.5),
-                                              borderRadius: BorderRadius.circular(20),
+                                              color: item.cdek_status ==
+                                                  'delivered'
+                                                  ? Colors.green.withOpacity(
+                                                  0.2)
+                                                  : Colors.orange.withOpacity(
+                                                  0.5),
+                                              borderRadius: BorderRadius
+                                                  .circular(20),
                                             ),
                                             child: Text(
-                                              item.cdek_status=='delivered' ? 'Доставлен' : 'В процессе',
+                                              item.cdek_status == 'delivered'
+                                                  ? AppLocalizations.of(context)!.deliveryProgressOk
+                                                  : AppLocalizations.of(context)!.deliveryProgressNotOk,
                                               style: TextStyle(
-                                                color: item.cdek_status == 'delivered'
+                                                color: item.cdek_status ==
+                                                    'delivered'
                                                     ? Colors.greenAccent
                                                     : Colors.white,
                                                 fontSize: 13,
@@ -267,168 +298,4 @@ class _ProfileOrdersScreen extends State<ProfileOrdersScreen> {
       ),
     );
   }
-
-  // void _openFullScreenPlayer(BuildContext context, ProductOrder item) async {
-  //   await Navigator.of(context).push(
-  //     PageRouteBuilder(
-  //       opaque: true,
-  //       maintainState: true,
-  //       transitionDuration: const Duration(milliseconds: 500),
-  //       reverseTransitionDuration: const Duration(milliseconds: 300),
-  //       pageBuilder: (_, animation, __) =>  OrderDetailScreen(toggleBottomNavigationBar: widget.toggleBottomNavigationBar,item:item),
-  //       transitionsBuilder: (_, animation, __, child) {
-  //         const begin = Offset(0.0, 1.0);
-  //         const end = Offset.zero;
-  //         const curve = Curves.easeOutCubic;
-  //
-  //         final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-  //         final offsetAnimation = animation.drive(tween);
-  //
-  //         return SlideTransition(
-  //           position: offsetAnimation,
-  //           child: child,
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
 }
-
-// class OrderDetailScreen extends StatelessWidget{
-//   final void Function(bool) toggleBottomNavigationBar;
-//   final ProductOrder item;
-//   const OrderDetailScreen({super.key,required this.toggleBottomNavigationBar,required this.item});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     double screenWidth = MediaQuery.of(context).size.width;
-//     return Scaffold(
-//       backgroundColor: Colors.black,
-//       appBar: AppBar(
-//         backgroundColor: Colors.black,
-//         title: Text('Заказ № ${item.id}'),
-//         leading: GestureDetector(
-//           onTap: () {
-//             toggleBottomNavigationBar(true);
-//             Navigator.pop(context);
-//           },
-//           child: Icon(Icons.keyboard_arrow_down_outlined, size: screenWidth * 0.09, color: Colors.grey.shade300),
-//         ),
-//       ),
-//       body:  Center(
-//         child:  _CardCatalog(product: item.products[0]),
-//       ),
-//     );
-//   }
-// }
-//
-// class _CardCatalog extends StatefulWidget {
-//   final Product product;
-//
-//   const _CardCatalog({
-//     required this.product,
-//   });
-//
-//   @override
-//   State<_CardCatalog> createState() => _CardCatalogState();
-// }
-//
-// class _CardCatalogState extends State<_CardCatalog> {
-//
-//   void t(){}
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final screenWidth = MediaQuery.of(context).size.width;
-//     final screenHeight = MediaQuery.of(context).size.height;
-//     final product = widget.product;
-//
-//     double paddingFactor = screenWidth * 0.06;
-//     double titleSizeFactor = screenWidth * 0.06;
-//     double descriptionSizeFactor = screenWidth * 0.06;
-//
-//     final productTitle = product.name ?? 'Название будет попозже(';
-//     final productPrice = product.price ?? 0;
-//
-//     return GestureDetector(
-//         onTap: () {
-//           Navigator.pushNamed(
-//             context,
-//             '/Product',
-//             arguments: {
-//               'screenHeight': screenHeight,
-//               'screenWidth': screenWidth,
-//               'autoRotate': false,
-//               'disableZoom': true,
-//               'productId': product.id,
-//             },
-//           );
-//         },
-//         child:
-//         Card(
-//           shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(20),
-//           ),
-//           color: Colors.black.withOpacity(0.2),
-//           child: Padding(
-//             padding: EdgeInsets.all(paddingFactor * 0.2),
-//             child: Row(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Container(
-//                     height: screenHeight * 0.15,
-//                     width: screenWidth * 0.4,
-//                     margin: EdgeInsets.only(right: paddingFactor * 0.2),
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(10),
-//                       boxShadow: const [
-//                         BoxShadow(color: Colors.black26, blurRadius: 5),
-//                       ],
-//                     ),
-//                     clipBehavior: Clip.hardEdge,
-//                     child: Image.network(
-//                       '$baseUrlFinal/static${product.photo_url!}',
-//                       fit: BoxFit.cover,
-//                       loadingBuilder: (context, child, loadingProgress) {
-//                         if (loadingProgress == null) return child;
-//                         return const Center(child: CircularProgressIndicator.adaptive());
-//                       },
-//                       errorBuilder: (context, error, stackTrace) {
-//                         return const Text('Не удалось загрузить');
-//                       },
-//                     )
-//                 ),
-//                 Expanded(
-//                   child: Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       Text(
-//                         productTitle,
-//                         style: TextStyle(
-//                           fontSize: descriptionSizeFactor * 0.7,
-//                           color: Colors.white,
-//                           fontFamily: 'Inria Serif',
-//                         ),
-//                         maxLines: 2,
-//                         overflow: TextOverflow.ellipsis,
-//                       ),
-//                       const SizedBox(height: 4),
-//                       const SizedBox(height: 6),
-//                       Text(
-//                         '$productPrice ₽',
-//                         style: TextStyle(
-//                           color: Colors.orange,
-//                           fontFamily: 'Inria Serif',
-//                           fontSize: titleSizeFactor * 0.8,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         )
-//     );
-//   }
-// }

@@ -1,36 +1,38 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../AnimatedBackButton.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/network/DataConverter.dart';
+
 import '../../core/services/local_cart_products.dart';
 import '../../data/models/product.dart';
 
-class ProductViewScreen extends StatefulWidget {
-  const ProductViewScreen({
+
+class BrushDetailScreen extends StatefulWidget {
+  final void Function(bool) toggle;
+  final Product product;
+  const BrushDetailScreen({
     super.key,
     this.autoRotate = false,
     this.disableZoom = false,
     required this.screenWidth,
     required this.screenHeight,
     required this.product,
-    required this.toggleCart
+    required this.toggleCart, required this.toggle
   });
-
   final bool autoRotate;
   final bool disableZoom;
   final double screenWidth;
   final double screenHeight;
-  final Product product;
   final void Function(bool) toggleCart;
-
   @override
-  State<ProductViewScreen> createState() => _ProductViewScreenState();
+  State<BrushDetailScreen> createState() => _BrushDetailScreenState();
 }
 
-class _ProductViewScreenState extends State<ProductViewScreen> {
+class _BrushDetailScreenState extends State<BrushDetailScreen> {
   SharedPreferences? prefs;
   bool isAddedToCart = false;
 
@@ -38,7 +40,10 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
   void initState() {
     super.initState();
     setPref();
-    isAddedToCart = LocalCartProducts.instance.isProductInCart(widget.product.id!);
+    final productId = widget.product.id;
+    if (productId != null) {
+      isAddedToCart = LocalCartProducts.instance.isProductInCart(productId);
+    }
   }
 
   Future<void> setPref() async {
@@ -49,13 +54,13 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
 
 
   void toggleCartStatus(BuildContext context) {
-
     final productId = widget.product.id;
+    if (productId == null) return;
 
     if (!isAddedToCart) {
-      LocalCartProducts.instance.addProductToCart(productId!,widget.toggleCart);
+      LocalCartProducts.instance.addProductToCart(productId, widget.toggleCart);
     } else {
-      LocalCartProducts.instance.removeProductFromCart(productId!,widget.toggleCart);
+      LocalCartProducts.instance.removeProductFromCart(productId, widget.toggleCart);
     }
 
     setState(() {
@@ -72,10 +77,20 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
     double titleSizeFactor = screenWidth * 0.06;
     double paddingFactor = screenWidth * 0.06;
     double spacingFactor = screenHeight * 0.04;
+    final int productPrice = double.parse(widget.product.price.toString()).round();
 
     return Consumer<Products>(builder: (context, products, child) {
-      final currentProduct = products.products.products!
-          .firstWhere((product) => product.id == widget.product.id);
+      final catalogProducts = products.products.products ?? <Product>[];
+      final currentProduct = catalogProducts.isEmpty
+          ? widget.product
+          : catalogProducts.firstWhere(
+              (product) => product.id == widget.product.id,
+              orElse: () => widget.product,
+            );
+      final productId = widget.product.id;
+      final cartCount = productId == null
+          ? 0
+          : LocalCartProducts.instance.countProductInCart(productId);
       return Scaffold(
         body: Stack(
           children: [
@@ -90,38 +105,49 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                 ),
               ),
             ),
+            SizedBox(height: screenHeight*0.1,),
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                Padding(padding: EdgeInsets.only(top: screenHeight*0.05),
+                child:
                 SizedBox(
-                  height: widget.screenHeight * 0.5,
+                  height: screenHeight * 0.25,
                   child: Container(
                     decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20)),
+                      borderRadius: BorderRadius.all(
+                           Radius.circular(20),
+                          ),
                       boxShadow: [
                         BoxShadow(color: Colors.black26, blurRadius: 5),
                       ],
                     ),
                     clipBehavior: Clip.hardEdge,
-                    child: ModelViewer(
-                      backgroundColor: Colors.grey.shade800,
-                      src: '$baseUrlFinal/static${currentProduct.model_url!}',
-                      alt: '',
-                      ar: true,
-                      autoRotate: widget.autoRotate,
-                      disableZoom: widget.disableZoom,
-                        orientation: "1 0 0 -90deg"
+                    child: CachedNetworkImage(
+                      imageUrl: '$baseUrlFinal/static${currentProduct.photo_url ?? widget.product.photo_url ?? ''}',
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          'Ошибка загрузки',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: titleSizeFactor * 0.6,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(height: spacingFactor * 0.1),
-                _buildInfoCard(
-                  title: currentProduct.description!,
-                  titleSizeFactor: titleSizeFactor,
                 ),
-                SizedBox(height: spacingFactor),
+                SizedBox(height: spacingFactor * 0.2),
+                _buildInfoCard(
+                    title: widget.product.description!,
+                    height: screenHeight
+                ),
+                SizedBox(height: spacingFactor*0.6),
                 !isAddedToCart? GestureDetector(
                   onTap: () => toggleCartStatus(context),
                   child: Container(
@@ -140,11 +166,11 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        "${double.parse(widget.product.price.toString()).round()} ₽",
+                        '$productPrice ₽',
                         style: TextStyle(
-                          fontWeight: FontWeight.bold,
                           color: Colors.black,
-                          fontSize: titleSizeFactor * 0.7,
+                            fontSize: titleSizeFactor * 0.7,
+                          fontWeight: FontWeight.bold
                         ),
                       ),
                     ),
@@ -162,7 +188,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                               ? [Colors.white.withOpacity(0.45), Colors.white.withOpacity(0.45)]
                               : [Colors.teal, Colors.blue],
                         ),
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(15),
                       ),
                       child:
                       Row(
@@ -171,22 +197,34 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
                           GestureDetector(
                             child: const Icon(Icons.remove, color: Colors.white),
                             onTap: () => setState(() {
-                              if (LocalCartProducts.instance.isProductInCart(widget.product.id!)) {
-                                LocalCartProducts.instance.removeProductFromCart(widget.product.id!,widget.toggleCart);
+                              final id = widget.product.id;
+                              if (id == null) return;
+                              if (LocalCartProducts.instance.isProductInCart(id)) {
+                                LocalCartProducts.instance.removeProductFromCart(
+                                  id,
+                                  widget.toggleCart,
+                                );
                               }
-                              if (!LocalCartProducts.instance.isProductInCart(widget.product.id!)){
-                                isAddedToCart=!isAddedToCart;
+                              if (!LocalCartProducts.instance.isProductInCart(id)) {
+                                isAddedToCart = false;
                               }
                             }),
                           ),
-                          Text('${LocalCartProducts.instance.countProductInCart(widget.product.id!)}',
-                            style: const TextStyle(fontSize: 16,color: Colors.white),
+                          Text(
+                            '$cartCount',
+                            style: const TextStyle(fontSize: 16, color: Colors.white),
                           ),
                           GestureDetector(
-                              child: const Icon(Icons.add,color: Colors.white,),
-                              onTap: ()=>setState(() {
-                                LocalCartProducts.instance.addProductToCart(widget.product.id!,widget.toggleCart);
-                              })
+                            child: const Icon(Icons.add, color: Colors.white),
+                            onTap: () => setState(() {
+                              final id = widget.product.id;
+                              if (id == null) return;
+                              LocalCartProducts.instance.addProductToCart(
+                                id,
+                                widget.toggleCart,
+                              );
+                              isAddedToCart = true;
+                            }),
                           ),
                         ],
                       )
@@ -210,7 +248,7 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
 
   Widget _buildInfoCard({
     required String title,
-    required double titleSizeFactor,
+    required double height
   }) {
     return Card(
       color: Colors.grey.shade900,
@@ -219,24 +257,18 @@ class _ProductViewScreenState extends State<ProductViewScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: titleSizeFactor * 0.7,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+        child: SizedBox(
+          height: height * 0.45,
+          child: SingleChildScrollView(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: height * 0.02,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

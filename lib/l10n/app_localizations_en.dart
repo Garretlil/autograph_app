@@ -70,4 +70,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get copyMail => 'Email Copied';
+
+  @override
+  String get deliveryProgressOk => 'Delivered';
+
+  @override
+  String get deliveryProgressNotOk => 'In Progress';
 }

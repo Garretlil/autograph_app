@@ -197,16 +197,14 @@ class _CardCatalog extends StatelessWidget {
 
     double paddingFactor = screenWidth * 0.06;
     double titleSizeFactor = screenWidth * 0.06;
-    double descriptionSizeFactor = screenWidth * 0.06;
 
-    final productTitle = product.name ?? 'Название будет попозже(';
     final int productPrice = double.parse(product.price.toString()).round();
 
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
           context,
-          '/Product',
+          '/BrushDetailScreen',
           arguments: {
             'screenHeight': screenHeight,
             'screenWidth': screenWidth,
@@ -296,23 +294,24 @@ class _CardCatalog extends StatelessWidget {
                   : GestureDetector(
                 onTap: () => toggleCartStatus(context, isInCart),
                 child: Container(
-                  width: paddingFactor * 6,
-                  height: screenHeight * 0.049,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  width: paddingFactor * 5,
+                  height: screenHeight * 0.05,
+                  padding: const EdgeInsets.symmetric(vertical: 9),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [buttonCard, buttonCard],
                     ),
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                   child: Center(
                     child: Text(
                       '$productPrice ₽',
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: titleSizeFactor * 0.6,
+                        fontSize: titleSizeFactor * 0.7,
+                          fontWeight: FontWeight.bold
                       ),
                     ),
                   ),

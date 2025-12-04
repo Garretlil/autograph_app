@@ -17,6 +17,7 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
     super.initState();
     setPref();
   }
+
   Shader createGradient(Rect bounds) {
     if (bounds.isEmpty) {
       return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
@@ -42,7 +43,7 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
       appBar: PreferredSize(
         preferredSize: Size(
           screenWidth,
-          kToolbarHeight-20,
+          kToolbarHeight - 20,
         ),
         child: ClipRect(
           child: BackdropFilter(
@@ -76,78 +77,42 @@ class _HomePage extends State<HomePage> with SingleTickerProviderStateMixin {
       ),
       body: Stack(
         children: [
-          // Positioned.fill(
-          //   child: Image.asset(
-          //     'assets/image.png',
-          //     fit: BoxFit.cover,
-          //   ),
-          // ),
           LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    paddingFactor * 0.4,
+                    paddingFactor * 1.9 + kToolbarHeight,
+                    paddingFactor * 0.4,
+                    paddingFactor*3.5,
                   ),
-                  child: IntrinsicHeight(
-                    child:
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        paddingFactor * 0.4,
-                        paddingFactor * 1.8 + kToolbarHeight,
-                        paddingFactor*0.4,
-                        0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/PreCatalog'),
+                        child: Image.asset(
+                          'assets/products2.png',
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () => Navigator.pushNamed(context, '/PreCatalog',),
-                                  child: Image.asset(
-                                    'assets/homepage2.png',
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => Navigator.pushNamed(context, '/EventsOnline',),
-                                  child: Image.asset(
-                                    'assets/courses.jpeg',
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                //  ThemeShowcaseCard(
-                                //     isDarkMode: false,
-                                //     isPhantoms: true,
-                                //     sectionTitle: 'Фантомы',
-                                //     icon: Icons.shopping_bag,
-                                //     description: 'Лучшие модели зубов',
-                                //     nextScreen: (ctx) =>Navigator.pushNamed(ctx, '/PreCatalog',),
-                                //    image: 'assets/homepage2.jpg',
-                                // ),
-                                // SizedBox(height: spacingFactor * 0.01),
-                                //  ThemeShowcaseCard(
-                                //     isDarkMode: true,
-                                //     sectionTitle: 'Мероприятия',
-                                //     icon: Icons.ondemand_video,
-                                //     description: 'Курсы по реставрации',
-                                //     isPhantoms: false,
-                                //     nextScreen: (ctx) => Navigator.pushNamed(
-                                //       ctx, '/EventsOnline',
-                                //     ),
-                                //      image: 'assets/homepage.jpg',
-                                // ),
-
-                                SizedBox(height: spacingFactor * 0.02),
-                              ],
-                            ),
-                          ),
-                        ],
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/EventsOnline'),
+                        child: Image.asset(
+                          'assets/courses.jpeg',
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, '/Videos'),
+                        child: Image.asset(
+                          'assets/videos.jpg',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(height: spacingFactor * 1.4),
+                    ],
                   ),
                 ),
               );
@@ -336,7 +301,6 @@ class ProductsScreen extends StatelessWidget {
           width: MediaQuery.of(context).size.width * 0.9,
           child: Stack(
             children: [
-              // Заголовок AUTOGRAPH
               Positioned(
                 top: 0,
                 left: 0,
@@ -351,7 +315,6 @@ class ProductsScreen extends StatelessWidget {
                 ),
               ),
 
-              // Модель (слева)
               Positioned(
                 top: 100,
                 left: 0,
@@ -359,7 +322,7 @@ class ProductsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      "assets/images/model.png", // твой 3D зуб
+                      "assets/images/model.png",
                       height: 120,
                     ),
                     const SizedBox(height: 8),
@@ -373,8 +336,6 @@ class ProductsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Phantom sets (справа)
               Positioned(
                 top: 100,
                 right: 0,
@@ -382,7 +343,7 @@ class ProductsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Image.asset(
-                      "assets/images/phantom_sets.png", // кучка зубов
+                      "assets/images/phantom_sets.png",
                       height: 120,
                     ),
                     const SizedBox(height: 8),
@@ -398,7 +359,6 @@ class ProductsScreen extends StatelessWidget {
                 ),
               ),
 
-              // Brushes (по центру сверху)
               Positioned(
                 top: 40,
                 left: 0,
@@ -423,19 +383,16 @@ class ProductsScreen extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // Инструменты (внизу)
               Positioned(
                 bottom: 80,
                 left: 0,
                 right: 0,
                 child: Image.asset(
-                  "assets/images/tools.png", // инструменты
+                  "assets/images/tools.png",
                   height: 40,
                 ),
               ),
 
-              // PRODUCTS (внизу)
               Positioned(
                 bottom: 20,
                 left: 0,

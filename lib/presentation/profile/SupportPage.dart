@@ -99,16 +99,13 @@ class _SupportPageScreenState extends State<SupportPageScreen> {
                   SizedBox(height: spacingFactorW),
                    Row(children:
                      [
-                       Text('ed763135@gmail.com',
+                       Text('info@autograph-dentistry.com',
                         style: TextStyle(fontSize: screenWidth*0.05),
                        ),
                        SizedBox(width: spacingFactorW*0.5),
                        GestureDetector(
                          onTap: () {
-                           Clipboard.setData(
-                             const ClipboardData(text: 'ed763135@gmail.com'),
-                           );
-                           showCopyToast(context, AppLocalizations.of(context)!.copyMail);
+                           HapticFeedback.mediumImpact();
                          },
                          child: const Icon(Icons.copy_outlined, color: Colors.grey, size: 20),
                        ),

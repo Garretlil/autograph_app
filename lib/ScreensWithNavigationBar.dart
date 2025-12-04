@@ -9,11 +9,13 @@ import 'package:autograph_app/presentation/home/EventsOnline.dart';
 import 'package:autograph_app/presentation/home/EventsOnlineOfflineScreen.dart';
 import 'package:autograph_app/presentation/home/HomePage.dart';
 import 'package:autograph_app/presentation/home/ListOfVebinars.dart';
+import 'package:autograph_app/presentation/home/Videos.dart';
 import 'package:autograph_app/presentation/login/CheckCode.dart';
 import 'package:autograph_app/presentation/login/RegistrationScreen.dart';
 import 'package:autograph_app/presentation/profile/MyEventsVebinars.dart';
 import 'package:autograph_app/presentation/profile/ProfilePage.dart';
 import 'package:autograph_app/presentation/profile/SupportPage.dart';
+import 'package:autograph_app/presentation/shop/BrushDetailScreen.dart';
 import 'package:autograph_app/presentation/shop/BrushScreen.dart';
 import 'package:autograph_app/presentation/shop/PartnersScreen.dart';
 import 'package:autograph_app/presentation/shop/PreCatalog.dart';
@@ -185,6 +187,8 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                 return customPageRoute(const HomePage());
               case '/EventsOnlineOffline':
                 return customPageRoute(const EventsOnlineOffline());
+              case '/Videos':
+                return customPageRoute(const VideosScreen());
               case '/PreCatalog':
                 return customPageRoute(const PreCatalogScreen());
               case '/Brushes':
@@ -197,6 +201,18 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                   src: args['src'],
                   section: args['section'],
                   toggleCart: _toggleCircleCart,
+                ));
+
+              case '/BrushDetailScreen':
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute(BrushDetailScreen(
+                  screenHeight: args['screenHeight'],
+                  screenWidth: args['screenWidth'],
+                  autoRotate: args['autoRotate'],
+                  disableZoom: args['disableZoom'],
+                  product: args['product'],
+                  toggleCart: _toggleCircleCart,
+                  toggle: _toggleBottomNavigationBar,
                 ));
               case '/Catalog':
                 final args = settings.arguments as Map<String, dynamic>;

@@ -19,6 +19,7 @@
   "addtocart" :"Add to cart",
   "get" : "To get",
   "supportEmail": "If you ran into a problem, please define  it and send to the email",
-  "copyMail":"Email Copied"
-
+  "copyMail":"Email Copied",
+  "deliveryProgressOk":"Delivered",
+  "deliveryProgressNotOk":"In Progress"
 }

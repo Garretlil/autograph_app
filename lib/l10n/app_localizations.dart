@@ -217,6 +217,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Email Copied'**
   String get copyMail;
+
+  /// No description provided for @deliveryProgressOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get deliveryProgressOk;
+
+  /// No description provided for @deliveryProgressNotOk.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get deliveryProgressNotOk;
 }
 
 class _AppLocalizationsDelegate

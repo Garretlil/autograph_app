@@ -90,3 +90,6 @@ flutter:
     - family: Masvol
       fonts:
         - asset: assets/fonts/cd-masvol-thin.otf
+    - family: Cormorant
+      fonts:
+          - asset: assets/fonts/CormorantSC-Medium.ttf
