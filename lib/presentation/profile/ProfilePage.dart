@@ -22,6 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int totalSum=0;
   int percents=0;
   ProductOrderResponse productOrder=ProductOrderResponse(product_orders: []);
+  bool _lastLoggedInState = false;
   Shader createGradient(Rect bounds) {
     if (bounds.isEmpty) {
       return const LinearGradient(colors: [Colors.transparent, Colors.transparent]).createShader(bounds);
@@ -35,8 +36,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadName();
+    _lastLoggedInState = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+    if (_lastLoggedInState) {
+      _loadName();
+    } else {
+      name = '';
+    }
     _getOrders();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Проверяем статус входа и обновляем имя
+    final currentIsLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+    if (currentIsLoggedIn != _lastLoggedInState) {
+      _lastLoggedInState = currentIsLoggedIn;
+      if (!currentIsLoggedIn) {
+        // Если вышли из аккаунта, принудительно очищаем имя
+        setState(() {
+          name = '';
+        });
+      } else {
+        // Если залогинились, загружаем имя
+        _loadName();
+      }
+    } else if (currentIsLoggedIn && name.isEmpty) {
+      // Если залогинен, но имя пустое, загружаем
+      _loadName();
+    } else if (!currentIsLoggedIn && name.isNotEmpty) {
+      // Если не залогинен, но имя есть, очищаем
+      setState(() {
+        name = '';
+      });
+    }
   }
   double countPercent(int sum){
     if (sum<15000){
@@ -57,10 +90,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final sessionKey=AppPrefs.prefs.getString('session_key');
       productOrder = await client.getOrders(sessionKey!);
       productOrder.product_orders.reverse();
-      // totalSum = productOrder.product_orders
-      //     .map((order) => int.parse(order.total_cost!))
-      //     .reduce((a, b) => a + b);
-      //totalSum = 5000;
       setState(() {
         isLoadedOrders =true;
         percents=countPercent(totalSum).toInt();
@@ -71,15 +100,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
   Future<void> _loadName() async {
+    final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+    if (!isLoggedIn) {
+      setState(() {
+        name = '';
+      });
+      return;
+    }
     final sessionKey = AppPrefs.prefs.getString('session_key');
-    final response = await AuthService(Dio()).getMe(sessionKey ?? '');
-    setState(() {
-      name = response.name ?? '';
-    });
+    if (sessionKey == null || sessionKey.isEmpty) {
+      setState(() {
+        name = '';
+      });
+      return;
+    }
+    try {
+      final response = await AuthService(Dio()).getMe(sessionKey);
+      setState(() {
+        name = response.name ?? '';
+      });
+    } catch (e) {
+      setState(() {
+        name = '';
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Всегда проверяем статус входа напрямую из SharedPreferences
+    final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+    
+    // Если статус изменился, обновляем состояние
+    if (isLoggedIn != _lastLoggedInState) {
+      _lastLoggedInState = isLoggedIn;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          if (!isLoggedIn) {
+            setState(() {
+              name = '';
+            });
+          } else {
+            _loadName();
+          }
+        }
+      });
+    }
+    
+    // Принудительно очищаем имя если не залогинен
+    if (!isLoggedIn && name.isNotEmpty) {
+      name = '';
+    }
+
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     double paddingFactor = screenWidth * 0.06;
@@ -124,33 +196,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-        body: Column(children: [
-          SizedBox(height: spacingFactor*1.8,),
-          SizedBox(height: paddingFactor),
-          Center(
-            child: Container(
-              alignment: Alignment.center,
-              width: spacingFactorW * 12,
-              padding: EdgeInsets.symmetric(horizontal: spacingFactorW),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade600.withOpacity(0.6),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: ShaderMask(
-                shaderCallback: (bounds) => createGradient(bounds),
-                child: Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: titleSizeFactor * 1.6,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                    fontFamily: 'Cormorant',
+        body: StatefulBuilder(
+          builder: (context, setStateBuilder) {
+            // ВСЕГДА проверяем статус входа напрямую при каждом рендере
+            final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+            
+            // Если не залогинен, принудительно очищаем имя
+            if (!isLoggedIn && name.isNotEmpty) {
+              name = '';
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                setStateBuilder(() {});
+              });
+            }
+            return Column(children: [
+              SizedBox(height: spacingFactor*1.8,),
+              SizedBox(height: paddingFactor),
+              Center(
+                child: Container(
+                  alignment: Alignment.center,
+                  width: spacingFactorW * 12,
+                  padding: EdgeInsets.symmetric(horizontal: spacingFactorW),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade600.withOpacity(0.6),
+                    borderRadius: BorderRadius.circular(15),
                   ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                  // Показываем имя ТОЛЬКО если залогинен И имя не пустое
+                  child: (isLoggedIn && name.isNotEmpty)
+                      ? ShaderMask(
+                          shaderCallback: (bounds) => createGradient(bounds),
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: titleSizeFactor * 1.6,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              fontFamily: 'Cormorant',
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        )
+                      : const SizedBox(),
+                  ),
               ),
-            ),
-          ),
           SizedBox(height: paddingFactor*1.5),
           GestureDetector(
             onTap: () {
@@ -235,7 +322,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // ),
           // const Spacer(),
           // SizedBox(height: spacingFactor),
-        ]
+            ]
+            );
+          },
         )
     );
   }

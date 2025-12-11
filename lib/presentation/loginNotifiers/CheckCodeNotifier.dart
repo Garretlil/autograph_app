@@ -16,12 +16,16 @@ class CheckCodeNotifier extends ChangeNotifier{
   final FocusNode rawKeyboardFocusNode = FocusNode();
   final String email;
   final String phone;
+  final VoidCallback? onLoginSuccess;
+  final void Function(bool)? toggleBottomNavigationBar;
 
   CheckCodeNotifier({
     required this.context,
     required TickerProvider vsync,
     required this.phone,
-    required this.email
+    required this.email,
+    this.onLoginSuccess,
+    this.toggleBottomNavigationBar,
   }) {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -77,6 +81,22 @@ class CheckCodeNotifier extends ChangeNotifier{
          AppPrefs.prefs.setBool('isLoggedIn', true);
 
         if (mounted) {
+          // Call callback if provided (for actions like opening cart modal)
+          if (onLoginSuccess != null) {
+            // Показываем bottom bar перед выходом
+            toggleBottomNavigationBar?.call(true);
+            // Pop back to the screen that called registration
+            Navigator.of(context).pop(); // Pop CheckCodeScreen
+            Navigator.of(context).pop(); // Pop RegistrationScreen
+            // Wait a bit for navigation to complete, then call the callback
+            await Future.delayed(const Duration(milliseconds: 300));
+            if (mounted) {
+              onLoginSuccess!();
+            }
+            return;
+          }
+          // Показываем bottom bar перед переходом на HomePage
+          toggleBottomNavigationBar?.call(true);
           navigateToNextScreen(true);
         }
 

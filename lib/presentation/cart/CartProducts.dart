@@ -132,13 +132,6 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                         ),
                       )
                           : Center(
-                        // child: Text(
-                        //   AppLocalizations.of(context)!.emptycart,
-                        //   style: TextStyle(
-                        //     fontSize: titleSizeFactor * 1.05,
-                        //     color: Colors.white,
-                        //     fontFamily: 'Inria Serif'
-                        //   ),
                         child:Lottie.asset(
                             'assets/empty ghost.json',
                             width: 200,
@@ -167,8 +160,30 @@ class _CartProductsScreen extends State<CartProductsScreen> {
                               color: Colors.transparent,
                               child: InkWell(
                                 borderRadius: BorderRadius.circular(30),
-                                onTap: () => {widget.toggleBottomNavigationBar(false),_showBottomSheet(
-                                    widget.toggleBottomNavigationBar,widget.toggleCart),},
+                                onTap: () async {
+                                  final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+                                  if (!isLoggedIn) {
+                                    await Navigator.pushNamed(
+                                      context,
+                                      '/RegistrationScreen',
+                                      arguments: {
+                                        'onLoginSuccess': () {
+                                          widget.toggleBottomNavigationBar(false);
+                                          _showBottomSheet(
+                                            widget.toggleBottomNavigationBar,
+                                            widget.toggleCart,
+                                          );
+                                        },
+                                      },
+                                    );
+                                  } else {
+                                    widget.toggleBottomNavigationBar(false);
+                                    _showBottomSheet(
+                                      widget.toggleBottomNavigationBar,
+                                      widget.toggleCart,
+                                    );
+                                  }
+                                },
                                 child: Center(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -6,12 +7,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../Theme/SysTheme/Constants.dart';
 import '../../core/services/SharedP.dart';
+import '../../AnimatedBackButton.dart';
 import '../loginNotifiers/RegistrationNotifier.dart';
 
 class RegistrationScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;
+  final VoidCallback? onLoginSuccess;
 
-  const RegistrationScreen({super.key, required this.toggleBottomNavigationBar});
+  const RegistrationScreen({
+    super.key,
+    required this.toggleBottomNavigationBar,
+    this.onLoginSuccess,
+  });
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreen();
@@ -105,6 +112,40 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
             child: Consumer<RegistrationNotifier>(
               builder: (context, registration, child) => Scaffold(
                 backgroundColor: background,
+                extendBodyBehindAppBar: true,
+                appBar: PreferredSize(
+                  preferredSize: Size(screenWidth, kToolbarHeight - 20),
+                  child: ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                      child: AppBar(
+                        forceMaterialTransparency: true,
+                        backgroundColor: Colors.transparent,
+                        elevation: 0,
+              leading: FadedIconButton(
+                onPressed: () {
+                  widget.toggleBottomNavigationBar(true);
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+              ),
+                        centerTitle: true,
+                        title: ShaderMask(
+                          shaderCallback: (bounds) => createGradient(bounds),
+                          child: Text(
+                            'AUTOGRAPH',
+                            style: TextStyle(
+                              fontSize: titleSizeFactor * 0.85,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Inria Serif',
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 body: LayoutBuilder(
                   builder: (context, constraints) {
                     return SingleChildScrollView(
@@ -113,10 +154,16 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                         child: IntrinsicHeight(
                           child: Stack(
                             children: [
+                              Positioned.fill(
+                                child: Image.asset(
+                                  'assets/image.png',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                               Padding(
                                 padding: EdgeInsets.fromLTRB(
                                   paddingFactor * 1.2,
-                                  paddingFactor * 2.4,
+                                  paddingFactor * 2.4 + kToolbarHeight,
                                   paddingFactor,
                                   0,
                                 ),
@@ -126,21 +173,6 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                     Center(
                                       child: Column(
                                         children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(20),
-                                                gradient: LinearGradient(colors: [Colors.orange.shade700,Colors.orange.shade600])
-                                            ),
-                                            child: Text(
-                                              '  AUTOGRAPH  ',
-                                              style: TextStyle(
-                                                fontSize: titleSizeFactor * 0.8,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily: 'Inria Serif',
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
 
                                           SizedBox(height: spacingFactor * 0.5),
                                           Text(
@@ -241,6 +273,7 @@ class _RegistrationScreen extends State<RegistrationScreen> with SingleTickerPro
                                               'surname': registration.surnameController.text,
                                               'email': registration.emailController.text,
                                               'phone': registration.phoneController.text,
+                                              'onLoginSuccess': widget.onLoginSuccess,
                                             },
                                           );
                                         }),

@@ -142,6 +142,37 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                   onTap: () async {
                     if (isLoadingUser) return;
 
+                    final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
+                    if (!isLoggedIn) {
+                      // Navigate to registration screen with callback
+                      await Navigator.pushNamed(
+                        context,
+                        '/RegistrationScreen',
+                        arguments: {
+                          'onLoginSuccess': () async {
+                            // This callback will be called after successful login
+                            try {
+                              final sessionKey = AppPrefs.prefs.getString('session_key');
+                              if (sessionKey == null) return;
+                              final dio = Dio();
+                              final me = await AuthService(dio).getMe(sessionKey);
+                              final email = me.email;
+                              if (email != null) {
+                                openWebsiteWithParams(
+                                  sessionId: sessionKey,
+                                  baseUrl: 'https://autograph-dentistry.com/shop',
+                                  email: email,
+                                );
+                              }
+                            } catch (_) {
+                              // Handle error silently
+                            }
+                          },
+                        },
+                      );
+                      return;
+                    }
+
                     await loadUser();
 
                     if (userEmail == null) return;

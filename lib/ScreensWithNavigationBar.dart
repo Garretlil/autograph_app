@@ -60,6 +60,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     widget.tabNotifier.addListener(_onTabChange);
     isLog = widget.isLoggedIn;
     _selectedIndex = widget.tabNotifier.value;
+    isBottomNavVisible = true;
     setPref();
   }
 
@@ -87,13 +88,6 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
       isLog = loggedIn;
     });
 
-    if (!loggedIn && newIndex == 0) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _navigatorKeys[newIndex]
-            .currentState
-            ?.pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-      });
-    }
   }
   Widget _buildCartIcon() {
     return Stack(
@@ -167,20 +161,23 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
           case 0:
             switch (settings.name) {
               case '/':
-                if (isLog) {
-                  _toggleBottomNavigationBar(true);
-                  return customPageRoute(const HomePage());
-                } else {
-                  _toggleBottomNavigationBar(false);
-                  return customPageRoute(RegistrationScreen(
-                      toggleBottomNavigationBar: _toggleBottomNavigationBar));
-                }
+                _toggleBottomNavigationBar(true);
+                return customPageRoute(const HomePage());
+              case '/RegistrationScreen':
+                _toggleBottomNavigationBar(false);
+                final args = settings.arguments as Map<String, dynamic>?;
+                return customPageRoute(RegistrationScreen(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  onLoginSuccess: args?['onLoginSuccess'] as VoidCallback?,
+                ));
               case '/CheckCodeScreen':
+                _toggleBottomNavigationBar(false);
                 final args = settings.arguments as Map<String, dynamic>;
                 return customPageRoute(CheckCodeScreen(
                   toggleBottomNavigationBar: _toggleBottomNavigationBar,
                   email: args['email'],
                   phone: args['phone'],
+                  onLoginSuccess: args['onLoginSuccess'] as VoidCallback?,
                 ));
               case '/HomePage':
                 _toggleBottomNavigationBar(true);
@@ -275,6 +272,22 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
                   toggleBottomNavigationBar: _toggleBottomNavigationBar,
                   toggleCart: _toggleCircleCart,
                 ));
+              case '/RegistrationScreen':
+                _toggleBottomNavigationBar(false);
+                final args = settings.arguments as Map<String, dynamic>?;
+                return customPageRoute(RegistrationScreen(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  onLoginSuccess: args?['onLoginSuccess'] as VoidCallback?,
+                ));
+              case '/CheckCodeScreen':
+                _toggleBottomNavigationBar(false);
+                final args = settings.arguments as Map<String, dynamic>;
+                return customPageRoute(CheckCodeScreen(
+                  toggleBottomNavigationBar: _toggleBottomNavigationBar,
+                  email: args['email'],
+                  phone: args['phone'],
+                  onLoginSuccess: args['onLoginSuccess'] as VoidCallback?,
+                ));
               case '/CartEvents':
                 return customPageRoute(CartEvents(
                   toggleBottomNavigationBar: _toggleBottomNavigationBar,
@@ -332,7 +345,7 @@ class _ScreensWithNavigationBarState extends State<ScreensWithNavigationBar>
     double screenWidth = MediaQuery.of(context).size.width;
     double spacingFactor = screenHeight * 0.06;
     double spacingFactorW = screenWidth * 0.06;
-    final bool shouldShowBottomNav = isBottomNavVisible && isLog;
+    final bool shouldShowBottomNav = isBottomNavVisible;
 
     return PopScope(
       canPop: false,

@@ -47,8 +47,8 @@ class CourseWebinars extends ChangeNotifier{
     try {
       final dio = createInsecureDio();
       final service = CourseVideoService(dio);
-      final sessionKey = AppPrefs.prefs.getString('session_key');
-      final response = await service.getCourses(sessionKey!);
+      final sessionKey = AppPrefs.prefs.getString('session_key') ?? "";
+      final response = await service.getCourses(sessionKey);
       courses = response.courses;
     } catch (e) {
       courses = [];

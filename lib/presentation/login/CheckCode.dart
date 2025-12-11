@@ -11,11 +11,13 @@ class CheckCodeScreen extends StatefulWidget {
   final void Function(bool) toggleBottomNavigationBar;
   final String email;
   final String phone;
+  final VoidCallback? onLoginSuccess;
   const CheckCodeScreen({
     super.key,
     required this.toggleBottomNavigationBar,
     required this.phone,
-    required this.email
+    required this.email,
+    this.onLoginSuccess,
   });
 
   @override
@@ -59,7 +61,10 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
               backgroundColor: Colors.transparent,
               elevation: 0,
               leading: FadedIconButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  widget.toggleBottomNavigationBar(true);
+                  Navigator.of(context).pop();
+                },
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
               ),
               centerTitle: true,
@@ -133,6 +138,7 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
                               toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
                               email: widget.email,
                               phone: widget.phone,
+                              onLoginSuccess: widget.onLoginSuccess,
                             ),
                           ),
                         ],
@@ -153,13 +159,14 @@ class _CheckCodeScreenState extends State<CheckCodeScreen> with SingleTickerProv
 class OtpInputFields extends StatefulWidget {
   final String email;
   final String phone;
-
   final void Function(bool) toggleBottomNavigationBar;
+  final VoidCallback? onLoginSuccess;
   const OtpInputFields({
     super.key,
     required this.toggleBottomNavigationBar,
     required this.phone,
-    required this.email
+    required this.email,
+    this.onLoginSuccess,
   });
 
   @override
@@ -204,7 +211,9 @@ class _OtpInputFieldsState extends State<OtpInputFields> with SingleTickerProvid
                     context: context,
                     vsync: this ,
                     email: widget.email,
-                    phone: widget.phone
+                    phone: widget.phone,
+                    onLoginSuccess: widget.onLoginSuccess,
+                    toggleBottomNavigationBar: widget.toggleBottomNavigationBar,
                 ),
             child: Consumer<CheckCodeNotifier>(
                 builder: (context, checkCode, child) =>

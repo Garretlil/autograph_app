@@ -52,6 +52,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     _loadUserProfile();
   }
 
+
   void _resetAuthState() {
     AppPrefs.prefs.setBool('isLoggedIn', false);
     AppPrefs.prefs.setBool('accepted_policy', false);
@@ -83,8 +84,9 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
   }
 
   void _loadUserProfile() {
+    final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
     final sessionKey = AppPrefs.prefs.getString('session_key');
-    if (sessionKey != null && sessionKey.isNotEmpty) {
+    if (isLoggedIn && sessionKey != null && sessionKey.isNotEmpty) {
       _userProfileFuture = AuthService(Dio()).getMe(sessionKey);
     } else {
       _userProfileFuture = Future.error('No session key');
@@ -96,6 +98,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     double titleSizeFactor = screenWidth * 0.06;
     double spacingFactorW = screenWidth * 0.06;
     double subtitleSizeFactor = screenWidth * 0.06;
+    final isLoggedIn = AppPrefs.prefs.getBool('isLoggedIn') ?? false;
 
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -105,6 +108,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Показываем все поля, но данные только если залогинен
           _buildInfoSection(
               "${AppLocalizations.of(context)!.personal}:",
               ""
@@ -112,25 +116,25 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
           SizedBox(height: spacingFactor * 0.1),
           _buildInfoSection(
               "${AppLocalizations.of(context)!.name}: ",
-              userData?.name ?? AppPrefs.prefs.getString('name') ?? ''
+              isLoggedIn ? (userData?.name ?? '') : ''
           ),
           const Divider(),
           SizedBox(height: spacingFactor * 0.1),
           _buildInfoSection(
               "${AppLocalizations.of(context)!.surname}: ",
-              userData?.surname ?? AppPrefs.prefs.getString('surname') ?? ''
+              isLoggedIn ? (userData?.surname ?? '') : ''
           ),
           const Divider(),
           SizedBox(height: spacingFactor * 0.1),
           _buildInfoSection(
               "${AppLocalizations.of(context)!.phone}: ",
-              userData?.phone ?? AppPrefs.prefs.getString('phoneNumber') ?? ''
+              isLoggedIn ? (userData?.phone ?? '') : ''
           ),
           const Divider(),
           SizedBox(height: spacingFactor * 0.1),
           _buildInfoSection(
               "Email: ",
-              userData?.email ?? AppPrefs.prefs.getString('email') ?? ''
+              isLoggedIn ? (userData?.email ?? '') : ''
           ),
           const Divider(),
 
@@ -155,106 +159,109 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
           ),
           SizedBox(height: spacingFactorW),
           SizedBox(height: spacingFactor * 0.8),
-          Center(
-            child: InkWell(
-              onTap: () async {
-                try {
-                  final sessionKey = AppPrefs.prefs.getString('session_key');
-                  if (sessionKey == null || sessionKey.isEmpty) {
-                    _resetAuthState();
-                    return;
+          // Показываем кнопки только если залогинен
+          if (isLoggedIn) ...[
+            Center(
+              child: InkWell(
+                onTap: () async {
+                  try {
+                    final sessionKey = AppPrefs.prefs.getString('session_key');
+                    if (sessionKey == null || sessionKey.isEmpty) {
+                      _resetAuthState();
+                      return;
+                    }
+                    final response = await AuthService(Dio()).logout(sessionKey);
+                    if (response.message == "Вышли из системы") {
+                      _resetAuthState();
+                    } else {
+                      _showError(context, "Не удалось выйти. Повторите позже.");
+                    }
+                  } catch (e) {
+                    _showError(context, "Ошибка при выходе: $e");
                   }
-                  final response = await AuthService(Dio()).logout(sessionKey);
-                  if (response.message == "Вышли из системы") {
-                    _resetAuthState();
-                  } else {
-                    _showError(context, "Не удалось выйти. Повторите позже.");
-                  }
-                } catch (e) {
-                  _showError(context, "Ошибка при выходе: $e");
-                }
-              },
-              borderRadius: BorderRadius.circular(15),
-              child: Container(
-                width: spacingFactor * 3,
-                height: spacingFactor * 1,
-                alignment: Alignment.center,
+                },
+                borderRadius: BorderRadius.circular(15),
+                child: Container(
+                  width: spacingFactor * 3,
+                  height: spacingFactor * 1,
+                  alignment: Alignment.center,
 
-                decoration:  BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                  ),
-                  color: Colors.grey.withOpacity(0.6),
-                ),
-                child: Container(
-                  width: spacingFactor * 5,
-                  height: spacingFactor * 1,
-                  alignment: Alignment.center,
-                  child: Text(
-                    AppLocalizations.of(context)!.logout,
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.9,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold
+                  decoration:  BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(30),
                     ),
+                    color: Colors.grey.withOpacity(0.6),
                   ),
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: screenHeight * 0.05),
-          Center(
-            child: InkWell(
-              onTap: () async {
-                try {
-                  final sessionKey = AppPrefs.prefs.getString('session_key');
-                  if (sessionKey == null || sessionKey.isEmpty) {
-                    _resetAuthState();
-                    return;
-                  }
-                  final response = await AuthService(Dio()).deleteAccount(sessionKey);
-                  if (response.message == "Удалено") {
-                    _resetAuthState();
-                  } else {
-                    _showError(context, "Не удалось удалить аккаунт. Повторите позже.");
-                  }
-                } catch (e) {
-                  _showError(context, "Ошибка при удалении аккаунта: $e");
-                }
-              },
-              borderRadius: BorderRadius.circular(15),
-              child: Container(
-                width: spacingFactor * 5,
-                height: spacingFactor * 1,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade700,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                  ),
-                ),
-                child: Container(
-                  width: spacingFactor * 5,
-                  height: spacingFactor * 1,
-                  alignment: Alignment.center,
-                  child: Text(
-                    AppLocalizations.of(context)!.deleteAccount,
-                    style: TextStyle(
-                      fontSize: titleSizeFactor * 0.9,
-                      color: Colors.white,
+                  child: Container(
+                    width: spacingFactor * 5,
+                    height: spacingFactor * 1,
+                    alignment: Alignment.center,
+                    child: Text(
+                      AppLocalizations.of(context)!.logout,
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.9,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          )
+            SizedBox(height: screenHeight * 0.05),
+            Center(
+              child: InkWell(
+                onTap: () async {
+                  try {
+                    final sessionKey = AppPrefs.prefs.getString('session_key');
+                    if (sessionKey == null || sessionKey.isEmpty) {
+                      _resetAuthState();
+                      return;
+                    }
+                    final response = await AuthService(Dio()).deleteAccount(sessionKey);
+                    if (response.message == "Удалено") {
+                      _resetAuthState();
+                    } else {
+                      _showError(context, "Не удалось удалить аккаунт. Повторите позже.");
+                    }
+                  } catch (e) {
+                    _showError(context, "Ошибка при удалении аккаунта: $e");
+                  }
+                },
+                borderRadius: BorderRadius.circular(15),
+                child: Container(
+                  width: spacingFactor * 5,
+                  height: spacingFactor * 1,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade700,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                      bottomLeft: Radius.circular(30),
+                    ),
+                  ),
+                  child: Container(
+                    width: spacingFactor * 5,
+                    height: spacingFactor * 1,
+                    alignment: Alignment.center,
+                    child: Text(
+                      AppLocalizations.of(context)!.deleteAccount,
+                      style: TextStyle(
+                        fontSize: titleSizeFactor * 0.9,
+                        color: Colors.white,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
